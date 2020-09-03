@@ -3,12 +3,12 @@ package common
 import "github.com/siovanus/wingServer/manager/flashpool"
 
 const (
-	MARKETDISTRIBUTION = "/api/v1/maketdistribution"
+	MARKETDISTRIBUTION = "/api/v1/marketdistribution"
 	POOLDISTRIBUTION = "/api/v1/pooldistribution"
 )
 
 const (
-	ACTION_MARKETDISTRIBUTION = "maketdistribution"
+	ACTION_MARKETDISTRIBUTION = "marketdistribution"
 	ACTION_POOLDISTRIBUTION = "pooldistribution"
 )
 
