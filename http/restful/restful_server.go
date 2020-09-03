@@ -57,7 +57,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 
 	postMethodMap := map[string]Action{
 		common.MARKETDISTRIBUTION: {name: common.ACTION_MARKETDISTRIBUTION, handler: web.MarketDistribution},
-		common.POOLDISTRIBUTION: {name: common.ACTION_POOLDISTRIBUTION, handler: web.MarketDistribution},
+		common.POOLDISTRIBUTION: {name: common.ACTION_POOLDISTRIBUTION, handler: web.PoolDistribution},
 	}
 	this.postMap = postMethodMap
 }

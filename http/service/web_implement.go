@@ -16,9 +16,7 @@ func (this *Service) MarketDistribution(param map[string]interface{}) map[string
 		log.Errorf("MarketDistribution error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = &common.MarketDistributionResp{
-			MarketDistribution: marketDistribution,
-		}
+		resp.Result = marketDistribution
 		log.Infof("MarketDistribution success")
 	}
 
@@ -40,9 +38,7 @@ func (this *Service) PoolDistribution(param map[string]interface{}) map[string]i
 		log.Errorf("PoolDistribution error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = &common.PoolDistributionResp{
-			PoolDistributionResp: poolDistribution,
-		}
+		resp.Result = poolDistribution
 		log.Infof("PoolDistribution success")
 	}
 

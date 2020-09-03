@@ -1,11 +1,11 @@
 package flashpool
 
 type MarketDistribution struct {
-	MarketDistribution []*Distribution
+	MarketDistribution []*Distribution `json:"market_distribution"`
 }
 
 type PoolDistribution struct {
-	PoolDistribution []*Distribution
+	PoolDistribution []*Distribution `json:"pool_distribution"`
 }
 
 type Distribution struct {
