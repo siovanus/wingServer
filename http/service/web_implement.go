@@ -7,43 +7,50 @@ import (
 	"github.com/siovanus/wingServer/utils"
 )
 
-func (this *Service) QueryData(params map[string]interface{}) map[string]interface{} {
-	req := &common.QueryDataReq{}
+func (this *Service) MarketDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	err := utils.ParseParams(req, params)
+	marketDistribution, err := this.fpMgr.MarketDistribution()
 	if err != nil {
-		resp.Error = restful.INVALID_PARAMS
+		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
-		log.Errorf("QueryData: decode params failed, err: %s", err)
+		log.Errorf("MarketDistribution error: %s", err)
 	} else {
-		replaceMap := make(map[string]string)
-		for _, v := range req.AddressMap {
-			replaceMap[v.OldAddress] = v.NewAddress
+		resp.Error = restful.SUCCESS
+		resp.Result = &common.MarketDistributionResp{
+			MarketDistribution: marketDistribution,
 		}
-		data1, voteData1, data2, voteData2, err := this.manager.QueryData(req.StartEpoch, req.EndEpoch, req.Sum, replaceMap)
-		if err != nil {
-			resp.Error = restful.INTERNAL_ERROR
-			resp.Desc = err.Error()
-			log.Errorf("QueryData: id %s, StartEpoch %d, EndEpoch:%d, Sum: %d, err: %s", req.Id, req.StartEpoch,
-				req.EndEpoch, req.Sum, err)
-		} else {
-			resp.Error = restful.SUCCESS
-			resp.Result = &common.QueryDataResp{
-				Id:        req.Id,
-				Data1:     data1,
-				VoteData1: voteData1,
-				Data2:     data2,
-				VoteData2: voteData2,
-			}
-			log.Infof("QueryData success, id %s, StartEpoch %d, EndEpoch:%d, Sum: %d", req.Id, req.StartEpoch,
-				req.EndEpoch, req.Sum)
-		}
+		log.Infof("MarketDistribution success")
 	}
+
 	m, err := utils.RefactorResp(resp, resp.Error)
 	if err != nil {
-		log.Errorf("QueryData: failed, err: %s", err)
+		log.Errorf("MarketDistribution: failed, err: %s", err)
 	} else {
-		log.Debug("QueryData: resp success")
+		log.Debug("MarketDistribution: resp success")
+	}
+	return m
+}
+
+func (this *Service) PoolDistribution(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	poolDistribution, err := this.fpMgr.PoolDistribution()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("PoolDistribution error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = &common.PoolDistributionResp{
+			PoolDistributionResp: poolDistribution,
+		}
+		log.Infof("PoolDistribution success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("PoolDistribution: failed, err: %s", err)
+	} else {
+		log.Debug("PoolDistribution: resp success")
 	}
 	return m
 }

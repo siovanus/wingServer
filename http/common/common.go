@@ -1,13 +1,15 @@
 package common
 
-import "github.com/siovanus/wingServer/manager"
+import "github.com/siovanus/wingServer/manager/flashpool"
 
 const (
-	QUERYDATA = "/api/v1/querydata"
+	MARKETDISTRIBUTION = "/api/v1/maketdistribution"
+	POOLDISTRIBUTION = "/api/v1/pooldistribution"
 )
 
 const (
-	ACTION_QUERYDATA = "querydata"
+	ACTION_MARKETDISTRIBUTION = "maketdistribution"
+	ACTION_POOLDISTRIBUTION = "pooldistribution"
 )
 
 type Response struct {
@@ -17,23 +19,10 @@ type Response struct {
 	Result interface{} `json:"result"`
 }
 
-type QueryDataReq struct {
-	Id         string       `json:"id"`
-	StartEpoch uint64       `json:"start_epoch"`
-	EndEpoch   uint64       `json:"end_epoch"`
-	Sum        uint64       `json:"sum"`
-	AddressMap []AddressMap `json:"address_map"`
+type MarketDistributionResp struct {
+	MarketDistribution *flashpool.MarketDistribution `json:"market_distribution"`
 }
 
-type QueryDataResp struct {
-	Id        string            `json:"id"`
-	Data1     []*manager.Data   `json:"data_1"`
-	VoteData1 *manager.VoteData `json:"vote_data_1"`
-	Data2     []*manager.Data   `json:"data_2"`
-	VoteData2 *manager.VoteData `json:"vote_data_2"`
-}
-
-type AddressMap struct {
-	OldAddress string `json:"old_address"`
-	NewAddress string `json:"new_address"`
+type PoolDistributionResp struct {
+	PoolDistributionResp *flashpool.PoolDistribution `json:"pool_distribution_resp"`
 }

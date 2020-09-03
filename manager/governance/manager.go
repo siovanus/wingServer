@@ -1,21 +1,21 @@
 package governance
 
 import (
-	"github.com/siovanus/wingServer/config"
+	"github.com/ontio/ontology/common"
 )
 
 type GovernanceManager struct {
-	cfg *config.Config
+	contractAddress common.Address
 }
 
-func NewGovernanceManager(cfg *config.Config) *GovernanceManager {
-	queryManager := &GovernanceManager{
-		cfg: cfg,
+func NewGovernanceManager(contractAddress common.Address) *GovernanceManager {
+	manager := &GovernanceManager{
+		contractAddress,
 	}
 
-	return queryManager
+	return manager
 }
 
-func (this *GovernanceManager) QueryData(startEpoch uint64, endEpoch uint64, sum uint64, replaceMap map[string]string) {
-	return this.getData()
+func (this *GovernanceManager) QueryData() {
+	return
 }

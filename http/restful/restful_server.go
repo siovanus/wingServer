@@ -56,7 +56,8 @@ func InitRestServer(web Web, port uint64) ApiServer {
 func (this *restServer) registryRestServerAction(web Web) {
 
 	postMethodMap := map[string]Action{
-		common.QUERYDATA: {name: common.ACTION_QUERYDATA, handler: web.QueryData},
+		common.MARKETDISTRIBUTION: {name: common.ACTION_MARKETDISTRIBUTION, handler: web.MarketDistribution},
+		common.POOLDISTRIBUTION: {name: common.ACTION_POOLDISTRIBUTION, handler: web.MarketDistribution},
 	}
 	this.postMap = postMethodMap
 }

@@ -1,9 +1,10 @@
 package service
 
 type Service struct {
-	manager QueryManager
+	govMgr GovernanceManager
+	fpMgr  FlashPoolManager
 }
 
-func NewService(manager QueryManager) *Service {
-	return &Service{manager: manager}
+func NewService(govMgr GovernanceManager, fpMgr FlashPoolManager) *Service {
+	return &Service{govMgr: govMgr, fpMgr: fpMgr}
 }

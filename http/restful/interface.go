@@ -1,5 +1,6 @@
 package restful
 
 type Web interface {
-	QueryData(map[string]interface{}) map[string]interface{}
+	MarketDistribution(map[string]interface{}) map[string]interface{}
+	PoolDistribution(map[string]interface{}) map[string]interface{}
 }

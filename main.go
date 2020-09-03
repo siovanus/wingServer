@@ -20,6 +20,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ontio/ontology/common"
 	"os"
 	"os/signal"
 	"runtime"
@@ -30,7 +31,8 @@ import (
 	"github.com/siovanus/wingServer/http/restful"
 	"github.com/siovanus/wingServer/http/service"
 	"github.com/siovanus/wingServer/log"
-	"github.com/siovanus/wingServer/manager"
+	"github.com/siovanus/wingServer/manager/flashpool"
+	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/urfave/cli"
 )
 
@@ -73,13 +75,28 @@ func startServer(ctx *cli.Context) {
 		return
 	}
 
-	mgr := manager.NewQueryManager(servConfig)
-	if mgr == nil {
-		log.Errorf("query manager is nil")
+	govAddress, err := common.AddressFromHexString(servConfig.GovernanceAddress)
+	if err != nil {
+		log.Errorf("govAddress common.AddressFromHexString error: %s", err)
+		return
+	}
+	govMgr := governance.NewGovernanceManager(govAddress)
+	if govMgr == nil {
+		log.Errorf("governance manager is nil")
+		return
+	}
+	fpAddress, err := common.AddressFromHexString(servConfig.FlashPoolAddress)
+	if err != nil {
+		log.Errorf("fpAddress common.AddressFromHexString error: %s", err)
+		return
+	}
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress)
+	if fpMgr == nil {
+		log.Errorf("flashpool manager is nil")
 		return
 	}
 	log.Infof("init svr success")
-	serv := service.NewService(mgr)
+	serv := service.NewService(govMgr, fpMgr)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 	go restServer.Start()
 
