@@ -24,6 +24,6 @@ func (this *FlashPoolManager) PoolDistribution() (*PoolDistribution, error) {
 	return this.poolDistribution()
 }
 
-func (this *FlashPoolManager) PoolBanner() (*PoolBanner, error) {
-	return this.poolBanner()
+func (this *FlashPoolManager) FlashPoolBanner() (*FlashPoolBanner, error) {
+	return this.flashPoolBanner()
 }

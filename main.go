@@ -21,6 +21,7 @@ package main
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	"github.com/siovanus/wingServer/manager/oracle"
 	"os"
 	"os/signal"
 	"runtime"
@@ -90,13 +91,23 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("fpAddress common.AddressFromHexString error: %s", err)
 		return
 	}
+	oracleAddress, err := common.AddressFromHexString(servConfig.OracleAddress)
+	if err != nil {
+		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
+		return
+	}
 	fpMgr := flashpool.NewFlashPoolManager(fpAddress)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
+	oracleMgr := oracle.NewOracleManager(oracleAddress)
+	if oracleMgr == nil {
+		log.Errorf("oracle manager is nil")
+		return
+	}
 	log.Infof("init svr success")
-	serv := service.NewService(govMgr, fpMgr)
+	serv := service.NewService(govMgr, fpMgr, oracleMgr)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 	go restServer.Start()
 

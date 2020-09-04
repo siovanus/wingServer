@@ -7,7 +7,7 @@ import (
 	"github.com/siovanus/wingServer/utils"
 )
 
-func (this *Service) MarketDistribution(param map[string]interface{}) map[string]interface{} {
+func (this *Service) FlashPoolMarketDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
 	marketDistribution, err := this.fpMgr.MarketDistribution()
 	if err != nil {
@@ -51,16 +51,38 @@ func (this *Service) PoolDistribution(param map[string]interface{}) map[string]i
 	return m
 }
 
+func (this *Service) GovBannerOverview(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	govBanner, err := this.govMgr.GovBannerOverview()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("GovBannerOverview error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = govBanner
+		log.Infof("GovBannerOverview success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("GovBannerOverview: failed, err: %s", err)
+	} else {
+		log.Debug("GovBannerOverview: resp success")
+	}
+	return m
+}
+
 func (this *Service) GovBanner(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	govBanner, err := this.govMgr.GovBanner()
+	poolBanner, err := this.govMgr.GovBanner()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("GovBanner error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = govBanner
+		resp.Result = poolBanner
 		log.Infof("GovBanner success")
 	}
 
@@ -73,24 +95,54 @@ func (this *Service) GovBanner(param map[string]interface{}) map[string]interfac
 	return m
 }
 
-func (this *Service) PoolBanner(param map[string]interface{}) map[string]interface{} {
+func (this *Service) AssetPrice(param map[string]interface{}) map[string]interface{} {
+	req := &common.AssetPriceRequest{}
 	resp := &common.Response{}
-	poolBanner, err := this.fpMgr.PoolBanner()
+	err := utils.ParseParams(req, param)
 	if err != nil {
-		resp.Error = restful.INTERNAL_ERROR
+		resp.Error = restful.INVALID_PARAMS
 		resp.Desc = err.Error()
-		log.Errorf("PoolBanner error: %s", err)
+		log.Errorf("AssetPrice: decode params failed, err: %s", err)
 	} else {
-		resp.Error = restful.SUCCESS
-		resp.Result = poolBanner
-		log.Infof("PoolBanner success")
+		assetPrice, err := this.oracleMgr.AssetPrice(req.Asset)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("AssetPrice error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = assetPrice
+			log.Infof("AssetPrice success")
+		}
 	}
 
 	m, err := utils.RefactorResp(resp, resp.Error)
 	if err != nil {
-		log.Errorf("PoolBanner: failed, err: %s", err)
+		log.Errorf("AssetPrice: failed, err: %s", err)
 	} else {
-		log.Debug("PoolBanner: resp success")
+		log.Debug("AssetPrice: resp success")
+	}
+	return m
+}
+
+func (this *Service) FlashPoolBanner(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	flashPoolBanner, err := this.fpMgr.FlashPoolBanner()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("FlashPoolBanner error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = flashPoolBanner
+		log.Infof("FlashPoolBanner success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("FlashPoolBanner: failed, err: %s", err)
+	} else {
+		log.Debug("FlashPoolBanner: resp success")
 	}
 	return m
 }

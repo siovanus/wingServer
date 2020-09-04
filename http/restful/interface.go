@@ -1,8 +1,11 @@
 package restful
 
 type Web interface {
-	MarketDistribution(map[string]interface{}) map[string]interface{}
+	FlashPoolMarketDistribution(map[string]interface{}) map[string]interface{}
 	PoolDistribution(map[string]interface{}) map[string]interface{}
+	GovBannerOverview(map[string]interface{}) map[string]interface{}
 	GovBanner(map[string]interface{}) map[string]interface{}
-	PoolBanner(map[string]interface{}) map[string]interface{}
+	FlashPoolBanner(map[string]interface{}) map[string]interface{}
+
+	AssetPrice(map[string]interface{}) map[string]interface{}
 }

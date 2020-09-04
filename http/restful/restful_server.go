@@ -56,10 +56,13 @@ func InitRestServer(web Web, port uint64) ApiServer {
 func (this *restServer) registryRestServerAction(web Web) {
 
 	postMethodMap := map[string]Action{
-		common.MARKETDISTRIBUTION: {name: common.ACTION_MARKETDISTRIBUTION, handler: web.MarketDistribution},
-		common.POOLDISTRIBUTION:   {name: common.ACTION_POOLDISTRIBUTION, handler: web.PoolDistribution},
-		common.GOVBANNER:          {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
-		common.POOLBANNER:         {name: common.ACTION_POOLBANNER, handler: web.PoolBanner},
+		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},
+		common.POOLDISTRIBUTION:            {name: common.ACTION_POOLDISTRIBUTION, handler: web.PoolDistribution},
+		common.GOVBANNEROVERVIEW:           {name: common.ACTION_GOVBANNEROVERVIEW, handler: web.GovBannerOverview},
+		common.GOVBANNER:                   {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
+		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
+
+		common.ASSETPRICE: {name: common.ACTION_ASSETPRICE, handler: web.AssetPrice},
 	}
 	this.postMap = postMethodMap
 }

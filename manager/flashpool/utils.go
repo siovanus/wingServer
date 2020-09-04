@@ -8,9 +8,10 @@ type PoolDistribution struct {
 	PoolDistribution []*Distribution `json:"pool_distribution"`
 }
 
-type PoolBanner struct {
-	Daily       uint64
-	Distributed uint64
+type FlashPoolBanner struct {
+	Today uint64
+	Share uint64
+	Total uint64
 }
 
 type Distribution struct {
@@ -67,9 +68,10 @@ func (this *FlashPoolManager) poolDistribution() (*PoolDistribution, error) {
 	return &PoolDistribution{PoolDistribution: []*Distribution{distribution1, distribution2}}, nil
 }
 
-func (this *FlashPoolManager) poolBanner() (*PoolBanner, error) {
-	return &PoolBanner{
-		Daily:       141513,
-		Distributed: 12141425,
+func (this *FlashPoolManager) flashPoolBanner() (*FlashPoolBanner, error) {
+	return &FlashPoolBanner{
+		Today: 8676,
+		Share: 7644,
+		Total: 3452636,
 	}, nil
 }

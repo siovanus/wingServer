@@ -16,6 +16,10 @@ func NewGovernanceManager(contractAddress common.Address) *GovernanceManager {
 	return manager
 }
 
-func (this *GovernanceManager) GovBanner() (*GovBanner, error) {
+func (this *GovernanceManager) GovBannerOverview() (*GovBanner, error) {
+	return this.govBannerOverview()
+}
+
+func (this *GovernanceManager) GovBanner() (*PoolBanner, error) {
 	return this.govBanner()
 }

@@ -6,11 +6,16 @@ import (
 )
 
 type GovernanceManager interface {
-	GovBanner() (*governance.GovBanner, error)
+	GovBannerOverview() (*governance.GovBanner, error)
+	GovBanner() (*governance.PoolBanner, error)
 }
 
 type FlashPoolManager interface {
 	MarketDistribution() (*flashpool.MarketDistribution, error)
 	PoolDistribution() (*flashpool.PoolDistribution, error)
-	PoolBanner() (*flashpool.PoolBanner, error)
+	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
+}
+
+type OracleManager interface {
+	AssetPrice(asset string) (uint64, error)
 }

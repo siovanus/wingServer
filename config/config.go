@@ -16,6 +16,7 @@ type Config struct {
 	Port              uint64 `json:"port"`
 	GovernanceAddress string `json:"governance_address"`
 	FlashPoolAddress  string `json:"flash_pool_address"`
+	OracleAddress     string `json:"oracle_address"`
 }
 
 func NewConfig(fileName string) (*Config, error) {
