@@ -27,3 +27,11 @@ func (this *FlashPoolManager) PoolDistribution() (*PoolDistribution, error) {
 func (this *FlashPoolManager) FlashPoolBanner() (*FlashPoolBanner, error) {
 	return this.flashPoolBanner()
 }
+
+func (this *FlashPoolManager) FlashPoolDetail() (*FlashPoolDetail, error) {
+	return this.flashPoolDetail()
+}
+
+func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) {
+	return this.flashPoolAllMarket()
+}

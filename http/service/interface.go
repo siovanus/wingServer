@@ -14,6 +14,8 @@ type FlashPoolManager interface {
 	MarketDistribution() (*flashpool.MarketDistribution, error)
 	PoolDistribution() (*flashpool.PoolDistribution, error)
 	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
+	FlashPoolDetail() (*flashpool.FlashPoolDetail, error)
+	FlashPoolAllMarket() (*flashpool.FlashPoolAllMarket, error)
 }
 
 type OracleManager interface {

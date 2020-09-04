@@ -7,6 +7,9 @@ const (
 	GOVBANNER                   = "/api/v1/govbanner"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
+	FLASHPOOLDETAIL    = "/api/v1/flashpooldetail"
+	FLASHPOOLALLMARKET = "/api/v1/flashpoolallmarket"
+
 	ASSETPRICE = "/api/v1/assetprice"
 )
 
@@ -16,6 +19,9 @@ const (
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
+
+	ACTION_FLASHPOOLDETAIL    = "flashpooldetail"
+	ACTION_FLASHPOOLALLMARKET = "flashpoolallmarket"
 
 	ACTION_ASSETPRICE = "assetprice"
 )
