@@ -35,3 +35,7 @@ func (this *FlashPoolManager) FlashPoolDetail() (*FlashPoolDetail, error) {
 func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) {
 	return this.flashPoolAllMarket()
 }
+
+func (this *FlashPoolManager) UserFlashPoolOverview(address string) (*UserFlashPoolOverview, error) {
+	return this.userFlashPoolOverview(address)
+}

@@ -111,7 +111,10 @@ func (this *Service) AssetPrice(param map[string]interface{}) map[string]interfa
 			log.Errorf("AssetPrice error: %s", err)
 		} else {
 			resp.Error = restful.SUCCESS
-			resp.Result = assetPrice
+			resp.Result = &common.AssetPriceResponse{
+				Id:    req.Id,
+				Price: assetPrice,
+			}
 			log.Infof("AssetPrice success")
 		}
 	}
@@ -187,6 +190,40 @@ func (this *Service) FlashPoolAllMarket(param map[string]interface{}) map[string
 		log.Errorf("FlashPoolAllMarket: failed, err: %s", err)
 	} else {
 		log.Debug("FlashPoolAllMarket: resp success")
+	}
+	return m
+}
+
+func (this *Service) UserFlashPoolOverview(param map[string]interface{}) map[string]interface{} {
+	req := &common.UserFlashPoolOverviewRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("UserFlashPoolOverview: decode params failed, err: %s", err)
+	} else {
+		userFlashPoolOverview, err := this.fpMgr.UserFlashPoolOverview(req.Address)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("UserFlashPoolOverview error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = &common.UserFlashPoolOverviewResponse{
+				Id:                    req.Id,
+				Address:               req.Address,
+				UserFlashPoolOverview: userFlashPoolOverview,
+			}
+			log.Infof("UserFlashPoolOverview success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("UserFlashPoolOverview: failed, err: %s", err)
+	} else {
+		log.Debug("UserFlashPoolOverview: resp success")
 	}
 	return m
 }

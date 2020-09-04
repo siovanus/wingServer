@@ -64,6 +64,27 @@ type Market struct {
 	InsuranceApy   uint64
 }
 
+type UserFlashPoolOverview struct {
+	SupplyBalance    uint64
+	BorrowBalance    uint64
+	InsuranceBalance uint64
+	BorrowLimit      uint64
+	NetApy           uint64
+
+	AllMarket []*UserMarket
+}
+
+type UserMarket struct {
+	Icon            string
+	Name            string
+	IfCollateral    bool
+	SupplyApy       uint64
+	BorrowApy       uint64
+	BorrowLiquidity uint64
+	InsuranceApy    uint64
+	InsuranceAmount uint64
+}
+
 func (this *FlashPoolManager) marketDistribution() (*MarketDistribution, error) {
 	distribution1 := &Distribution{
 		Icon:         "http://106.75.209.209/icon/eth_icon.svg",
@@ -120,23 +141,23 @@ func (this *FlashPoolManager) flashPoolDetail() (*FlashPoolDetail, error) {
 	return &FlashPoolDetail{
 		TotalSupply:     86544,
 		TotalSupplyRate: 8754,
-		SupplyMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH"},
-			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI"},
-			{Icon: "", Name: "BTC"}},
+		SupplyMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH", Fund: 2344},
+			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI", Fund: 1234},
+			{Icon: "", Name: "BTC", Fund: 1233}},
 		SupplyVolumeDaily: 24526,
 		Supplier:          125,
 
 		TotalBorrow:     2524,
 		TotalBorrowRate: 4252,
-		BorrowMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH"},
-			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI"}},
+		BorrowMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH", Fund: 535},
+			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI", Fund: 234}},
 		BorrowVolumeDaily: 3115,
 		Borrower:          36,
 
 		TotalInsurance:     6754,
 		TotalInsuranceRate: 9632,
-		InsuranceMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH"},
-			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI"}},
+		InsuranceMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH", Fund: 2526},
+			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI", Fund: 2458}},
 		InsuranceVolumeDaily: 3277,
 		Guarantor:            234,
 	}, nil
@@ -146,24 +167,57 @@ func (this *FlashPoolManager) flashPoolAllMarket() (*FlashPoolAllMarket, error) 
 	return &FlashPoolAllMarket{
 		FlashPoolAllMarket: []*Market{
 			{
-				Icon: "http://106.75.209.209/icon/eth_icon.svg",
-				Name: "ETH",
-				TotalSupply: 2526,
-				SupplyApy: 4468,
-				TotalBorrow: 25267,
-				BorrowApy: 563,
+				Icon:           "http://106.75.209.209/icon/eth_icon.svg",
+				Name:           "ETH",
+				TotalSupply:    2526,
+				SupplyApy:      4468,
+				TotalBorrow:    25267,
+				BorrowApy:      563,
 				TotalInsurance: 8265,
-				InsuranceApy: 256,
+				InsuranceApy:   256,
 			},
 			{
-				Icon: "http://106.75.209.209/icon/asset_dai_icon.svg",
-				Name: "DAI",
-				TotalSupply: 2526,
-				SupplyApy: 3526,
-				TotalBorrow: 2415,
-				BorrowApy: 241,
+				Icon:           "http://106.75.209.209/icon/asset_dai_icon.svg",
+				Name:           "DAI",
+				TotalSupply:    2526,
+				SupplyApy:      3526,
+				TotalBorrow:    2415,
+				BorrowApy:      241,
 				TotalInsurance: 3473,
-				InsuranceApy: 2541,
+				InsuranceApy:   2541,
 			}},
+	}, nil
+}
+
+func (this *FlashPoolManager) userFlashPoolOverview(address string) (*UserFlashPoolOverview, error) {
+	return &UserFlashPoolOverview{
+		SupplyBalance:    22626,
+		BorrowBalance:    23525,
+		InsuranceBalance: 252,
+		BorrowLimit:      2355,
+		NetApy:           252,
+
+		AllMarket: []*UserMarket{
+			{
+				Icon:            "http://106.75.209.209/icon/eth_icon.svg",
+				Name:            "ETH",
+				IfCollateral:    true,
+				SupplyApy:       4468,
+				BorrowApy:       563,
+				BorrowLiquidity: 255,
+				InsuranceApy:    256,
+				InsuranceAmount: 2526,
+			},
+			{
+				Icon:            "http://106.75.209.209/icon/asset_dai_icon.svg",
+				Name:            "DAI",
+				IfCollateral:    true,
+				SupplyApy:       3526,
+				BorrowApy:       241,
+				BorrowLiquidity: 255,
+				InsuranceApy:    2541,
+				InsuranceAmount: 2526,
+			},
+		},
 	}, nil
 }

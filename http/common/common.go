@@ -1,5 +1,7 @@
 package common
 
+import "github.com/siovanus/wingServer/manager/flashpool"
+
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
@@ -7,8 +9,9 @@ const (
 	GOVBANNER                   = "/api/v1/govbanner"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
-	FLASHPOOLDETAIL    = "/api/v1/flashpooldetail"
-	FLASHPOOLALLMARKET = "/api/v1/flashpoolallmarket"
+	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
+	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
+	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
 	ASSETPRICE = "/api/v1/assetprice"
 )
@@ -20,8 +23,9 @@ const (
 	ACTION_GOVBANNER                   = "govbanner"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
-	ACTION_FLASHPOOLDETAIL    = "flashpooldetail"
-	ACTION_FLASHPOOLALLMARKET = "flashpoolallmarket"
+	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
+	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
+	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
 
 	ACTION_ASSETPRICE = "assetprice"
 )
@@ -34,11 +38,22 @@ type Response struct {
 }
 
 type AssetPriceRequest struct {
-	Id    string `json:"id"`
-	Asset string `json:"asset"`
+	Id    string
+	Asset string
 }
 
 type AssetPriceResponse struct {
-	Id    string `json:"id"`
-	Price uint64 `json:"price"`
+	Id    string
+	Price uint64
+}
+
+type UserFlashPoolOverviewRequest struct {
+	Id      string
+	Address string
+}
+
+type UserFlashPoolOverviewResponse struct {
+	Id                    string
+	Address               string
+	UserFlashPoolOverview *flashpool.UserFlashPoolOverview
 }

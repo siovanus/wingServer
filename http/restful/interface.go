@@ -9,6 +9,7 @@ type Web interface {
 
 	FlashPoolDetail(map[string]interface{}) map[string]interface{}
 	FlashPoolAllMarket(map[string]interface{}) map[string]interface{}
+	UserFlashPoolOverview(map[string]interface{}) map[string]interface{}
 
 	AssetPrice(map[string]interface{}) map[string]interface{}
 }

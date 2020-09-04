@@ -16,6 +16,7 @@ type FlashPoolManager interface {
 	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
 	FlashPoolDetail() (*flashpool.FlashPoolDetail, error)
 	FlashPoolAllMarket() (*flashpool.FlashPoolAllMarket, error)
+	UserFlashPoolOverview(address string) (*flashpool.UserFlashPoolOverview, error)
 }
 
 type OracleManager interface {
