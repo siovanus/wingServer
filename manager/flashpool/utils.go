@@ -54,14 +54,20 @@ type FlashPoolAllMarket struct {
 }
 
 type Market struct {
-	Icon           string
-	Name           string
-	TotalSupply    uint64
-	SupplyApy      uint64
-	TotalBorrow    uint64
-	BorrowApy      uint64
-	TotalInsurance uint64
-	InsuranceApy   uint64
+	Icon               string
+	Name               string
+	TotalSupply        uint64
+	TotalSupplyRate    uint64
+	SupplyApy          uint64
+	SupplyApyRate      uint64
+	TotalBorrow        uint64
+	TotalBorrowRate    uint64
+	BorrowApy          uint64
+	BorrowApyRate      uint64
+	TotalInsurance     uint64
+	TotalInsuranceRate uint64
+	InsuranceApy       uint64
+	InsuranceApyRate   uint64
 }
 
 type UserFlashPoolOverview struct {
@@ -71,7 +77,18 @@ type UserFlashPoolOverview struct {
 	BorrowLimit      uint64
 	NetApy           uint64
 
+	CurrentSupply []*Supply
+
 	AllMarket []*UserMarket
+}
+
+type Supply struct {
+	Icon          string
+	Name          string
+	SupplyBalance uint64
+	Apy           uint64
+	Earned        uint64
+	IfCollateral  bool
 }
 
 type UserMarket struct {
@@ -143,7 +160,7 @@ func (this *FlashPoolManager) flashPoolDetail() (*FlashPoolDetail, error) {
 		TotalSupplyRate: 8754,
 		SupplyMarketRank: []*MarketFund{{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "ETH", Fund: 2344},
 			{Icon: "http://106.75.209.209/icon/asset_dai_icon.svg", Name: "DAI", Fund: 1234},
-			{Icon: "", Name: "BTC", Fund: 1233}},
+			{Icon: "http://106.75.209.209/icon/eth_icon.svg", Name: "BTC", Fund: 1233}},
 		SupplyVolumeDaily: 24526,
 		Supplier:          125,
 
@@ -167,24 +184,36 @@ func (this *FlashPoolManager) flashPoolAllMarket() (*FlashPoolAllMarket, error) 
 	return &FlashPoolAllMarket{
 		FlashPoolAllMarket: []*Market{
 			{
-				Icon:           "http://106.75.209.209/icon/eth_icon.svg",
-				Name:           "ETH",
-				TotalSupply:    2526,
-				SupplyApy:      4468,
-				TotalBorrow:    25267,
-				BorrowApy:      563,
-				TotalInsurance: 8265,
-				InsuranceApy:   256,
+				Icon:               "http://106.75.209.209/icon/eth_icon.svg",
+				Name:               "ETH",
+				TotalSupply:        2526,
+				TotalSupplyRate:    2,
+				SupplyApy:          4468,
+				SupplyApyRate:      3,
+				TotalBorrow:        25267,
+				TotalBorrowRate:    23,
+				BorrowApy:          563,
+				BorrowApyRate:      6,
+				TotalInsurance:     8265,
+				TotalInsuranceRate: 6,
+				InsuranceApy:       256,
+				InsuranceApyRate:   9,
 			},
 			{
-				Icon:           "http://106.75.209.209/icon/asset_dai_icon.svg",
-				Name:           "DAI",
-				TotalSupply:    2526,
-				SupplyApy:      3526,
-				TotalBorrow:    2415,
-				BorrowApy:      241,
-				TotalInsurance: 3473,
-				InsuranceApy:   2541,
+				Icon:               "http://106.75.209.209/icon/asset_dai_icon.svg",
+				Name:               "DAI",
+				TotalSupply:        2526,
+				TotalSupplyRate:    1,
+				SupplyApy:          3526,
+				SupplyApyRate:      2,
+				TotalBorrow:        2415,
+				TotalBorrowRate:    3,
+				BorrowApy:          241,
+				BorrowApyRate:      4,
+				TotalInsurance:     3473,
+				TotalInsuranceRate: 5,
+				InsuranceApy:       2541,
+				InsuranceApyRate:   6,
 			}},
 	}, nil
 }
@@ -196,6 +225,25 @@ func (this *FlashPoolManager) userFlashPoolOverview(address string) (*UserFlashP
 		InsuranceBalance: 252,
 		BorrowLimit:      2355,
 		NetApy:           252,
+
+		CurrentSupply: []*Supply{
+			{
+				Icon:          "http://106.75.209.209/icon/eth_icon.svg",
+				Name:          "ETH",
+				SupplyBalance: 2326,
+				Apy:           266,
+				Earned:        67,
+				IfCollateral:  true,
+			},
+			{
+				Icon:          "http://106.75.209.209/icon/eth_icon.svg",
+				Name:          "ETH",
+				SupplyBalance: 4627,
+				Apy:           54,
+				Earned:        367,
+				IfCollateral:  false,
+			},
+		},
 
 		AllMarket: []*UserMarket{
 			{
