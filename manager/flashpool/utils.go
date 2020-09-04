@@ -8,6 +8,11 @@ type PoolDistribution struct {
 	PoolDistribution []*Distribution `json:"pool_distribution"`
 }
 
+type PoolBanner struct {
+	Daily       uint64
+	Distributed uint64
+}
+
 type Distribution struct {
 	Icon         string
 	Name         string
@@ -15,6 +20,7 @@ type Distribution struct {
 	SupplyApy    uint64
 	BorrowApy    uint64
 	InsuranceApy uint64
+	Total        uint64
 }
 
 func (this *FlashPoolManager) marketDistribution() (*MarketDistribution, error) {
@@ -25,6 +31,7 @@ func (this *FlashPoolManager) marketDistribution() (*MarketDistribution, error) 
 		SupplyApy:    6783,
 		BorrowApy:    8325,
 		InsuranceApy: 9517,
+		Total:        121234,
 	}
 	distribution2 := &Distribution{
 		Icon:         "http://106.75.209.209/icon/asset_dai_icon.svg",
@@ -33,6 +40,7 @@ func (this *FlashPoolManager) marketDistribution() (*MarketDistribution, error) 
 		SupplyApy:    1574,
 		BorrowApy:    4576,
 		InsuranceApy: 3842,
+		Total:        25252,
 	}
 	return &MarketDistribution{MarketDistribution: []*Distribution{distribution1, distribution2}}, nil
 }
@@ -45,6 +53,7 @@ func (this *FlashPoolManager) poolDistribution() (*PoolDistribution, error) {
 		SupplyApy:    2532,
 		BorrowApy:    4547,
 		InsuranceApy: 1231,
+		Total:        28364,
 	}
 	distribution2 := &Distribution{
 		Icon:         "http://106.75.209.209/icon/if_icon.svg",
@@ -53,6 +62,14 @@ func (this *FlashPoolManager) poolDistribution() (*PoolDistribution, error) {
 		SupplyApy:    1214,
 		BorrowApy:    2525,
 		InsuranceApy: 7742,
+		Total:        72526,
 	}
 	return &PoolDistribution{PoolDistribution: []*Distribution{distribution1, distribution2}}, nil
+}
+
+func (this *FlashPoolManager) poolBanner() (*PoolBanner, error) {
+	return &PoolBanner{
+		Daily:       141513,
+		Distributed: 12141425,
+	}, nil
 }
