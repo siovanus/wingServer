@@ -54,3 +54,21 @@ type GovBanner struct {
 	Daily       uint64
 	Distributed uint64
 }
+
+type FlashPoolMarketDistribution struct {
+	FlashPoolMarketDistribution []*Distribution
+}
+
+type PoolDistribution struct {
+	PoolDistribution []*Distribution
+}
+
+type Distribution struct {
+	Icon            string
+	Name            string
+	PerDay          uint64
+	SupplyAmount    uint64
+	BorrowAmount    uint64
+	InsuranceAmount uint64
+	Total           uint64
+}

@@ -11,8 +11,8 @@ type GovernanceManager interface {
 }
 
 type FlashPoolManager interface {
-	MarketDistribution() (*flashpool.MarketDistribution, error)
-	PoolDistribution() (*flashpool.PoolDistribution, error)
+	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
+	PoolDistribution() (*common.PoolDistribution, error)
 	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
 	FlashPoolDetail() (*flashpool.FlashPoolDetail, error)
 	FlashPoolAllMarket() (*flashpool.FlashPoolAllMarket, error)

@@ -9,7 +9,7 @@ import (
 
 func (this *Service) FlashPoolMarketDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	marketDistribution, err := this.fpMgr.MarketDistribution()
+	marketDistribution, err := this.fpMgr.FlashPoolMarketDistribution()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
