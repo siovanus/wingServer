@@ -73,6 +73,35 @@ type Distribution struct {
 	Total           uint64
 }
 
+type FlashPoolBanner struct {
+	Today uint64
+	Share uint64
+	Total uint64
+}
+
+type FlashPoolDetail struct {
+	TotalSupply       uint64
+	TotalSupplyRate   int64
+	SupplyMarketRank  []*MarketFund
+	SupplyVolumeDaily uint64
+
+	TotalBorrow       uint64
+	TotalBorrowRate   int64
+	BorrowMarketRank  []*MarketFund
+	BorrowVolumeDaily uint64
+
+	TotalInsurance       uint64
+	TotalInsuranceRate   int64
+	InsuranceMarketRank  []*MarketFund
+	InsuranceVolumeDaily uint64
+}
+
+type MarketFund struct {
+	Icon string
+	Name string
+	Fund uint64
+}
+
 type UserFlashPoolOverviewRequest struct {
 	Id      string
 	Address string

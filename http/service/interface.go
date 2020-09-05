@@ -14,8 +14,8 @@ type FlashPoolManager interface {
 	AssetPrice(asset string) (uint64, error)
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
 	PoolDistribution() (*common.Distribution, error)
-	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
-	FlashPoolDetail() (*flashpool.FlashPoolDetail, error)
+	FlashPoolBanner() (*common.FlashPoolBanner, error)
+	FlashPoolDetail() (*common.FlashPoolDetail, error)
 	FlashPoolAllMarket() (*flashpool.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 }

@@ -2,14 +2,18 @@ package flashpool
 
 import (
 	"fmt"
+	"time"
+
 	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/manager/governance"
-	"time"
 )
 
-const BlockPerYear = 60 * 60 * 24 * 365 * 2 / 3
+const (
+	BlockPerYear         = 60 * 60 * 24 * 365 * 2 / 3
+	PercentageMultiplier = 10000
+)
 
 var IconMap = map[string]string{
 	"oETH":  "http://106.75.209.209/icon/eth_icon.svg",
@@ -54,19 +58,19 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 	for _, address := range allMarkets {
 		supplyAmount, err := this.getSupplyAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getSupplyApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getSupplyAmount error: %s", err)
 		}
 		borrowAmount, err := this.getBorrowAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getBorrowApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getBorrowAmount error: %s", err)
 		}
 		insuranceAmount, err := this.getInsuranceAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceAmount error: %s", err)
 		}
 		totalDistribution, err := this.getTotalDistribution(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getTotalDistribution error: %s", err)
 		}
 		distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
 		distribution := &common.Distribution{
@@ -104,7 +108,7 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 		}
 		totalDistribution, err := this.getTotalDistribution(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
+			return nil, fmt.Errorf("PoolDistribution, this.getTotalDistribution error: %s", err)
 		}
 		price, err := this.assetPrice(AssetMap[address.ToHexString()])
 		if err != nil {
@@ -120,12 +124,64 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 	return distribution, nil
 }
 
-func (this *FlashPoolManager) FlashPoolBanner() (*FlashPoolBanner, error) {
-	return this.flashPoolBanner()
+func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error) {
+	distributed := uint64(time.Now().Unix()) - governance.GenesisTime
+	index := distributed/governance.YearSecond + 1
+
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolBanner, this.getAllMarkets error: %s", err)
+	}
+	var total uint64 = 0
+	for _, address := range allMarkets {
+		totalDistribution, err := this.getTotalDistribution(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolBanner, this.getTotalDistribution error: %s", err)
+		}
+		total += totalDistribution
+	}
+	today := governance.DailyDistibute[index]
+
+	return &common.FlashPoolBanner{
+		Today: today,
+		Share: today * PercentageMultiplier / total,
+		Total: total,
+	}, nil
 }
 
-func (this *FlashPoolManager) FlashPoolDetail() (*FlashPoolDetail, error) {
-	return this.flashPoolDetail()
+func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error) {
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolDetail, this.getAllMarkets error: %s", err)
+	}
+	flashPoolDetail := &common.FlashPoolDetail{
+		SupplyMarketRank:    make([]*common.MarketFund, 0),
+		BorrowMarketRank:    make([]*common.MarketFund, 0),
+		InsuranceMarketRank: make([]*common.MarketFund, 0),
+	}
+	for _, address := range allMarkets {
+		supplyAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetail, this.getSupplyAmount error: %s", err)
+		}
+		borrowAmount, err := this.getBorrowAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetail, this.getSupplyAmount error: %s", err)
+		}
+		insuranceAmount, err := this.getInsuranceAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetail, this.getSupplyAmount error: %s", err)
+		}
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetail, this.assetPrice error: %s", err)
+		}
+		flashPoolDetail.TotalSupply += supplyAmount * price
+		flashPoolDetail.TotalBorrow += borrowAmount * price
+		flashPoolDetail.TotalInsurance += insuranceAmount * price
+	}
+	//TODO: Rank
+	return flashPoolDetail, nil
 }
 
 func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) {
@@ -133,6 +189,7 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) 
 }
 
 func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.UserFlashPoolOverview, error) {
+	//TODO
 	//account, err := ocommon.AddressFromBase58(accountStr)
 	//if err != nil {
 	//	return nil, fmt.Errorf("UserFlashPoolOverview, ocommon.AddressFromBase58 error: %s", err)
