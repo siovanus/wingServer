@@ -1,4 +1,5 @@
 {
+  "json_rpc_address": "http://polaris2.ont.io:20336",
   "port": 20334,
   "governance_address": "0100000000000000000000000000000000000000",
   "flash_pool_address": "0100000000000000000000000000000000000000",

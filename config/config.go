@@ -13,8 +13,10 @@ const (
 
 //Config object used by ontology-instance
 type Config struct {
+	JsonRpcAddress    string `json:"json_rpc_address"`
 	Port              uint64 `json:"port"`
 	GovernanceAddress string `json:"governance_address"`
+	WingAddress       string `json:"wing_address"`
 	FlashPoolAddress  string `json:"flash_pool_address"`
 	OracleAddress     string `json:"oracle_address"`
 }

@@ -1,7 +1,5 @@
 package common
 
-import "github.com/siovanus/wingServer/manager/flashpool"
-
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
@@ -47,13 +45,12 @@ type AssetPriceResponse struct {
 	Price uint64
 }
 
-type UserFlashPoolOverviewRequest struct {
-	Id      string
-	Address string
+type GovBannerOverview struct {
+	Remain20 uint64
+	Remain80 uint64
 }
 
-type UserFlashPoolOverviewResponse struct {
-	Id                    string
-	Address               string
-	UserFlashPoolOverview *flashpool.UserFlashPoolOverview
+type GovBanner struct {
+	Daily       uint64
+	Distributed uint64
 }

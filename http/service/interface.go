@@ -1,13 +1,13 @@
 package service
 
 import (
+	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/manager/flashpool"
-	"github.com/siovanus/wingServer/manager/governance"
 )
 
 type GovernanceManager interface {
-	GovBannerOverview() (*governance.GovBanner, error)
-	GovBanner() (*governance.PoolBanner, error)
+	GovBannerOverview() (*common.GovBannerOverview, error)
+	GovBanner() (*common.GovBanner, error)
 }
 
 type FlashPoolManager interface {

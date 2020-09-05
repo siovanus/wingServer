@@ -1,16 +1,19 @@
 package oracle
 
 import (
+	sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 )
 
 type OracleManager struct {
 	contractAddress common.Address
+	sdk             *sdk.OntologySdk
 }
 
-func NewOracleManager(contractAddress common.Address) *OracleManager {
+func NewOracleManager(contractAddress common.Address, sdk *sdk.OntologySdk) *OracleManager {
 	manager := &OracleManager{
-		contractAddress,
+		contractAddress: contractAddress,
+		sdk:             sdk,
 	}
 
 	return manager

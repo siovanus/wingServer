@@ -1,16 +1,19 @@
 package flashpool
 
 import (
+	sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 )
 
 type FlashPoolManager struct {
 	contractAddress common.Address
+	sdk             *sdk.OntologySdk
 }
 
-func NewFlashPoolManager(contractAddress common.Address) *FlashPoolManager {
+func NewFlashPoolManager(contractAddress common.Address, sdk *sdk.OntologySdk) *FlashPoolManager {
 	manager := &FlashPoolManager{
-		contractAddress,
+		contractAddress: contractAddress,
+		sdk:             sdk,
 	}
 
 	return manager

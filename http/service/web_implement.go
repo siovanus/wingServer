@@ -53,14 +53,14 @@ func (this *Service) PoolDistribution(param map[string]interface{}) map[string]i
 
 func (this *Service) GovBannerOverview(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	govBanner, err := this.govMgr.GovBannerOverview()
+	govBannerOverview, err := this.govMgr.GovBannerOverview()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("GovBannerOverview error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = govBanner
+		resp.Result = govBannerOverview
 		log.Infof("GovBannerOverview success")
 	}
 
@@ -75,14 +75,14 @@ func (this *Service) GovBannerOverview(param map[string]interface{}) map[string]
 
 func (this *Service) GovBanner(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	poolBanner, err := this.govMgr.GovBanner()
+	govBanner, err := this.govMgr.GovBanner()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("GovBanner error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = poolBanner
+		resp.Result = govBanner
 		log.Infof("GovBanner success")
 	}
 

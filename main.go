@@ -20,20 +20,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/ontio/ontology/common"
-	"github.com/siovanus/wingServer/manager/oracle"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
 
+	sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/restful"
 	"github.com/siovanus/wingServer/http/service"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/manager/flashpool"
 	"github.com/siovanus/wingServer/manager/governance"
+	"github.com/siovanus/wingServer/manager/oracle"
 	"github.com/urfave/cli"
 )
 
@@ -75,15 +76,12 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("parse config failed, err: %s", err)
 		return
 	}
+	sdk := sdk.NewOntologySdk()
+	sdk.NewRpcClient().SetAddress(servConfig.JsonRpcAddress)
 
 	govAddress, err := common.AddressFromHexString(servConfig.GovernanceAddress)
 	if err != nil {
 		log.Errorf("govAddress common.AddressFromHexString error: %s", err)
-		return
-	}
-	govMgr := governance.NewGovernanceManager(govAddress)
-	if govMgr == nil {
-		log.Errorf("governance manager is nil")
 		return
 	}
 	fpAddress, err := common.AddressFromHexString(servConfig.FlashPoolAddress)
@@ -96,12 +94,17 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress)
+	govMgr := governance.NewGovernanceManager(govAddress, servConfig.WingAddress, sdk)
+	if govMgr == nil {
+		log.Errorf("governance manager is nil")
+		return
+	}
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress, sdk)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
-	oracleMgr := oracle.NewOracleManager(oracleAddress)
+	oracleMgr := oracle.NewOracleManager(oracleAddress, sdk)
 	if oracleMgr == nil {
 		log.Errorf("oracle manager is nil")
 		return

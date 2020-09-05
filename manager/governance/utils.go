@@ -1,25 +1,24 @@
 package governance
 
-type GovBanner struct {
-	Remain20 uint64
-	Remain80 uint64
+import (
+	"fmt"
+	"github.com/ontio/ontology/common"
+)
+
+// get 20% wing distribute count
+func (this *GovernanceManager) get20WingCount() (uint64, error) {
+	r, err := this.sdk.GetStorage(this.wingAddress, []byte("Community"))
+	if err != nil {
+		return 0, fmt.Errorf("get20WingCount, this.sdk.GetStorage error: %s", err)
+	}
+	return common.BigIntFromNeoBytes(r).Uint64(), nil
 }
 
-type PoolBanner struct {
-	Daily       uint64
-	Distributed uint64
-}
-
-func (this *GovernanceManager) govBannerOverview() (*GovBanner, error) {
-	return &GovBanner{
-		Remain20: 1450000,
-		Remain80: 7650000,
-	}, nil
-}
-
-func (this *GovernanceManager) govBanner() (*PoolBanner, error) {
-	return &PoolBanner{
-		Daily:       141513,
-		Distributed: 1221312,
-	}, nil
+// get wing total supply
+func (this *GovernanceManager) getWingTotalSupply() (uint64, error) {
+	r, err := this.sdk.GetStorage(this.wingAddress, []byte("TotalSupply"))
+	if err != nil {
+		return 0, fmt.Errorf("getWingTotalSupply, this.sdk.GetStorage error: %s", err)
+	}
+	return common.BigIntFromNeoBytes(r).Uint64(), nil
 }
