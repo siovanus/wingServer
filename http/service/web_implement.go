@@ -31,14 +31,14 @@ func (this *Service) FlashPoolMarketDistribution(param map[string]interface{}) m
 
 func (this *Service) PoolDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	poolDistribution, err := this.fpMgr.PoolDistribution()
+	flashPoolDistribution, err := this.fpMgr.PoolDistribution()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("PoolDistribution error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = poolDistribution
+		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{flashPoolDistribution}}
 		log.Infof("PoolDistribution success")
 	}
 
@@ -104,7 +104,7 @@ func (this *Service) AssetPrice(param map[string]interface{}) map[string]interfa
 		resp.Desc = err.Error()
 		log.Errorf("AssetPrice: decode params failed, err: %s", err)
 	} else {
-		assetPrice, err := this.oracleMgr.AssetPrice(req.Asset)
+		assetPrice, err := this.fpMgr.AssetPrice(req.Asset)
 		if err != nil {
 			resp.Error = restful.INTERNAL_ERROR
 			resp.Desc = err.Error()

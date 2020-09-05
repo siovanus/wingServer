@@ -11,14 +11,11 @@ type GovernanceManager interface {
 }
 
 type FlashPoolManager interface {
+	AssetPrice(asset string) (uint64, error)
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
-	PoolDistribution() (*common.PoolDistribution, error)
+	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*flashpool.FlashPoolBanner, error)
 	FlashPoolDetail() (*flashpool.FlashPoolDetail, error)
 	FlashPoolAllMarket() (*flashpool.FlashPoolAllMarket, error)
-	UserFlashPoolOverview(address string) (*flashpool.UserFlashPoolOverview, error)
-}
-
-type OracleManager interface {
-	AssetPrice(asset string) (uint64, error)
+	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 }

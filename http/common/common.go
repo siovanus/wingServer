@@ -72,3 +72,67 @@ type Distribution struct {
 	InsuranceAmount uint64
 	Total           uint64
 }
+
+type UserFlashPoolOverviewRequest struct {
+	Id      string
+	Address string
+}
+
+type UserFlashPoolOverviewResponse struct {
+	Id                    string
+	Address               string
+	UserFlashPoolOverview *UserFlashPoolOverview
+}
+
+type UserFlashPoolOverview struct {
+	SupplyBalance    uint64
+	BorrowBalance    uint64
+	InsuranceBalance uint64
+	BorrowLimit      uint64
+	NetApy           uint64
+
+	CurrentSupply    []*Supply
+	CurrentBorrow    []*Borrow
+	CurrentInsurance []*Insurance
+
+	AllMarket []*UserMarket
+}
+
+type Supply struct {
+	Icon          string
+	Name          string
+	SupplyDollar  uint64
+	SupplyBalance uint64
+	Apy           uint64
+	Earned        uint64
+	IfCollateral  bool
+}
+
+type Borrow struct {
+	Icon          string
+	Name          string
+	BorrowDollar  uint64
+	BorrowBalance uint64
+	Apy           uint64
+	Accrued       uint64
+	Limit         uint64
+}
+
+type Insurance struct {
+	Icon             string
+	Name             string
+	InsuranceDollar  uint64
+	InsuranceBalance uint64
+	Apy              uint64
+}
+
+type UserMarket struct {
+	Icon            string
+	Name            string
+	IfCollateral    bool
+	SupplyApy       uint64
+	BorrowApy       uint64
+	BorrowLiquidity uint64
+	InsuranceApy    uint64
+	InsuranceAmount uint64
+}

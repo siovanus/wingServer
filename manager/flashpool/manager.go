@@ -5,6 +5,8 @@ import (
 	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/manager/governance"
+	"time"
 )
 
 const BlockPerYear = 60 * 60 * 24 * 365 * 2 / 3
@@ -25,16 +27,22 @@ var AssetMap = map[string]string{
 
 type FlashPoolManager struct {
 	contractAddress ocommon.Address
+	oracleAddress   ocommon.Address
 	sdk             *sdk.OntologySdk
 }
 
-func NewFlashPoolManager(contractAddress ocommon.Address, sdk *sdk.OntologySdk) *FlashPoolManager {
+func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk) *FlashPoolManager {
 	manager := &FlashPoolManager{
 		contractAddress: contractAddress,
+		oracleAddress:   oracleAddress,
 		sdk:             sdk,
 	}
 
 	return manager
+}
+
+func (this *FlashPoolManager) AssetPrice(asset string) (uint64, error) {
+	return this.assetPrice(asset)
 }
 
 func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error) {
@@ -56,51 +64,60 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
 		}
+		totalDistribution, err := this.getTotalDistribution(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
+		}
+		distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
 		distribution := &common.Distribution{
-			Icon: IconMap[AssetMap[address.ToHexString()]],
-			Name: AssetMap[address.ToHexString()],
-			//TODO: Per Day
+			Icon:            IconMap[AssetMap[address.ToHexString()]],
+			Name:            AssetMap[address.ToHexString()],
+			PerDay:          totalDistribution / distributedDay,
 			SupplyAmount:    supplyAmount,
 			BorrowAmount:    borrowAmount,
 			InsuranceAmount: insuranceAmount,
-			//TODO: total distribution
+			Total:           totalDistribution,
 		}
 		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
 	}
 	return &common.FlashPoolMarketDistribution{FlashPoolMarketDistribution: flashPoolMarketDistribution}, nil
 }
 
-func (this *FlashPoolManager) PoolDistribution() (*common.PoolDistribution, error) {
+func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 	allMarkets, err := this.getAllMarkets()
 	if err != nil {
 		return nil, fmt.Errorf("PoolDistribution, this.getAllMarkets error: %s", err)
 	}
-	poolDistribution := make([]*common.Distribution, 0)
-	for _, address := range allPools {
+	distribution := new(common.Distribution)
+	for _, address := range allMarkets {
 		supplyAmount, err := this.getSupplyAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getSupplyApy error: %s", err)
+			return nil, fmt.Errorf("PoolDistribution, this.getSupplyAmount error: %s", err)
 		}
 		borrowAmount, err := this.getBorrowAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getBorrowApy error: %s", err)
+			return nil, fmt.Errorf("PoolDistribution, this.getSupplyAmount error: %s", err)
 		}
 		insuranceAmount, err := this.getInsuranceAmount(address)
 		if err != nil {
+			return nil, fmt.Errorf("PoolDistribution, this.getSupplyAmount error: %s", err)
+		}
+		totalDistribution, err := this.getTotalDistribution(address)
+		if err != nil {
 			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getInsuranceApy error: %s", err)
 		}
-		distribution := &common.Distribution{
-			Icon: IconMap[AssetMap[address.ToHexString()]],
-			Name: AssetMap[address.ToHexString()],
-			//TODO: Per Day
-			SupplyAmount:    supplyAmount,
-			BorrowAmount:    borrowAmount,
-			InsuranceAmount: insuranceAmount,
-			//TODO: total distribution
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("PoolDistribution, this.assetPrice error: %s", err)
 		}
-		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
+		distribution.SupplyAmount += supplyAmount * price
+		distribution.BorrowAmount += borrowAmount * price
+		distribution.InsuranceAmount += insuranceAmount * price
+		distribution.Total += totalDistribution
 	}
-	return &common.FlashPoolMarketDistribution{FlashPoolMarketDistribution: flashPoolMarketDistribution}, nil
+	distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
+	distribution.PerDay = distribution.Total / distributedDay
+	return distribution, nil
 }
 
 func (this *FlashPoolManager) FlashPoolBanner() (*FlashPoolBanner, error) {
@@ -115,6 +132,34 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) 
 	return this.flashPoolAllMarket()
 }
 
-func (this *FlashPoolManager) UserFlashPoolOverview(address string) (*UserFlashPoolOverview, error) {
-	return this.userFlashPoolOverview(address)
+func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.UserFlashPoolOverview, error) {
+	//account, err := ocommon.AddressFromBase58(accountStr)
+	//if err != nil {
+	//	return nil, fmt.Errorf("UserFlashPoolOverview, ocommon.AddressFromBase58 error: %s", err)
+	//}
+	//assetsIn, err := this.getAssetsIn(account)
+	//if err != nil {
+	//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getAssetsIn error: %s", err)
+	//}
+	result := &common.UserFlashPoolOverview{
+		CurrentSupply:    make([]*common.Supply, 0),
+		CurrentBorrow:    make([]*common.Borrow, 0),
+		CurrentInsurance: make([]*common.Insurance, 0),
+		AllMarket:        make([]*common.UserMarket, 0),
+	}
+	//for _, address := range assetsIn {
+	//	supplyAmount, err := this.getSupplyAmount(address)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyApy error: %s", err)
+	//	}
+	//	borrowAmount, err := this.getBorrowAmount(address)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowApy error: %s", err)
+	//	}
+	//	insuranceAmount, err := this.getInsuranceAmount(address)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getInsuranceApy error: %s", err)
+	//	}
+	//}
+	return result, nil
 }

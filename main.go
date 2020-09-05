@@ -34,7 +34,6 @@ import (
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/manager/flashpool"
 	"github.com/siovanus/wingServer/manager/governance"
-	"github.com/siovanus/wingServer/manager/oracle"
 	"github.com/urfave/cli"
 )
 
@@ -99,18 +98,13 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("governance manager is nil")
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress, sdk)
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
-	oracleMgr := oracle.NewOracleManager(oracleAddress, sdk)
-	if oracleMgr == nil {
-		log.Errorf("oracle manager is nil")
-		return
-	}
 	log.Infof("init svr success")
-	serv := service.NewService(govMgr, fpMgr, oracleMgr)
+	serv := service.NewService(govMgr, fpMgr)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 	go restServer.Start()
 

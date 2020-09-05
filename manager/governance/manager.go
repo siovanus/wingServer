@@ -12,7 +12,8 @@ const (
 	Total20         = 2000000000000000
 	Total80         = 8000000000000000
 	WingAmount20Per = 500000000000000
-	YearSecound     = 31536000
+	YearSecond      = 31536000
+	DaySecond       = 86400
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 15, 0, 0, 0, 0, time.UTC).Unix())
@@ -51,7 +52,7 @@ func (this *GovernanceManager) GovBannerOverview() (*common.GovBannerOverview, e
 
 func (this *GovernanceManager) GovBanner() (*common.GovBanner, error) {
 	distributed := uint64(time.Now().Unix()) - GenesisTime
-	index := distributed/YearSecound + 1
+	index := distributed/YearSecond + 1
 	return &common.GovBanner{
 		Daily:       DailyDistibute[index],
 		Distributed: distributed,

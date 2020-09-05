@@ -1,11 +1,10 @@
 package service
 
 type Service struct {
-	govMgr    GovernanceManager
-	fpMgr     FlashPoolManager
-	oracleMgr OracleManager
+	govMgr GovernanceManager
+	fpMgr  FlashPoolManager
 }
 
-func NewService(govMgr GovernanceManager, fpMgr FlashPoolManager, oracleMgr OracleManager) *Service {
-	return &Service{govMgr: govMgr, fpMgr: fpMgr, oracleMgr: oracleMgr}
+func NewService(govMgr GovernanceManager, fpMgr FlashPoolManager) *Service {
+	return &Service{govMgr: govMgr, fpMgr: fpMgr}
 }
