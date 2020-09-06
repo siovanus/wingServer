@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/store"
 )
 
 type GovernanceManager interface {
@@ -15,6 +16,7 @@ type FlashPoolManager interface {
 	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*common.FlashPoolBanner, error)
 	FlashPoolDetail() (*common.FlashPoolDetail, error)
+	FlashPoolDetailForStore() (*store.FlashPoolDetail, error)
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 }

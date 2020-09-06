@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/store"
 	"math/big"
 	"sort"
 	"time"
@@ -38,13 +39,16 @@ type FlashPoolManager struct {
 	contractAddress ocommon.Address
 	oracleAddress   ocommon.Address
 	sdk             *sdk.OntologySdk
+	store           *store.Client
 }
 
-func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk) *FlashPoolManager {
+func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk,
+	store *store.Client) *FlashPoolManager {
 	manager := &FlashPoolManager{
 		contractAddress: contractAddress,
 		oracleAddress:   oracleAddress,
 		sdk:             sdk,
+		store:           store,
 	}
 
 	return manager
@@ -214,7 +218,48 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 	sort.SliceStable(flashPoolDetail.InsuranceMarketRank, func(i, j int) bool {
 		return flashPoolDetail.InsuranceMarketRank[i].Fund > flashPoolDetail.InsuranceMarketRank[j].Fund
 	})
+	preFlashPoolDetailStore, err := this.store.LoadLastestFlashPoolDetail()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadLastestFlashPoolDetail error: %s", err)
+	}
+	flashPoolDetail.SupplyVolumeDaily = int64(flashPoolDetail.TotalSupply) - int64(preFlashPoolDetailStore.TotalSupply)
+	flashPoolDetail.BorrowVolumeDaily = int64(flashPoolDetail.TotalBorrow) - int64(preFlashPoolDetailStore.TotalBorrow)
+	flashPoolDetail.InsuranceVolumeDaily = int64(flashPoolDetail.TotalInsurance) - int64(preFlashPoolDetailStore.TotalInsurance)
 	//TODO: rate
+	return flashPoolDetail, nil
+}
+
+func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail, error) {
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolDetailForStore, this.getAllMarkets error: %s", err)
+	}
+	flashPoolDetail := new(store.FlashPoolDetail)
+	for _, address := range allMarkets {
+		supplyAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
+		}
+		borrowAmount, err := this.getBorrowAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
+		}
+		insuranceAmount, err := this.getInsuranceAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
+		}
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolDetailForStore, this.assetPrice error: %s", err)
+		}
+		supplyDollar := supplyAmount * price
+		borrowDollar := borrowAmount * price
+		insuranceDollar := insuranceAmount * price
+		flashPoolDetail.TotalSupply += supplyDollar
+		flashPoolDetail.TotalBorrow += borrowDollar
+		flashPoolDetail.TotalInsurance += insuranceDollar
+	}
+	flashPoolDetail.Timestamp = uint64(time.Now().Unix())
 	return flashPoolDetail, nil
 }
 

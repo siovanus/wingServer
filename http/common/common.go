@@ -83,17 +83,17 @@ type FlashPoolDetail struct {
 	TotalSupply       uint64
 	TotalSupplyRate   int64
 	SupplyMarketRank  []*MarketFund
-	SupplyVolumeDaily uint64
+	SupplyVolumeDaily int64
 
 	TotalBorrow       uint64
 	TotalBorrowRate   int64
 	BorrowMarketRank  []*MarketFund
-	BorrowVolumeDaily uint64
+	BorrowVolumeDaily int64
 
 	TotalInsurance       uint64
 	TotalInsuranceRate   int64
 	InsuranceMarketRank  []*MarketFund
-	InsuranceVolumeDaily uint64
+	InsuranceVolumeDaily int64
 }
 
 type MarketFund struct {

@@ -20,10 +20,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/store"
 	"os"
 	"os/signal"
 	"runtime"
-	"syscall"
 	"time"
 
 	sdk "github.com/ontio/ontology-go-sdk"
@@ -75,6 +75,14 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("parse config failed, err: %s", err)
 		return
 	}
+
+	store, err := store.ConnectToDb(servConfig.DatabaseURL)
+	if err != nil {
+		log.Errorf("store.ConnectToDb error: %s", err)
+		return
+	}
+	defer store.Close()
+
 	sdk := sdk.NewOntologySdk()
 	sdk.NewRpcClient().SetAddress(servConfig.JsonRpcAddress)
 
@@ -98,32 +106,25 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("governance manager is nil")
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk)
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk, store)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
 	log.Infof("init svr success")
-	serv := service.NewService(govMgr, fpMgr)
+	serv := service.NewService(govMgr, fpMgr, store)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
+
+	go serv.Snapshot()
 	go restServer.Start()
-
 	go checkLogFile(logLevel)
-	waitToExit()
-}
 
-func waitToExit() {
-	exit := make(chan bool, 0)
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	go func() {
-		for sig := range sc {
-			log.Infof("server received exit signal:%v.", sig.String())
-			close(exit)
-			break
-		}
-	}()
-	<-exit
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	<-sig
+	log.Info("Shutting down...")
+	serv.Close()
+	os.Exit(0)
 }
 
 func checkLogFile(logLevel int) {
