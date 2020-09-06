@@ -5,27 +5,6 @@ import (
 	"github.com/ontio/ontology/common"
 )
 
-type FlashPoolAllMarket struct {
-	FlashPoolAllMarket []*Market
-}
-
-type Market struct {
-	Icon               string
-	Name               string
-	TotalSupply        uint64
-	TotalSupplyRate    uint64
-	SupplyApy          uint64
-	SupplyApyRate      uint64
-	TotalBorrow        uint64
-	TotalBorrowRate    uint64
-	BorrowApy          uint64
-	BorrowApyRate      uint64
-	TotalInsurance     uint64
-	TotalInsuranceRate uint64
-	InsuranceApy       uint64
-	InsuranceApyRate   uint64
-}
-
 func (this *FlashPoolManager) assetPrice(asset string) (uint64, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.oracleAddress,
 		"getUnderlyingPrice", []interface{}{asset})
@@ -269,42 +248,4 @@ func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (u
 		return 0, fmt.Errorf("getInsuranceApy, source.NextI128 error")
 	}
 	return ratePerBlock.ToBigInt().Uint64() * BlockPerYear, nil
-}
-
-func (this *FlashPoolManager) flashPoolAllMarket() (*FlashPoolAllMarket, error) {
-	return &FlashPoolAllMarket{
-		FlashPoolAllMarket: []*Market{
-			{
-				Icon:               "http://106.75.209.209/icon/eth_icon.svg",
-				Name:               "ETH",
-				TotalSupply:        2526,
-				TotalSupplyRate:    2,
-				SupplyApy:          4468,
-				SupplyApyRate:      3,
-				TotalBorrow:        25267,
-				TotalBorrowRate:    23,
-				BorrowApy:          563,
-				BorrowApyRate:      6,
-				TotalInsurance:     8265,
-				TotalInsuranceRate: 6,
-				InsuranceApy:       256,
-				InsuranceApyRate:   9,
-			},
-			{
-				Icon:               "http://106.75.209.209/icon/asset_dai_icon.svg",
-				Name:               "DAI",
-				TotalSupply:        2526,
-				TotalSupplyRate:    1,
-				SupplyApy:          3526,
-				SupplyApyRate:      2,
-				TotalBorrow:        2415,
-				TotalBorrowRate:    3,
-				BorrowApy:          241,
-				BorrowApyRate:      4,
-				TotalInsurance:     3473,
-				TotalInsuranceRate: 5,
-				InsuranceApy:       2541,
-				InsuranceApyRate:   6,
-			}},
-	}, nil
 }

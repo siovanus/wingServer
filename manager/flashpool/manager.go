@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	sdk "github.com/ontio/ontology-go-sdk"
@@ -27,6 +28,7 @@ var AssetMap = map[string]string{
 	"b": "oETH",
 	"c": "oDAI",
 	"d": "ONT",
+	"e": "oUSDT",
 }
 
 type FlashPoolManager struct {
@@ -176,16 +178,95 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.assetPrice error: %s", err)
 		}
-		flashPoolDetail.TotalSupply += supplyAmount * price
-		flashPoolDetail.TotalBorrow += borrowAmount * price
-		flashPoolDetail.TotalInsurance += insuranceAmount * price
+		supplyDollar := supplyAmount * price
+		borrowDollar := borrowAmount * price
+		insuranceDollar := insuranceAmount * price
+		flashPoolDetail.TotalSupply += supplyDollar
+		flashPoolDetail.TotalBorrow += borrowDollar
+		flashPoolDetail.TotalInsurance += insuranceDollar
+
+		name := AssetMap[address.ToHexString()]
+		flashPoolDetail.SupplyMarketRank = append(flashPoolDetail.SupplyMarketRank, &common.MarketFund{
+			Icon: IconMap[name],
+			Name: name,
+			Fund: supplyDollar,
+		})
+		flashPoolDetail.BorrowMarketRank = append(flashPoolDetail.BorrowMarketRank, &common.MarketFund{
+			Icon: IconMap[name],
+			Name: name,
+			Fund: borrowDollar,
+		})
+		flashPoolDetail.InsuranceMarketRank = append(flashPoolDetail.InsuranceMarketRank, &common.MarketFund{
+			Icon: IconMap[name],
+			Name: name,
+			Fund: insuranceDollar,
+		})
 	}
-	//TODO: Rank
+	sort.SliceStable(flashPoolDetail.SupplyMarketRank, func(i, j int) bool {
+		return flashPoolDetail.SupplyMarketRank[i].Fund > flashPoolDetail.SupplyMarketRank[j].Fund
+	})
+	sort.SliceStable(flashPoolDetail.BorrowMarketRank, func(i, j int) bool {
+		return flashPoolDetail.BorrowMarketRank[i].Fund > flashPoolDetail.BorrowMarketRank[j].Fund
+	})
+	sort.SliceStable(flashPoolDetail.InsuranceMarketRank, func(i, j int) bool {
+		return flashPoolDetail.InsuranceMarketRank[i].Fund > flashPoolDetail.InsuranceMarketRank[j].Fund
+	})
+	//TODO: rate
 	return flashPoolDetail, nil
 }
 
-func (this *FlashPoolManager) FlashPoolAllMarket() (*FlashPoolAllMarket, error) {
-	return this.flashPoolAllMarket()
+func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, error) {
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolAllMarket, this.getAllMarkets error: %s", err)
+	}
+	flashPoolAllMarket := &common.FlashPoolAllMarket{
+		FlashPoolAllMarket: make([]*common.Market, 0),
+	}
+	for _, address := range allMarkets {
+		supplyAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+		}
+		borrowAmount, err := this.getBorrowAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+		}
+		insuranceAmount, err := this.getInsuranceAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+		}
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.assetPrice error: %s", err)
+		}
+
+		supplyApy, err := this.getSupplyApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyApy error: %s", err)
+		}
+		borrowApy, err := this.getBorrowApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getBorrowApy error: %s", err)
+		}
+		insuranceApy, err := this.getInsuranceApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.getInsuranceApy error: %s", err)
+		}
+
+		market := new(common.Market)
+		market.Name = AssetMap[address.ToHexString()]
+		market.Icon = IconMap[market.Name]
+		market.TotalSupply = supplyAmount * price
+		market.TotalBorrow = borrowAmount * price
+		market.TotalInsurance = insuranceAmount * price
+		market.SupplyApy = supplyApy
+		market.BorrowApy = borrowApy
+		market.InsuranceApy = insuranceApy
+		//TODO: rate
+		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
+	}
+	return flashPoolAllMarket, nil
 }
 
 func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.UserFlashPoolOverview, error) {

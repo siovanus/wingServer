@@ -165,3 +165,24 @@ type UserMarket struct {
 	InsuranceApy    uint64
 	InsuranceAmount uint64
 }
+
+type FlashPoolAllMarket struct {
+	FlashPoolAllMarket []*Market
+}
+
+type Market struct {
+	Icon               string
+	Name               string
+	TotalSupply        uint64
+	TotalSupplyRate    uint64
+	SupplyApy          uint64
+	SupplyApyRate      uint64
+	TotalBorrow        uint64
+	TotalBorrowRate    uint64
+	BorrowApy          uint64
+	BorrowApyRate      uint64
+	TotalInsurance     uint64
+	TotalInsuranceRate uint64
+	InsuranceApy       uint64
+	InsuranceApyRate   uint64
+}
