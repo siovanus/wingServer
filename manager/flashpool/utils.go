@@ -3,6 +3,7 @@ package flashpool
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	"math/big"
 )
 
 func (this *FlashPoolManager) assetPrice(asset string) (uint64, error) {
@@ -211,7 +212,9 @@ func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (uint
 	if eof {
 		return 0, fmt.Errorf("getSupplyApy, source.NextI128 error")
 	}
-	return ratePerBlock.ToBigInt().Uint64() * BlockPerYear, nil
+	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear*PercentageMultiplier)),
+		Decimal).Uint64()
+	return result, nil
 }
 
 func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (uint64, error) {
@@ -229,7 +232,9 @@ func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (uint
 	if eof {
 		return 0, fmt.Errorf("getBorrowApy, source.NextI128 error")
 	}
-	return ratePerBlock.ToBigInt().Uint64() * BlockPerYear, nil
+	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear*PercentageMultiplier)),
+		Decimal).Uint64()
+	return result, nil
 }
 
 func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (uint64, error) {
@@ -247,5 +252,51 @@ func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (u
 	if eof {
 		return 0, fmt.Errorf("getInsuranceApy, source.NextI128 error")
 	}
-	return ratePerBlock.ToBigInt().Uint64() * BlockPerYear, nil
+	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear*PercentageMultiplier)),
+		Decimal).Uint64()
+	return result, nil
+}
+
+type MarketMeta struct {
+	Address          common.Address
+	IsList           bool
+	CollateralFactor common.I128
+}
+
+func (this *MarketMeta) Deserialization(source *common.ZeroCopySource) error {
+	address, eof := source.NextAddress()
+	if eof {
+		return fmt.Errorf("address deserialization error eof")
+	}
+	isList, irregular, eof := source.NextBool()
+	if irregular || eof {
+		return fmt.Errorf("isList deserialization error eof")
+	}
+	collateralFactor, eof := source.NextI128()
+	if eof {
+		return fmt.Errorf("collateralFactor deserialization error eof")
+	}
+	this.Address = address
+	this.IsList = isList
+	this.CollateralFactor = collateralFactor
+	return nil
+}
+
+func (this *FlashPoolManager) getMarketMeta() (*MarketMeta, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress,
+		"marketMeta", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getMarketMeta, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getMarketMeta, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	marketMeta := new(MarketMeta)
+	err = marketMeta.Deserialization(source)
+	if err != nil {
+		return nil, fmt.Errorf("getMarketMeta, marketMeta.Deserialization error")
+	}
+	return marketMeta, nil
 }

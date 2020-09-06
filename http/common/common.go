@@ -118,7 +118,7 @@ type UserFlashPoolOverview struct {
 	BorrowBalance    uint64
 	InsuranceBalance uint64
 	BorrowLimit      uint64
-	NetApy           uint64
+	NetApy           int64
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow
@@ -158,7 +158,6 @@ type Insurance struct {
 type UserMarket struct {
 	Icon            string
 	Name            string
-	IfCollateral    bool
 	SupplyApy       uint64
 	BorrowApy       uint64
 	BorrowLiquidity uint64

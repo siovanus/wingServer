@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	"math/big"
 	"sort"
 	"time"
 
@@ -15,6 +16,8 @@ const (
 	BlockPerYear         = 60 * 60 * 24 * 365 * 2 / 3
 	PercentageMultiplier = 10000
 )
+
+var Decimal = new(big.Int).SetUint64(1000000000000000000)
 
 var IconMap = map[string]string{
 	"oETH":  "http://106.75.209.209/icon/eth_icon.svg",
@@ -270,34 +273,150 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 }
 
 func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.UserFlashPoolOverview, error) {
-	//TODO
-	//account, err := ocommon.AddressFromBase58(accountStr)
-	//if err != nil {
-	//	return nil, fmt.Errorf("UserFlashPoolOverview, ocommon.AddressFromBase58 error: %s", err)
-	//}
-	//assetsIn, err := this.getAssetsIn(account)
-	//if err != nil {
-	//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getAssetsIn error: %s", err)
-	//}
-	result := &common.UserFlashPoolOverview{
+	account, err := ocommon.AddressFromBase58(accountStr)
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverview, ocommon.AddressFromBase58 error: %s", err)
+	}
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverview, this.getAllMarkets error: %s", err)
+	}
+	assetsIn, err := this.getAssetsIn(account)
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverview, this.getAssetsIn error: %s", err)
+	}
+	userFlashPoolOverview := &common.UserFlashPoolOverview{
 		CurrentSupply:    make([]*common.Supply, 0),
 		CurrentBorrow:    make([]*common.Borrow, 0),
 		CurrentInsurance: make([]*common.Insurance, 0),
 		AllMarket:        make([]*common.UserMarket, 0),
 	}
-	//for _, address := range assetsIn {
-	//	supplyAmount, err := this.getSupplyAmount(address)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyApy error: %s", err)
-	//	}
-	//	borrowAmount, err := this.getBorrowAmount(address)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowApy error: %s", err)
-	//	}
-	//	insuranceAmount, err := this.getInsuranceAmount(address)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("UserFlashPoolOverview, this.getInsuranceApy error: %s", err)
-	//	}
-	//}
-	return result, nil
+
+	var assetInSupplyDollar uint64 = 0
+	var totalBorrowBalance uint64 = 0
+	for _, address := range allMarkets {
+		borrowAmount, err := this.getSupplyAmountByAccount(address, account)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
+		}
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.assetPrice error: %s", err)
+		}
+		totalBorrowBalance += borrowAmount * price
+	}
+	userFlashPoolOverview.BorrowBalance = totalBorrowBalance
+
+	for _, address := range allMarkets {
+		supplyAmount, err := this.getSupplyAmountByAccount(address, account)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
+		}
+		borrowAmount, err := this.getSupplyAmountByAccount(address, account)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
+		}
+		insuranceAmount, err := this.getSupplyAmountByAccount(address, account)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
+		}
+		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.assetPrice error: %s", err)
+		}
+		userFlashPoolOverview.SupplyBalance += supplyAmount * price
+		userFlashPoolOverview.InsuranceBalance += insuranceAmount * price
+
+		supplyApy, err := this.getSupplyApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyApy error: %s", err)
+		}
+		borrowApy, err := this.getBorrowApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowApy error: %s", err)
+		}
+		insuranceApy, err := this.getInsuranceApy(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getInsuranceApy error: %s", err)
+		}
+		userFlashPoolOverview.NetApy += int64(supplyAmount*price*supplyApy+insuranceAmount*price*insuranceApy) -
+			int64(borrowAmount*price*borrowApy)
+
+		isAssetIn := false
+		for _, a := range assetsIn {
+			if address == a {
+				isAssetIn = true
+				break
+			}
+		}
+		if isAssetIn {
+			assetInSupplyDollar += supplyAmount * price
+		}
+
+		if supplyAmount != 0 {
+			supply := &common.Supply{
+				Name:          AssetMap[address.ToHexString()],
+				Icon:          IconMap[AssetMap[address.ToHexString()]],
+				SupplyDollar:  supplyAmount * price,
+				SupplyBalance: supplyAmount,
+				Apy:           supplyApy,
+				IfCollateral:  isAssetIn,
+			}
+			userFlashPoolOverview.CurrentSupply = append(userFlashPoolOverview.CurrentSupply, supply)
+		}
+		if borrowAmount != 0 {
+			borrow := &common.Borrow{
+				Name:          AssetMap[address.ToHexString()],
+				Icon:          IconMap[AssetMap[address.ToHexString()]],
+				BorrowDollar:  borrowAmount * price,
+				BorrowBalance: borrowAmount,
+				Apy:           borrowApy,
+				Limit:         borrowAmount * price * PercentageMultiplier / totalBorrowBalance,
+			}
+			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
+		}
+		if insuranceAmount != 0 {
+			insurance := &common.Insurance{
+				Name:             AssetMap[address.ToHexString()],
+				Icon:             IconMap[AssetMap[address.ToHexString()]],
+				InsuranceDollar:  insuranceAmount * price,
+				InsuranceBalance: insuranceAmount,
+				Apy:              insuranceApy,
+			}
+			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
+		}
+
+		totalBorrowAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmount error: %s", err)
+		}
+		totalInsuranceAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmount error: %s", err)
+		}
+		if supplyAmount == 0 && borrowAmount == 0 && insuranceAmount == 0 {
+			userMarket := &common.UserMarket{
+				Name:            AssetMap[address.ToHexString()],
+				Icon:            IconMap[AssetMap[address.ToHexString()]],
+				SupplyApy:       supplyApy,
+				BorrowApy:       borrowApy,
+				BorrowLiquidity: totalBorrowAmount,
+				InsuranceApy:    insuranceApy,
+				InsuranceAmount: totalInsuranceAmount,
+			}
+			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
+		}
+	}
+
+	marketMeta, err := this.getMarketMeta()
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverview, this.getMarketMeta error: %s", err)
+	}
+	userFlashPoolOverview.NetApy = userFlashPoolOverview.NetApy / int64(userFlashPoolOverview.SupplyBalance+
+		userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance)
+	// assetInSupplyDollar * CollateralFactor / CollateralFactorDecimal
+	userFlashPoolOverview.BorrowLimit = new(big.Int).Div(new(big.Int).Mul(new(big.Int).SetUint64(assetInSupplyDollar),
+		marketMeta.CollateralFactor.ToBigInt()), Decimal).Uint64()
+
+	return userFlashPoolOverview, nil
 }
