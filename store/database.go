@@ -78,21 +78,37 @@ func (client Client) Close() error {
 }
 
 type FlashPoolDetail struct {
-	gorm.Model
 	Timestamp      uint64 `gorm:"primary_key"`
 	TotalSupply    uint64
 	TotalBorrow    uint64
 	TotalInsurance uint64
 }
 
-func (client Client) LoadLastestFlashPoolDetail() (FlashPoolDetail, error) {
+func (client Client) LoadLatestFlashPoolDetail() (FlashPoolDetail, error) {
 	var flashPoolDetail FlashPoolDetail
-	err := client.db.First(flashPoolDetail).Error
+	err := client.db.Last(&flashPoolDetail).Error
 	return flashPoolDetail, err
 }
 
-// SaveEndpoint will store the FlashPoolDetail in the database
-// and overwrite any previous record with the same name.
 func (client Client) SaveFlashPoolDetail(flashPoolDetail *FlashPoolDetail) error {
 	return client.db.Create(flashPoolDetail).Error
+}
+
+type FlashPoolMarket struct {
+	ID             uint64
+	Name           string
+	Timestamp      uint64
+	TotalSupply    uint64
+	TotalBorrow    uint64
+	TotalInsurance uint64
+}
+
+func (client Client) LoadLatestFlashPoolMarket(name string) (FlashPoolMarket, error) {
+	var flashPoolMarket FlashPoolMarket
+	err := client.db.Where(FlashPoolMarket{Name: name}).Last(&flashPoolMarket).Error
+	return flashPoolMarket, err
+}
+
+func (client Client) SaveFlashPoolMarket(flashPoolMarket *FlashPoolMarket) error {
+	return client.db.Create(flashPoolMarket).Error
 }

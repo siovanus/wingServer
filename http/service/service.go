@@ -34,7 +34,8 @@ func (this *Service) Snapshot() {
 		t := time.NewTimer(next.Sub(now))
 		<-t.C
 		log.Infof("snapshot start: %v", time.Now())
-		//以下为定时执行的操作
+		// 以下为定时执行的操作
+		// FlashPoolDetailForStore
 		flashPoolDetail, err := this.fpMgr.FlashPoolDetailForStore()
 		if err != nil {
 			log.Errorf("Snapshot, this.fpMgr.FlashPoolDetailForStore error: %s", err)
@@ -42,6 +43,12 @@ func (this *Service) Snapshot() {
 		err = this.store.SaveFlashPoolDetail(flashPoolDetail)
 		if err != nil {
 			log.Errorf("Snapshot, this.store.SaveFlashPoolDetail error: %s", err)
+		}
+
+		// FlashPoolMarketForStore
+		err = this.fpMgr.FlashPoolMarketStore()
+		if err != nil {
+			log.Errorf("Snapshot, this.fpMgr.FlashPoolMarketStore error: %s", err)
 		}
 	}
 }

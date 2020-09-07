@@ -17,6 +17,7 @@ type FlashPoolManager interface {
 	FlashPoolBanner() (*common.FlashPoolBanner, error)
 	FlashPoolDetail() (*common.FlashPoolDetail, error)
 	FlashPoolDetailForStore() (*store.FlashPoolDetail, error)
+	FlashPoolMarketStore() error
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 }

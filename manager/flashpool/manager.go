@@ -227,14 +227,17 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 	sort.SliceStable(flashPoolDetail.InsuranceMarketRank, func(i, j int) bool {
 		return flashPoolDetail.InsuranceMarketRank[i].Fund > flashPoolDetail.InsuranceMarketRank[j].Fund
 	})
-	preFlashPoolDetailStore, err := this.store.LoadLastestFlashPoolDetail()
+	preFlashPoolDetailStore, err := this.store.LoadLatestFlashPoolDetail()
 	if err != nil {
 		return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadLastestFlashPoolDetail error: %s", err)
 	}
 	flashPoolDetail.SupplyVolumeDaily = int64(flashPoolDetail.TotalSupply) - int64(preFlashPoolDetailStore.TotalSupply)
 	flashPoolDetail.BorrowVolumeDaily = int64(flashPoolDetail.TotalBorrow) - int64(preFlashPoolDetailStore.TotalBorrow)
 	flashPoolDetail.InsuranceVolumeDaily = int64(flashPoolDetail.TotalInsurance) - int64(preFlashPoolDetailStore.TotalInsurance)
-	//TODO: rate
+
+	flashPoolDetail.TotalSupplyRate = flashPoolDetail.SupplyVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalSupply)
+	flashPoolDetail.TotalBorrowRate = flashPoolDetail.BorrowVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalBorrow)
+	flashPoolDetail.TotalInsuranceRate = flashPoolDetail.InsuranceVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalInsurance)
 	return flashPoolDetail, nil
 }
 
@@ -273,6 +276,50 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 	}
 	flashPoolDetail.Timestamp = uint64(time.Now().Unix())
 	return flashPoolDetail, nil
+}
+
+func (this *FlashPoolManager) FlashPoolMarketStore() error {
+	allMarkets, err := this.getAllMarkets()
+	if err != nil {
+		return fmt.Errorf("FlashPoolMarketStore, this.getAllMarkets error: %s", err)
+	}
+	timestamp := uint64(time.Now().Unix())
+	for _, address := range allMarkets {
+		flashPoolMarket := new(store.FlashPoolMarket)
+		supplyAmount, err := this.getSupplyAmount(address)
+		if err != nil {
+			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
+		}
+		borrowAmount, err := this.getBorrowAmount(address)
+		if err != nil {
+			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
+		}
+		insuranceAmount, err := this.getInsuranceAmount(address)
+		if err != nil {
+			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
+		}
+		name := AssetMap[address.ToHexString()]
+		price, err := this.assetPrice(name)
+		if err != nil {
+			return fmt.Errorf("FlashPoolMarketStore, this.assetPrice error: %s", err)
+		}
+		// supplyAmount * price
+		// borrowAmount * price
+		// insuranceAmount * price
+		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		flashPoolMarket.Name = name
+		flashPoolMarket.TotalSupply = supplyDollar
+		flashPoolMarket.TotalBorrow = borrowDollar
+		flashPoolMarket.TotalInsurance = insuranceDollar
+		flashPoolMarket.Timestamp = timestamp
+		err = this.store.SaveFlashPoolMarket(flashPoolMarket)
+		if err != nil {
+			return fmt.Errorf("FlashPoolMarketStore, this.store.SaveFlashPoolMarket error: %s", err)
+		}
+	}
+	return nil
 }
 
 func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, error) {
@@ -328,7 +375,14 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		market.SupplyApy = supplyApy
 		market.BorrowApy = borrowApy
 		market.InsuranceApy = insuranceApy
-		//TODO: rate
+
+		latestFlashPoolMarket, err := this.store.LoadLatestFlashPoolMarket(market.Name)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
+		}
+		market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / latestFlashPoolMarket.TotalSupply
+		market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / latestFlashPoolMarket.TotalBorrow
+		market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / latestFlashPoolMarket.TotalInsurance
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
 	return flashPoolAllMarket, nil
