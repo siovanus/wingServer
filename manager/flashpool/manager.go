@@ -414,7 +414,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 	var assetInSupplyDollar uint64 = 0
 	var totalBorrowBalance uint64 = 0
 	for _, address := range allMarkets {
-		borrowAmount, err := this.getSupplyAmountByAccount(address, account)
+		borrowAmount, err := this.getBorrowAmountByAccount(address, account)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
@@ -432,11 +432,11 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
-		borrowAmount, err := this.getSupplyAmountByAccount(address, account)
+		borrowAmount, err := this.getBorrowAmountByAccount(address, account)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
-		insuranceAmount, err := this.getSupplyAmountByAccount(address, account)
+		insuranceAmount, err := this.getInsuranceAmountByAccount(address, account)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
