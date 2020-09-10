@@ -403,10 +403,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 	if err != nil {
 		return nil, fmt.Errorf("UserFlashPoolOverview, this.getAllMarkets error: %s", err)
 	}
-	assetsIn, err := this.getAssetsIn(account)
-	if err != nil {
-		return nil, fmt.Errorf("UserFlashPoolOverview, this.getAssetsIn error: %s", err)
-	}
+	assetsIn, _ := this.getAssetsIn(account)
 	userFlashPoolOverview := &common.UserFlashPoolOverview{
 		CurrentSupply:    make([]*common.Supply, 0),
 		CurrentBorrow:    make([]*common.Borrow, 0),
@@ -537,14 +534,15 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 	}
 
 	marketMeta, err := this.getMarketMeta()
-	if err != nil {
-		return nil, fmt.Errorf("UserFlashPoolOverview, this.getMarketMeta error: %s", err)
+	if err == nil {
+		// assetInSupplyDollar(already multiply 100) * CollateralFactor / FrontDecimal
+		userFlashPoolOverview.BorrowLimit = new(big.Int).Div(new(big.Int).Mul(new(big.Int).SetUint64(assetInSupplyDollar),
+			marketMeta.CollateralFactor.ToBigInt()), FrontDecimal).Uint64()
 	}
-	userFlashPoolOverview.NetApy = userFlashPoolOverview.NetApy / int64(userFlashPoolOverview.SupplyBalance+
-		userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance)
-	// assetInSupplyDollar(already multiply 100) * CollateralFactor / FrontDecimal
-	userFlashPoolOverview.BorrowLimit = new(big.Int).Div(new(big.Int).Mul(new(big.Int).SetUint64(assetInSupplyDollar),
-		marketMeta.CollateralFactor.ToBigInt()), FrontDecimal).Uint64()
+	if userFlashPoolOverview.SupplyBalance+userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance != 0 {
+		userFlashPoolOverview.NetApy = userFlashPoolOverview.NetApy / int64(userFlashPoolOverview.SupplyBalance+
+			userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance)
+	}
 
 	return userFlashPoolOverview, nil
 }
