@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/store"
 	"math/big"
 	"sort"
@@ -22,22 +23,8 @@ var WingDecimal = new(big.Int).SetUint64(1000000)
 var FrontDecimal = new(big.Int).SetUint64(10000000000000000)
 var FrontPercentageDecimal = new(big.Int).SetUint64(100000000000000)
 
-var IconMap = map[string]string{
-	"oETH":  "http://106.75.209.209/icon/eth_icon.svg",
-	"oDAI":  "http://106.75.209.209/icon/asset_dai_icon.svg",
-	"Flash": "http://106.75.209.209/icon/flash_icon.svg",
-	"IF":    "http://106.75.209.209/icon/if_icon.svg",
-}
-
-var AssetMap = map[string]string{
-	"a": "oWBTC",
-	"b": "oETH",
-	"c": "oDAI",
-	"d": "ONT",
-	"e": "oUSDT",
-}
-
 type FlashPoolManager struct {
+	cfg             *config.Config
 	contractAddress ocommon.Address
 	oracleAddress   ocommon.Address
 	sdk             *sdk.OntologySdk
@@ -45,8 +32,9 @@ type FlashPoolManager struct {
 }
 
 func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk,
-	store *store.Client) *FlashPoolManager {
+	store *store.Client, cfg *config.Config) *FlashPoolManager {
 	manager := &FlashPoolManager{
+		cfg:             cfg,
 		contractAddress: contractAddress,
 		oracleAddress:   oracleAddress,
 		sdk:             sdk,
@@ -85,8 +73,8 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 		}
 		distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
 		distribution := &common.Distribution{
-			Icon: IconMap[AssetMap[address.ToHexString()]],
-			Name: AssetMap[address.ToHexString()],
+			Icon: this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
+			Name: this.cfg.AssetMap[address.ToHexString()],
 			// totalDistribution / distributedDay
 			PerDay:          new(big.Int).Div(new(big.Int).Div(totalDistribution, new(big.Int).SetUint64(distributedDay)), FrontDecimal).Uint64(),
 			SupplyAmount:    new(big.Int).Div(supplyAmount, FrontDecimal).Uint64(),
@@ -122,7 +110,7 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 		if err != nil {
 			return nil, fmt.Errorf("PoolDistribution, this.getTotalDistribution error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("PoolDistribution, this.assetPrice error: %s", err)
 		}
@@ -187,7 +175,7 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.getSupplyAmount error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.assetPrice error: %s", err)
 		}
@@ -201,19 +189,19 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		flashPoolDetail.TotalBorrow += borrowDollar
 		flashPoolDetail.TotalInsurance += insuranceDollar
 
-		name := AssetMap[address.ToHexString()]
+		name := this.cfg.AssetMap[address.ToHexString()]
 		flashPoolDetail.SupplyMarketRank = append(flashPoolDetail.SupplyMarketRank, &common.MarketFund{
-			Icon: IconMap[name],
+			Icon: this.cfg.IconMap[name],
 			Name: name,
 			Fund: supplyDollar,
 		})
 		flashPoolDetail.BorrowMarketRank = append(flashPoolDetail.BorrowMarketRank, &common.MarketFund{
-			Icon: IconMap[name],
+			Icon: this.cfg.IconMap[name],
 			Name: name,
 			Fund: borrowDollar,
 		})
 		flashPoolDetail.InsuranceMarketRank = append(flashPoolDetail.InsuranceMarketRank, &common.MarketFund{
-			Icon: IconMap[name],
+			Icon: this.cfg.IconMap[name],
 			Name: name,
 			Fund: insuranceDollar,
 		})
@@ -235,9 +223,9 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 	flashPoolDetail.BorrowVolumeDaily = int64(flashPoolDetail.TotalBorrow) - int64(preFlashPoolDetailStore.TotalBorrow)
 	flashPoolDetail.InsuranceVolumeDaily = int64(flashPoolDetail.TotalInsurance) - int64(preFlashPoolDetailStore.TotalInsurance)
 
-	flashPoolDetail.TotalSupplyRate = flashPoolDetail.SupplyVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalSupply)
-	flashPoolDetail.TotalBorrowRate = flashPoolDetail.BorrowVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalBorrow)
-	flashPoolDetail.TotalInsuranceRate = flashPoolDetail.InsuranceVolumeDaily * 100 / int64(preFlashPoolDetailStore.TotalInsurance)
+	flashPoolDetail.TotalSupplyRate = flashPoolDetail.SupplyVolumeDaily * 100 / int64(flashPoolDetail.TotalSupply)
+	flashPoolDetail.TotalBorrowRate = flashPoolDetail.BorrowVolumeDaily * 100 / int64(flashPoolDetail.TotalBorrow)
+	flashPoolDetail.TotalInsuranceRate = flashPoolDetail.InsuranceVolumeDaily * 100 / int64(flashPoolDetail.TotalInsurance)
 	return flashPoolDetail, nil
 }
 
@@ -260,7 +248,7 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetailForStore, this.assetPrice error: %s", err)
 		}
@@ -298,8 +286,8 @@ func (this *FlashPoolManager) FlashPoolMarketStore() error {
 		if err != nil {
 			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
 		}
-		name := AssetMap[address.ToHexString()]
-		price, err := this.assetPrice(name)
+		name := this.cfg.AssetMap[address.ToHexString()]
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return fmt.Errorf("FlashPoolMarketStore, this.assetPrice error: %s", err)
 		}
@@ -343,7 +331,7 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.assetPrice error: %s", err)
 		}
@@ -362,8 +350,8 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		}
 
 		market := new(common.Market)
-		market.Name = AssetMap[address.ToHexString()]
-		market.Icon = IconMap[market.Name]
+		market.Name = this.cfg.AssetMap[address.ToHexString()]
+		market.Icon = this.cfg.IconMap[market.Name]
 
 		// supplyAmount * price
 		// borrowAmount * price
@@ -380,9 +368,9 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
 		}
-		market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / latestFlashPoolMarket.TotalSupply
-		market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / latestFlashPoolMarket.TotalBorrow
-		market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / latestFlashPoolMarket.TotalInsurance
+		market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
+		market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / market.TotalBorrow
+		market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / market.TotalInsurance
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
 	return flashPoolAllMarket, nil
@@ -415,7 +403,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.assetPrice error: %s", err)
 		}
@@ -437,7 +425,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmountByAccount error: %s", err)
 		}
-		price, err := this.assetPrice(AssetMap[address.ToHexString()])
+		price, err := this.assetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.assetPrice error: %s", err)
 		}
@@ -477,8 +465,8 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 
 		if supplyAmount.Uint64() != 0 {
 			supply := &common.Supply{
-				Name:          AssetMap[address.ToHexString()],
-				Icon:          IconMap[AssetMap[address.ToHexString()]],
+				Name:          this.cfg.AssetMap[address.ToHexString()],
+				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyDollar:  supplyAmountU64,
 				SupplyBalance: new(big.Int).Div(supplyAmount, FrontDecimal).Uint64(),
 				Apy:           supplyApy,
@@ -488,8 +476,8 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		}
 		if borrowAmount.Uint64() != 0 {
 			borrow := &common.Borrow{
-				Name:          AssetMap[address.ToHexString()],
-				Icon:          IconMap[AssetMap[address.ToHexString()]],
+				Name:          this.cfg.AssetMap[address.ToHexString()],
+				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				BorrowDollar:  borrowAmountU64,
 				BorrowBalance: new(big.Int).Div(borrowAmount, FrontDecimal).Uint64(),
 				Apy:           borrowApy,
@@ -499,8 +487,8 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		}
 		if insuranceAmount.Uint64() != 0 {
 			insurance := &common.Insurance{
-				Name:             AssetMap[address.ToHexString()],
-				Icon:             IconMap[AssetMap[address.ToHexString()]],
+				Name:             this.cfg.AssetMap[address.ToHexString()],
+				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				InsuranceDollar:  insuranceAmountU64,
 				InsuranceBalance: new(big.Int).Div(insuranceAmount, FrontDecimal).Uint64(),
 				Apy:              insuranceApy,
@@ -518,8 +506,8 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		}
 		if supplyAmount.Uint64() == 0 && borrowAmount.Uint64() == 0 && insuranceAmount.Uint64() == 0 {
 			userMarket := &common.UserMarket{
-				Name:            AssetMap[address.ToHexString()],
-				Icon:            IconMap[AssetMap[address.ToHexString()]],
+				Name:            this.cfg.AssetMap[address.ToHexString()],
+				Icon:            this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyApy:       supplyApy,
 				BorrowApy:       borrowApy,
 				BorrowLiquidity: new(big.Int).Div(totalBorrowAmount, FrontDecimal).Uint64(),

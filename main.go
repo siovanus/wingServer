@@ -101,12 +101,12 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
 		return
 	}
-	govMgr := governance.NewGovernanceManager(govAddress, servConfig.WingAddress, sdk)
+	govMgr := governance.NewGovernanceManager(govAddress, servConfig.WingAddress, sdk, servConfig)
 	if govMgr == nil {
 		log.Errorf("governance manager is nil")
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk, store)
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk, store, servConfig)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return

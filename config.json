@@ -1,8 +1,24 @@
 {
   "json_rpc_address": "http://polaris2.ont.io:20336",
-  "port": 20334,
-  "governance_address": "0100000000000000000000000000000000000000",
-  "flash_pool_address": "0100000000000000000000000000000000000000",
-  "oracle_address": "0100000000000000000000000000000000000000",
-  "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable"
+  "port": 10337,
+  "governance_address": "f4c864cd5c01339eef2ebbf7dd6904f389e4cd75",
+  "flash_pool_address": "57460136bb03f60a5c6ed55515fe3ae39d630756",
+  "oracle_address": "356fb121f0812e4be51d5668d3d26832d2121695",
+  "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
+  "asset_map": {
+    "413730b92d1d5b7e1a80fa5a24779ee13d17767f": "oWBTC",
+    "7e805443900dfd9987c7bfbb545a914a86b9b487": "oETH",
+    "b2e1aa62df018869d665579982086160652da128": "oUSDT"
+  },
+  "icon_map": {
+    "oETH":  "http://106.75.209.209/icon/eth_icon.svg",
+    "oDAI":  "http://106.75.209.209/icon/asset_dai_icon.svg",
+    "Flash": "http://106.75.209.209/icon/flash_icon.svg",
+    "IF":    "http://106.75.209.209/icon/if_icon.svg"
+  },
+  "oracle_map": {
+    "413730b92d1d5b7e1a80fa5a24779ee13d17767f": "BTC",
+    "7e805443900dfd9987c7bfbb545a914a86b9b487": "ETH",
+    "b2e1aa62df018869d665579982086160652da128": "USDT"
+  }
 }

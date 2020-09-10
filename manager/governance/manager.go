@@ -4,6 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
+	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
 	"time"
 )
@@ -20,13 +21,15 @@ var GenesisTime = uint64(time.Date(2020, time.September, 15, 0, 0, 0, 0, time.UT
 var DailyDistibute = []uint64{5184, 4320, 3456, 2952, 1728, 1728, 864, 864, 864, 864}
 
 type GovernanceManager struct {
+	cfg             *config.Config
 	contractAddress ocommon.Address
 	wingAddress     string
 	sdk             *sdk.OntologySdk
 }
 
-func NewGovernanceManager(contractAddress ocommon.Address, wingAddress string, sdk *sdk.OntologySdk) *GovernanceManager {
+func NewGovernanceManager(contractAddress ocommon.Address, wingAddress string, sdk *sdk.OntologySdk, cfg *config.Config) *GovernanceManager {
 	manager := &GovernanceManager{
+		cfg:             cfg,
 		contractAddress: contractAddress,
 		wingAddress:     wingAddress,
 		sdk:             sdk,
