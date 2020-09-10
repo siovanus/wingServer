@@ -122,6 +122,8 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 		distribution.InsuranceAmount += new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
 		distribution.Total += new(big.Int).Div(totalDistribution, WingDecimal).Uint64()
 	}
+	distribution.Name = "Flash"
+	distribution.Icon = this.cfg.IconMap[distribution.Name]
 	distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
 	distribution.PerDay = distribution.Total / distributedDay
 	return distribution, nil
@@ -144,10 +146,14 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 		total += new(big.Int).Div(totalDistribution, WingDecimal).Uint64()
 	}
 	today := governance.DailyDistibute[index]
+	var share uint64 = 0
+	if total == 0 {
+		share = 0
+	}
 
 	return &common.FlashPoolBanner{
 		Today: today,
-		Share: today * PercentageDecimal / total,
+		Share: share,
 		Total: total,
 	}, nil
 }
@@ -223,9 +229,15 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 	flashPoolDetail.BorrowVolumeDaily = int64(flashPoolDetail.TotalBorrow) - int64(preFlashPoolDetailStore.TotalBorrow)
 	flashPoolDetail.InsuranceVolumeDaily = int64(flashPoolDetail.TotalInsurance) - int64(preFlashPoolDetailStore.TotalInsurance)
 
-	flashPoolDetail.TotalSupplyRate = flashPoolDetail.SupplyVolumeDaily * 100 / int64(flashPoolDetail.TotalSupply)
-	flashPoolDetail.TotalBorrowRate = flashPoolDetail.BorrowVolumeDaily * 100 / int64(flashPoolDetail.TotalBorrow)
-	flashPoolDetail.TotalInsuranceRate = flashPoolDetail.InsuranceVolumeDaily * 100 / int64(flashPoolDetail.TotalInsurance)
+	if flashPoolDetail.TotalSupply != 0 {
+		flashPoolDetail.TotalSupplyRate = flashPoolDetail.SupplyVolumeDaily * 100 / int64(flashPoolDetail.TotalSupply)
+	}
+	if flashPoolDetail.TotalBorrow != 0 {
+		flashPoolDetail.TotalBorrowRate = flashPoolDetail.BorrowVolumeDaily * 100 / int64(flashPoolDetail.TotalBorrow)
+	}
+	if flashPoolDetail.TotalInsurance != 0 {
+		flashPoolDetail.TotalInsuranceRate = flashPoolDetail.InsuranceVolumeDaily * 100 / int64(flashPoolDetail.TotalInsurance)
+	}
 	return flashPoolDetail, nil
 }
 
@@ -368,9 +380,15 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
 		}
-		market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
-		market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / market.TotalBorrow
-		market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / market.TotalInsurance
+		if market.TotalSupply != 0 {
+			market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
+		}
+		if market.TotalBorrow != 0 {
+			market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / market.TotalBorrow
+		}
+		if market.TotalInsurance != 0 {
+			market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / market.TotalInsurance
+		}
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
 	return flashPoolAllMarket, nil

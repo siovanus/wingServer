@@ -239,11 +239,25 @@ func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (uint
 
 func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (uint64, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
-		"insuranceRatePerBlock", []interface{}{})
+		"insuranceAddr", []interface{}{})
 	if err != nil {
 		return 0, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return 0, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	insuranceAddress, err := common.AddressParseFromBytes(r)
+	if err != nil {
+		return 0, fmt.Errorf("getInsuranceApy, common.AddressParseFromBytes error: %s", err)
+	}
+
+	preExecResult, err = this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
+		"supplyRatePerBlock", []interface{}{})
+	if err != nil {
+		return 0, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err = preExecResult.Result.ToByteArray()
 	if err != nil {
 		return 0, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
 	}

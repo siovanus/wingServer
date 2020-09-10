@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/siovanus/wingServer/store/migrations"
 )
 
 const (
@@ -65,6 +66,9 @@ func ConnectToDb(uri string) (*Client, error) {
 	db, err := gorm.Open(sqlDialect, uri)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open %s for gorm DB: %+v", uri, err)
+	}
+	if err = migrations.Migrate(db); err != nil {
+		return nil, fmt.Errorf("newDBStore#Migrate: %s", err)
 	}
 	store := &Client{
 		db: db.Set("gorm:auto_preload", true),

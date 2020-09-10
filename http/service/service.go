@@ -26,6 +26,20 @@ func (this *Service) Close() {
 }
 
 func (this *Service) Snapshot() {
+	flashPoolDetail, err := this.fpMgr.FlashPoolDetailForStore()
+	if err != nil {
+		log.Errorf("Snapshot, this.fpMgr.FlashPoolDetailForStore error: %s", err)
+	}
+	err = this.store.SaveFlashPoolDetail(flashPoolDetail)
+	if err != nil {
+		log.Errorf("Snapshot, this.store.SaveFlashPoolDetail error: %s", err)
+	}
+
+	// FlashPoolMarketForStore
+	err = this.fpMgr.FlashPoolMarketStore()
+	if err != nil {
+		log.Errorf("Snapshot, this.fpMgr.FlashPoolMarketStore error: %s", err)
+	}
 	for {
 		now := time.Now()
 		// 计算下一个零点
