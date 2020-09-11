@@ -5,15 +5,18 @@ import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/csv"
+	"encoding/hex"
 	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	ocommon "github.com/ontio/ontology/common"
+	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/store/migrations"
 )
 
 const (
-	sqlDialect         = "postgres"
-	FlashPoolDetailKey = "flashpooldetail"
+	sqlDialect = "postgres"
 )
 
 // SQLStringArray is a string array stored in the database as comma separated values.
@@ -115,4 +118,84 @@ func (client Client) LoadLatestFlashPoolMarket(name string) (FlashPoolMarket, er
 
 func (client Client) SaveFlashPoolMarket(flashPoolMarket *FlashPoolMarket) error {
 	return client.db.Create(flashPoolMarket).Error
+}
+
+type Price struct {
+	Name  string `gorm:"primary_key"`
+	Price uint64
+}
+
+func (client Client) LoadPrice(name string) (Price, error) {
+	var price Price
+	err := client.db.Where(Price{Name: name}).Last(&price).Error
+	return price, err
+}
+
+func (client Client) SavePrice(Price *Price) error {
+	return client.db.Save(Price).Error
+}
+
+type TrackHeight struct {
+	Name   string `gorm:"primary_key"`
+	Height uint32
+}
+
+func (client Client) LoadTrackHeight() (uint32, error) {
+	var trackHeight TrackHeight
+	err := client.db.Where(TrackHeight{Name: "TrackHeight"}).Last(&trackHeight).Error
+	return trackHeight.Height, err
+}
+
+func (client Client) SaveTrackHeight(height uint32) error {
+	trackHeight := &TrackHeight{
+		Name:   "TrackHeight",
+		Height: height,
+	}
+	return client.db.Save(trackHeight).Error
+}
+
+type UserFlashPoolOverview struct {
+	UserAddress      string `gorm:"primary_key"`
+	SupplyBalance    uint64
+	BorrowBalance    uint64
+	InsuranceBalance uint64
+	BorrowLimit      uint64
+	NetApy           int64
+	Info             string
+}
+
+func (client Client) LoadUserFlashPoolOverview(userAddress string) (*common.UserFlashPoolOverview, error) {
+	var userFlashPoolOverview UserFlashPoolOverview
+	err := client.db.Where(UserFlashPoolOverview{UserAddress: userAddress}).Last(&userFlashPoolOverview).Error
+	output := new(common.UserFlashPoolOverview)
+	info, err := hex.DecodeString(userFlashPoolOverview.Info)
+	if err != nil {
+		return output, nil
+	}
+	source := ocommon.NewZeroCopySource(info)
+	err = output.HalfDeserialization(source)
+	if err != nil {
+		return output, nil
+	}
+	output.SupplyBalance = userFlashPoolOverview.SupplyBalance
+	output.BorrowBalance = userFlashPoolOverview.BorrowBalance
+	output.InsuranceBalance = userFlashPoolOverview.InsuranceBalance
+	output.BorrowLimit = userFlashPoolOverview.BorrowLimit
+	output.NetApy = userFlashPoolOverview.NetApy
+	return output, err
+}
+
+func (client Client) SaveUserFlashPoolOverview(userAddress string, input *common.UserFlashPoolOverview) error {
+	sink := ocommon.NewZeroCopySink(nil)
+	input.HalfSerialization(sink)
+	userFlashPoolOverview := &UserFlashPoolOverview{
+		UserAddress:      userAddress,
+		SupplyBalance:    input.SupplyBalance,
+		BorrowBalance:    input.BorrowBalance,
+		InsuranceBalance: input.InsuranceBalance,
+		BorrowLimit:      input.BorrowLimit,
+		NetApy:           input.NetApy,
+		Info:             hex.EncodeToString(sink.Bytes()),
+	}
+	return client.db.Save(userFlashPoolOverview).Error
 }

@@ -1,19 +1,28 @@
 package service
 
 import (
+	"os"
+	"time"
+
+	sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
-	"time"
 )
 
 type Service struct {
-	govMgr GovernanceManager
-	fpMgr  FlashPoolManager
-	store  *store.Client
+	sdk         *sdk.OntologySdk
+	cfg         *config.Config
+	govMgr      GovernanceManager
+	fpMgr       FlashPoolManager
+	store       *store.Client
+	trackHeight uint32
 }
 
-func NewService(govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client) *Service {
-	return &Service{govMgr: govMgr, fpMgr: fpMgr, store: store}
+var ASSET = []string{"ONT", "BTC", "ETH", "DAI"}
+
+func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client, cfg *config.Config) *Service {
+	return &Service{sdk: sdk, govMgr: govMgr, fpMgr: fpMgr, store: store}
 }
 
 func (this *Service) Close() {
@@ -64,5 +73,60 @@ func (this *Service) Snapshot() {
 		if err != nil {
 			log.Errorf("Snapshot, this.fpMgr.FlashPoolMarketStore error: %s", err)
 		}
+	}
+}
+
+func (this *Service) TrackEvent() {
+	trackHeight, err := this.store.LoadTrackHeight()
+	if err != nil {
+		log.Infof("TrackEvent, this.store.LoadTrackHeight error: %s", err)
+		currentHeight, err := this.sdk.GetCurrentBlockHeight()
+		if err != nil {
+			log.Errorf("TrackEvent, this.sdk.GetCurrentBlockHeight error:", err)
+			os.Exit(1)
+		}
+		this.trackHeight = currentHeight
+	}
+	this.trackHeight = trackHeight
+	for {
+		currentHeight, err := this.sdk.GetCurrentBlockHeight()
+		if err != nil {
+			log.Errorf("TrackEvent, this.sideSdk.GetCurrentBlockHeight error:", err)
+		}
+		for i := this.trackHeight + 1; i <= currentHeight; i++ {
+			ok, err := this.TrackOracle(i)
+			if err != nil {
+				log.Errorf("TrackEvent, this.TrackOracle error:", err)
+				break
+			}
+			if ok {
+				err = this.PriceFeed()
+				if err != nil {
+					log.Errorf("TrackEvent, this.PriceFeed error:", err)
+					break
+				}
+			}
+
+			account, err := this.TrackFlash(i)
+			if err != nil {
+				log.Errorf("TrackEvent, this.TrackFlash error:", err)
+				break
+			}
+			if account != "" {
+				err = this.StoreFlashPoolOverview(account)
+				if err != nil {
+					log.Errorf("TrackEvent, this.StoreFlashPoolOverview error:", err)
+					break
+				}
+			}
+
+			this.trackHeight++
+			err = this.store.SaveTrackHeight(this.trackHeight)
+			if err != nil {
+				log.Errorf("TrackEvent, this.store.SaveTrackHeight error:", err)
+				break
+			}
+		}
+		time.Sleep(time.Duration(this.cfg.TrackEventInterval) * time.Second)
 	}
 }

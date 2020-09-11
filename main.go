@@ -112,10 +112,11 @@ func startServer(ctx *cli.Context) {
 		return
 	}
 	log.Infof("init svr success")
-	serv := service.NewService(govMgr, fpMgr, store)
+	serv := service.NewService(sdk, govMgr, fpMgr, store, servConfig)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 
 	go serv.Snapshot()
+	go serv.TrackEvent()
 	go restServer.Start()
 	go checkLogFile(logLevel)
 

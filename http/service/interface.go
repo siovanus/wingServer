@@ -20,4 +20,5 @@ type FlashPoolManager interface {
 	FlashPoolMarketStore() error
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
+	UserFlashPoolOverviewForStore(account string) (*common.UserFlashPoolOverview, error)
 }

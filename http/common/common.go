@@ -1,5 +1,10 @@
 package common
 
+import (
+	"fmt"
+	"github.com/ontio/ontology/common"
+)
+
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
@@ -127,14 +132,142 @@ type UserFlashPoolOverview struct {
 	AllMarket []*UserMarket
 }
 
+func (this *UserFlashPoolOverview) HalfSerialization(sink *common.ZeroCopySink) {
+	sink.WriteUint64(uint64(len(this.CurrentSupply)))
+	for _, v := range this.CurrentSupply {
+		v.Serialization(sink)
+	}
+
+	sink.WriteUint64(uint64(len(this.CurrentBorrow)))
+	for _, v := range this.CurrentBorrow {
+		v.Serialization(sink)
+	}
+
+	sink.WriteUint64(uint64(len(this.CurrentInsurance)))
+	for _, v := range this.CurrentInsurance {
+		v.Serialization(sink)
+	}
+
+	sink.WriteUint64(uint64(len(this.AllMarket)))
+	for _, v := range this.AllMarket {
+		v.Serialization(sink)
+	}
+}
+
+func (this *UserFlashPoolOverview) HalfDeserialization(source *common.ZeroCopySource) error {
+	l, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("currentSupply length deserialization error eof")
+	}
+	currentSupply := make([]*Supply, 0)
+	for i := 0; uint64(i) < l; i++ {
+		t := new(Supply)
+		err := t.Deserialization(source)
+		if err != nil {
+			return fmt.Errorf("currentSupply deserialization error eof")
+		}
+		currentSupply = append(currentSupply, t)
+	}
+
+	l, eof = source.NextUint64()
+	if eof {
+		return fmt.Errorf("currentBorrow length deserialization error eof")
+	}
+	currentBorrow := make([]*Borrow, 0)
+	for i := 0; uint64(i) < l; i++ {
+		t := new(Borrow)
+		err := t.Deserialization(source)
+		if err != nil {
+			return fmt.Errorf("currentBorrow deserialization error eof")
+		}
+		currentBorrow = append(currentBorrow, t)
+	}
+
+	l, eof = source.NextUint64()
+	if eof {
+		return fmt.Errorf("currentInsurance length deserialization error eof")
+	}
+	currentInsurance := make([]*Insurance, 0)
+	for i := 0; uint64(i) < l; i++ {
+		t := new(Insurance)
+		err := t.Deserialization(source)
+		if err != nil {
+			return fmt.Errorf("currentInsurance deserialization error eof")
+		}
+		currentInsurance = append(currentInsurance, t)
+	}
+
+	l, eof = source.NextUint64()
+	if eof {
+		return fmt.Errorf("allMarket length deserialization error eof")
+	}
+	allMarket := make([]*UserMarket, 0)
+	for i := 0; uint64(i) < l; i++ {
+		t := new(UserMarket)
+		err := t.Deserialization(source)
+		if err != nil {
+			return fmt.Errorf("allMarket deserialization error eof")
+		}
+		allMarket = append(allMarket, t)
+	}
+
+	this.CurrentSupply = currentSupply
+	this.CurrentBorrow = currentBorrow
+	this.CurrentInsurance = currentInsurance
+	this.AllMarket = allMarket
+	return nil
+}
+
 type Supply struct {
 	Icon          string
 	Name          string
 	SupplyDollar  uint64
 	SupplyBalance uint64
 	Apy           uint64
-	Earned        uint64
 	IfCollateral  bool
+}
+
+func (this *Supply) Serialization(sink *common.ZeroCopySink) {
+	sink.WriteString(this.Icon)
+	sink.WriteString(this.Name)
+	sink.WriteUint64(this.SupplyDollar)
+	sink.WriteUint64(this.SupplyBalance)
+	sink.WriteUint64(this.Apy)
+	sink.WriteBool(this.IfCollateral)
+}
+
+func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
+	icon, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
+	}
+	name, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("name deserialization error eof")
+	}
+	supplyDollar, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("supplyDollar deserialization error eof")
+	}
+	supplyBalance, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("supplyBalance deserialization error eof")
+	}
+	apy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("apy deserialization error eof")
+	}
+	ifCollateral, irregular, eof := source.NextBool()
+	if irregular || eof {
+		return fmt.Errorf("ifCollateral deserialization error eof")
+	}
+	this.Icon = icon
+	this.Name = name
+	this.SupplyDollar = supplyDollar
+	this.SupplyBalance = supplyBalance
+	this.Apy = apy
+	this.IfCollateral = ifCollateral
+	return nil
 }
 
 type Borrow struct {
@@ -143,8 +276,50 @@ type Borrow struct {
 	BorrowDollar  uint64
 	BorrowBalance uint64
 	Apy           uint64
-	Accrued       uint64
 	Limit         uint64
+}
+
+func (this *Borrow) Serialization(sink *common.ZeroCopySink) {
+	sink.WriteString(this.Icon)
+	sink.WriteString(this.Name)
+	sink.WriteUint64(this.BorrowDollar)
+	sink.WriteUint64(this.BorrowBalance)
+	sink.WriteUint64(this.Apy)
+	sink.WriteUint64(this.Limit)
+}
+
+func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
+	icon, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
+	}
+	name, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("name deserialization error eof")
+	}
+	borrowDollar, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("borrowDollar deserialization error eof")
+	}
+	borrowBalance, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("borrowBalance deserialization error eof")
+	}
+	apy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("apy deserialization error eof")
+	}
+	limit, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("limit deserialization error eof")
+	}
+	this.Icon = icon
+	this.Name = name
+	this.BorrowDollar = borrowDollar
+	this.BorrowBalance = borrowBalance
+	this.Apy = apy
+	this.Limit = limit
+	return nil
 }
 
 type Insurance struct {
@@ -155,6 +330,43 @@ type Insurance struct {
 	Apy              uint64
 }
 
+func (this *Insurance) Serialization(sink *common.ZeroCopySink) {
+	sink.WriteString(this.Icon)
+	sink.WriteString(this.Name)
+	sink.WriteUint64(this.InsuranceDollar)
+	sink.WriteUint64(this.InsuranceBalance)
+	sink.WriteUint64(this.Apy)
+}
+
+func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
+	icon, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
+	}
+	name, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("name deserialization error eof")
+	}
+	insuranceDollar, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("insuranceDollar deserialization error eof")
+	}
+	insuranceBalance, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("insuranceBalance deserialization error eof")
+	}
+	apy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("apy deserialization error eof")
+	}
+	this.Icon = icon
+	this.Name = name
+	this.InsuranceDollar = insuranceDollar
+	this.InsuranceBalance = insuranceBalance
+	this.Apy = apy
+	return nil
+}
+
 type UserMarket struct {
 	Icon            string
 	Name            string
@@ -163,6 +375,55 @@ type UserMarket struct {
 	BorrowLiquidity uint64
 	InsuranceApy    uint64
 	InsuranceAmount uint64
+}
+
+func (this *UserMarket) Serialization(sink *common.ZeroCopySink) {
+	sink.WriteString(this.Icon)
+	sink.WriteString(this.Name)
+	sink.WriteUint64(this.SupplyApy)
+	sink.WriteUint64(this.BorrowApy)
+	sink.WriteUint64(this.BorrowLiquidity)
+	sink.WriteUint64(this.InsuranceApy)
+	sink.WriteUint64(this.InsuranceAmount)
+}
+
+func (this *UserMarket) Deserialization(source *common.ZeroCopySource) error {
+	icon, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
+	}
+	name, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("name deserialization error eof")
+	}
+	supplyApy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("supplyApy deserialization error eof")
+	}
+	borrowApy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("borrowApy deserialization error eof")
+	}
+	borrowLiquidity, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("borrowLiquidity deserialization error eof")
+	}
+	insuranceApy, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("insuranceApy deserialization error eof")
+	}
+	insuranceAmount, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("insuranceAmount deserialization error eof")
+	}
+	this.Icon = icon
+	this.Name = name
+	this.SupplyApy = supplyApy
+	this.BorrowApy = borrowApy
+	this.BorrowLiquidity = borrowLiquidity
+	this.InsuranceApy = insuranceApy
+	this.InsuranceAmount = insuranceAmount
+	return nil
 }
 
 type FlashPoolAllMarket struct {
