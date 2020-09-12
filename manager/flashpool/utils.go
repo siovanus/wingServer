@@ -283,47 +283,74 @@ func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (u
 }
 
 type MarketMeta struct {
-	Address          common.Address
-	IsList           bool
-	CollateralFactor common.I128
+	Addr          common.Address
+	InsuranceAddr common.Address
+
+	IsListed    bool
+	ReceiveWing bool
+
+	WingWeight               *big.Int
+	CollateralFactorMantissa *big.Int
 }
 
-func (this *MarketMeta) Deserialization(source *common.ZeroCopySource) error {
-	address, eof := source.NextAddress()
+func DeserializeMarketMeta(data []byte) (*MarketMeta, error) {
+	source := common.NewZeroCopySource(data)
+	addr, eof := source.NextAddress()
 	if eof {
-		return fmt.Errorf("address deserialization error eof")
+		return nil, fmt.Errorf("read addr eof")
 	}
-	isList, irregular, eof := source.NextBool()
-	if irregular || eof {
-		return fmt.Errorf("isList deserialization error eof")
+	insurance, eof := source.NextAddress()
+	if eof {
+		return nil, fmt.Errorf("read insurance eof")
+	}
+	isListed, irr, eof := source.NextBool()
+	if irr {
+		return nil, fmt.Errorf("read isListed irr")
+	}
+	if eof {
+		return nil, fmt.Errorf("read isListed eof")
+	}
+	receiveWing, irr, eof := source.NextBool()
+	if irr {
+		return nil, fmt.Errorf("read receiveWing irr")
+	}
+	if eof {
+		return nil, fmt.Errorf("read receiveWing eof")
+	}
+	wingWeight, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read wingWeight eof")
 	}
 	collateralFactor, eof := source.NextI128()
 	if eof {
-		return fmt.Errorf("collateralFactor deserialization error eof")
+		return nil, fmt.Errorf("read collateralFactor eof")
 	}
-	this.Address = address
-	this.IsList = isList
-	this.CollateralFactor = collateralFactor
-	return nil
+	return &MarketMeta{
+		Addr:                     addr,
+		InsuranceAddr:            insurance,
+		IsListed:                 isListed,
+		ReceiveWing:              receiveWing,
+		WingWeight:               wingWeight.ToBigInt(),
+		CollateralFactorMantissa: collateralFactor.ToBigInt(),
+	}, nil
 }
 
-func (this *FlashPoolManager) getMarketMeta() (*MarketMeta, error) {
-	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress,
-		"marketMeta", []interface{}{})
+func (this *FlashPoolManager) getMarketMeta(market common.Address) (*MarketMeta, error) {
+	method := "marketMeta"
+	params := []interface{}{market}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
 	if err != nil {
-		return nil, fmt.Errorf("getMarketMeta, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("MarketMeta: %s", err)
 	}
-	r, err := preExecResult.Result.ToByteArray()
+	data, err := res.Result.ToByteArray()
 	if err != nil {
-		return nil, fmt.Errorf("getMarketMeta, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("MarketMeta: %s", err)
 	}
-	source := common.NewZeroCopySource(r)
-	marketMeta := new(MarketMeta)
-	err = marketMeta.Deserialization(source)
+	result, err := DeserializeMarketMeta(data)
 	if err != nil {
-		return nil, fmt.Errorf("getMarketMeta, marketMeta.Deserialization error")
+		return nil, fmt.Errorf("MarketMeta: %s", err)
 	}
-	return marketMeta, nil
+	return result, nil
 }
 
 type AccountLiquidity struct {

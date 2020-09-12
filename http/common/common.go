@@ -219,12 +219,13 @@ func (this *UserFlashPoolOverview) HalfDeserialization(source *common.ZeroCopySo
 }
 
 type Supply struct {
-	Icon          string
-	Name          string
-	SupplyDollar  uint64
-	SupplyBalance uint64
-	Apy           uint64
-	IfCollateral  bool
+	Icon             string
+	Name             string
+	SupplyDollar     uint64
+	SupplyBalance    uint64
+	Apy              uint64
+	CollateralFactor uint64
+	IfCollateral     bool
 }
 
 func (this *Supply) Serialization(sink *common.ZeroCopySink) {
@@ -233,6 +234,7 @@ func (this *Supply) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteUint64(this.SupplyDollar)
 	sink.WriteUint64(this.SupplyBalance)
 	sink.WriteUint64(this.Apy)
+	sink.WriteUint64(this.CollateralFactor)
 	sink.WriteBool(this.IfCollateral)
 }
 
@@ -257,6 +259,10 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 	if eof {
 		return fmt.Errorf("apy deserialization error eof")
 	}
+	collateralFactor, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("collateralFactor deserialization error eof")
+	}
 	ifCollateral, irregular, eof := source.NextBool()
 	if irregular || eof {
 		return fmt.Errorf("ifCollateral deserialization error eof")
@@ -266,17 +272,19 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 	this.SupplyDollar = supplyDollar
 	this.SupplyBalance = supplyBalance
 	this.Apy = apy
+	this.CollateralFactor = collateralFactor
 	this.IfCollateral = ifCollateral
 	return nil
 }
 
 type Borrow struct {
-	Icon          string
-	Name          string
-	BorrowDollar  uint64
-	BorrowBalance uint64
-	Apy           uint64
-	Limit         uint64
+	Icon             string
+	Name             string
+	BorrowDollar     uint64
+	BorrowBalance    uint64
+	Apy              uint64
+	Limit            uint64
+	CollateralFactor uint64
 }
 
 func (this *Borrow) Serialization(sink *common.ZeroCopySink) {
@@ -286,6 +294,7 @@ func (this *Borrow) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteUint64(this.BorrowBalance)
 	sink.WriteUint64(this.Apy)
 	sink.WriteUint64(this.Limit)
+	sink.WriteUint64(this.CollateralFactor)
 }
 
 func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
@@ -313,12 +322,17 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 	if eof {
 		return fmt.Errorf("limit deserialization error eof")
 	}
+	collateralFactor, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("collateralFactor deserialization error eof")
+	}
 	this.Icon = icon
 	this.Name = name
 	this.BorrowDollar = borrowDollar
 	this.BorrowBalance = borrowBalance
 	this.Apy = apy
 	this.Limit = limit
+	this.CollateralFactor = collateralFactor
 	return nil
 }
 
@@ -328,6 +342,7 @@ type Insurance struct {
 	InsuranceDollar  uint64
 	InsuranceBalance uint64
 	Apy              uint64
+	CollateralFactor uint64
 }
 
 func (this *Insurance) Serialization(sink *common.ZeroCopySink) {
@@ -336,6 +351,7 @@ func (this *Insurance) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteUint64(this.InsuranceDollar)
 	sink.WriteUint64(this.InsuranceBalance)
 	sink.WriteUint64(this.Apy)
+	sink.WriteUint64(this.CollateralFactor)
 }
 
 func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
@@ -359,22 +375,28 @@ func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
 	if eof {
 		return fmt.Errorf("apy deserialization error eof")
 	}
+	collateralFactor, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("collateralFactor deserialization error eof")
+	}
 	this.Icon = icon
 	this.Name = name
 	this.InsuranceDollar = insuranceDollar
 	this.InsuranceBalance = insuranceBalance
 	this.Apy = apy
+	this.CollateralFactor = collateralFactor
 	return nil
 }
 
 type UserMarket struct {
-	Icon            string
-	Name            string
-	SupplyApy       uint64
-	BorrowApy       uint64
-	BorrowLiquidity uint64
-	InsuranceApy    uint64
-	InsuranceAmount uint64
+	Icon             string
+	Name             string
+	SupplyApy        uint64
+	BorrowApy        uint64
+	BorrowLiquidity  uint64
+	InsuranceApy     uint64
+	InsuranceAmount  uint64
+	CollateralFactor uint64
 }
 
 func (this *UserMarket) Serialization(sink *common.ZeroCopySink) {
@@ -385,6 +407,7 @@ func (this *UserMarket) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteUint64(this.BorrowLiquidity)
 	sink.WriteUint64(this.InsuranceApy)
 	sink.WriteUint64(this.InsuranceAmount)
+	sink.WriteUint64(this.CollateralFactor)
 }
 
 func (this *UserMarket) Deserialization(source *common.ZeroCopySource) error {
@@ -416,6 +439,10 @@ func (this *UserMarket) Deserialization(source *common.ZeroCopySource) error {
 	if eof {
 		return fmt.Errorf("insuranceAmount deserialization error eof")
 	}
+	collateralFactor, eof := source.NextUint64()
+	if eof {
+		return fmt.Errorf("collateralFactor deserialization error eof")
+	}
 	this.Icon = icon
 	this.Name = name
 	this.SupplyApy = supplyApy
@@ -423,6 +450,7 @@ func (this *UserMarket) Deserialization(source *common.ZeroCopySource) error {
 	this.BorrowLiquidity = borrowLiquidity
 	this.InsuranceApy = insuranceApy
 	this.InsuranceAmount = insuranceAmount
+	this.CollateralFactor = collateralFactor
 	return nil
 }
 

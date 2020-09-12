@@ -511,6 +511,10 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.AssetStoredPrice error: %s", err)
 		}
+		marketMeta, err := this.getMarketMeta(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getMarketMeta error: %s", err)
+		}
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
@@ -547,23 +551,25 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 
 		if supplyAmount.Uint64() != 0 {
 			supply := &common.Supply{
-				Name:          this.cfg.AssetMap[address.ToHexString()],
-				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyDollar:  supplyAmountU64,
-				SupplyBalance: supplyAmount.Uint64(),
-				Apy:           supplyApy,
-				IfCollateral:  isAssetIn,
+				Name:             this.cfg.AssetMap[address.ToHexString()],
+				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
+				SupplyDollar:     supplyAmountU64,
+				SupplyBalance:    supplyAmount.Uint64(),
+				Apy:              supplyApy,
+				CollateralFactor: marketMeta.CollateralFactorMantissa.Uint64(),
+				IfCollateral:     isAssetIn,
 			}
 			userFlashPoolOverview.CurrentSupply = append(userFlashPoolOverview.CurrentSupply, supply)
 		}
 		if borrowAmount.Uint64() != 0 {
 			borrow := &common.Borrow{
-				Name:          this.cfg.AssetMap[address.ToHexString()],
-				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				BorrowDollar:  borrowAmountU64,
-				BorrowBalance: borrowAmount.Uint64(),
-				Apy:           borrowApy,
-				Limit:         borrowAmountU64 * PercentageDecimal / totalBorrowBalance,
+				Name:             this.cfg.AssetMap[address.ToHexString()],
+				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
+				BorrowDollar:     borrowAmountU64,
+				BorrowBalance:    borrowAmount.Uint64(),
+				Apy:              borrowApy,
+				Limit:            borrowAmountU64 * PercentageDecimal / totalBorrowBalance,
+				CollateralFactor: marketMeta.CollateralFactorMantissa.Uint64(),
 			}
 			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
 		}
@@ -574,6 +580,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 				InsuranceDollar:  insuranceAmountU64,
 				InsuranceBalance: insuranceAmount.Uint64(),
 				Apy:              insuranceApy,
+				CollateralFactor: marketMeta.CollateralFactorMantissa.Uint64(),
 			}
 			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
 		}
@@ -588,13 +595,14 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		}
 		if supplyAmount.Uint64() == 0 && borrowAmount.Uint64() == 0 && insuranceAmount.Uint64() == 0 {
 			userMarket := &common.UserMarket{
-				Name:            this.cfg.AssetMap[address.ToHexString()],
-				Icon:            this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyApy:       supplyApy,
-				BorrowApy:       borrowApy,
-				BorrowLiquidity: totalBorrowAmount.Uint64(),
-				InsuranceApy:    insuranceApy,
-				InsuranceAmount: totalInsuranceAmount.Uint64(),
+				Name:             this.cfg.AssetMap[address.ToHexString()],
+				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
+				SupplyApy:        supplyApy,
+				BorrowApy:        borrowApy,
+				BorrowLiquidity:  totalBorrowAmount.Uint64(),
+				InsuranceApy:     insuranceApy,
+				InsuranceAmount:  totalInsuranceAmount.Uint64(),
+				CollateralFactor: marketMeta.CollateralFactorMantissa.Uint64(),
 			}
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
