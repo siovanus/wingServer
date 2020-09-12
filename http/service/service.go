@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/ontio/ontology/common"
 	"os"
 	"time"
 
@@ -18,7 +17,7 @@ type Service struct {
 	fpMgr                FlashPoolManager
 	store                *store.Client
 	trackHeight          uint32
-	listeningAddressList []common.Address
+	listeningAddressList []string
 }
 
 var ASSET = []string{"ONT", "BTC", "ETH", "DAI"}
@@ -28,17 +27,15 @@ func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolM
 }
 
 func (this *Service) AddListeningAddressList() {
-	oracleAddress, err := common.AddressFromHexString(this.cfg.OracleAddress)
-	if err != nil {
-		log.Errorf("AddListeningAddressList, common.AddressFromHexString error: %s", err)
-		os.Exit(1)
-	}
 	allMarkets, err := this.fpMgr.GetAllMarkets()
 	if err != nil {
 		log.Errorf("AddListeningAddressList, this.fpMgr.GetAllMarkets error: %s", err)
 		os.Exit(1)
 	}
-	this.listeningAddressList = append(allMarkets, oracleAddress)
+	for _, v := range allMarkets {
+		this.listeningAddressList = append(this.listeningAddressList, v.ToHexString())
+	}
+	this.listeningAddressList = append(this.listeningAddressList, this.cfg.OracleAddress)
 }
 
 func (this *Service) Close() {
@@ -131,26 +128,14 @@ func (this *Service) TrackEvent() {
 
 			if ifOracle {
 				log.Infof("TrackEvent, this.PriceFeed")
-				err = this.PriceFeed()
-				if err != nil {
-					log.Errorf("TrackEvent, this.PriceFeed error:", err)
-					break
-				}
+				go this.PriceFeed()
 			}
 
 			if len(accounts) != 0 {
 				for _, v := range accounts {
 					log.Infof("TrackEvent, account: %s", v)
-					err = this.StoreFlashPoolOverview(v)
-					if err != nil {
-						log.Errorf("TrackEvent, this.StoreFlashPoolOverview error:", err)
-						break
-					}
-					err = this.StoreFlashPoolAllMarket()
-					if err != nil {
-						log.Errorf("TrackEvent, this.StoreFlashPoolAllMarket error:", err)
-						break
-					}
+					go this.StoreFlashPoolOverview(v)
+					go this.StoreFlashPoolAllMarket()
 				}
 			}
 

@@ -31,5 +31,27 @@
   },
   "track_event_interval": 1,
   "init_track_height": 13671504,
-  "system_contract": ["AHeHnMS2krsDzifww12WXUL7SLuHNmFHna"]
+  "system_contract": [
+    "APoGJ4SsEXairLD9sECKvP1suBsCWDRxKC",
+    "AdPp1FbZw6JWygtWeH1mymV5Cc4sNZDkD6",
+    "AXeESB8omc1onYS5gNbiDaXCqHEKe7uzwv",
+    "AVNAmmy5PSgE4st7aAyeZUDA8Lcz3xLxNF",
+    "Acqhf7V2Tbi8Ui76ThadX4ri8LdfjQvTPV",
+    "ANRhuJb9Y51SdqEtdyjWcJG97GGoK1UeXw",
+    "ASPLA7qfEJ3WiyEvK6E8tcdfjyjkF9BPPu",
+    "AQ9sxiHrALXyMmyskXdXLTMYaKZBHnp3c8",
+    "AHeHnMS2krsDzifww12WXUL7SLuHNmFHna",
+    "AUbAEv8JCeSQsSXPC3XivCtJwS7TYkgRoN",
+    "AX7WGjGF9PE9WudSDYMzxyDMKV4w4j5YBY",
+    "AMAa989dgUFUpycu4PAtB9gxow4zsYxgd8",
+    "Aab3VKKfVzphnx83LLBEV53YFJHtPneqWa",
+    "AcMccok3UdP9BfEmKeFMzfRiqpUty4sUty",
+    "AcMq64T1Ge64755eCuuStzGCS8mZAEUcGT",
+    "AciJHW6Jn7EBP1n5bNpv5fXDwH6B7X3hyY",
+    "APdhmFEQBaJzj2yC5xHSuwdVEwjvvpFSw7",
+    "ANCygWzSXzG6VruVyW7gZJz25gE3gZwgoZ",
+    "ARV4p6XnGh95EsGe8Nio5CmWPoPnnT7wxu",
+    "AeYnkzUdv1ZyRcpghzRcuM6n6N1NGgztFb",
+    "ALzgUUXMbthr4gPVxtTnm3zQF3uybM7k3N"
+  ]
 }

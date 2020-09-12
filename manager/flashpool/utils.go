@@ -47,7 +47,7 @@ func (this *FlashPoolManager) GetAllMarkets() ([]common.Address, error) {
 
 func (this *FlashPoolManager) getAssetsIn(account common.Address) ([]common.Address, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress,
-		"assetsIn", []interface{}{})
+		"assetsIn", []interface{}{account})
 	if err != nil {
 		return nil, fmt.Errorf("getAssetsIn, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
@@ -73,7 +73,7 @@ func (this *FlashPoolManager) getAssetsIn(account common.Address) ([]common.Addr
 
 func (this *FlashPoolManager) getSupplyAmountByAccount(contractAddress, account common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
-		"balanceOf", []interface{}{account})
+		"balanceOfUnderlying", []interface{}{account})
 	if err != nil {
 		return nil, fmt.Errorf("getSupplyAmountByAccount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
@@ -226,8 +226,7 @@ func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (uint
 	if eof {
 		return 0, fmt.Errorf("getSupplyApy, source.NextI128 error")
 	}
-	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)),
-		FrontPercentageDecimal).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
 	return result, nil
 }
 
@@ -246,8 +245,7 @@ func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (uint
 	if eof {
 		return 0, fmt.Errorf("getBorrowApy, source.NextI128 error")
 	}
-	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)),
-		FrontPercentageDecimal).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
 	return result, nil
 }
 
@@ -280,8 +278,7 @@ func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (u
 	if eof {
 		return 0, fmt.Errorf("getInsuranceApy, source.NextI128 error")
 	}
-	result := new(big.Int).Div(new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)),
-		FrontPercentageDecimal).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
 	return result, nil
 }
 
@@ -327,4 +324,52 @@ func (this *FlashPoolManager) getMarketMeta() (*MarketMeta, error) {
 		return nil, fmt.Errorf("getMarketMeta, marketMeta.Deserialization error")
 	}
 	return marketMeta, nil
+}
+
+type AccountLiquidity struct {
+	Error     string
+	Liquidity common.I128
+	Shortfall common.I128
+}
+
+func DeserializeAccountLiquidity(data []byte) (*AccountLiquidity, error) {
+	source := common.NewZeroCopySource(data)
+	errStr, _, ill, eof := source.NextString()
+	if ill {
+		return nil, fmt.Errorf("read errStr ill")
+	}
+	if eof {
+		return nil, fmt.Errorf("read errStr eof")
+	}
+	liquidity, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read liquidity eof")
+	}
+	shortfall, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read shortfall eof")
+	}
+	return &AccountLiquidity{
+		Error:     errStr,
+		Liquidity: liquidity,
+		Shortfall: shortfall,
+	}, nil
+}
+
+func (this *FlashPoolManager) getAccountLiquidity(account common.Address) (*AccountLiquidity, error) {
+	method := "getAccountLiquidity"
+	params := []interface{}{account}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
+	if err != nil {
+		return nil, fmt.Errorf("GetAccountLiquidity: %s", err)
+	}
+	data, err := res.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("GetAccountLiquidity: %s", err)
+	}
+	result, err := DeserializeAccountLiquidity(data)
+	if err != nil {
+		return nil, fmt.Errorf("GetAccountLiquidity: %s", err)
+	}
+	return result, nil
 }

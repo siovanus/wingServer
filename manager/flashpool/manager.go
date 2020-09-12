@@ -19,9 +19,7 @@ const (
 	PercentageDecimal = 10000
 )
 
-var WingDecimal = new(big.Int).SetUint64(1000000)
-var FrontDecimal = new(big.Int).SetUint64(10000000000000000)
-var FrontPercentageDecimal = new(big.Int).SetUint64(100000000000000)
+var PriceDecimal = new(big.Int).SetUint64(1000000000)
 
 type FlashPoolManager struct {
 	cfg             *config.Config
@@ -87,11 +85,11 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 			Icon: this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 			Name: this.cfg.AssetMap[address.ToHexString()],
 			// totalDistribution / distributedDay
-			PerDay:          new(big.Int).Div(new(big.Int).Div(totalDistribution, new(big.Int).SetUint64(distributedDay)), FrontDecimal).Uint64(),
-			SupplyAmount:    new(big.Int).Div(supplyAmount, FrontDecimal).Uint64(),
-			BorrowAmount:    new(big.Int).Div(borrowAmount, FrontDecimal).Uint64(),
-			InsuranceAmount: new(big.Int).Div(insuranceAmount, FrontDecimal).Uint64(),
-			Total:           new(big.Int).Div(totalDistribution, WingDecimal).Uint64(),
+			PerDay:          new(big.Int).Div(totalDistribution, new(big.Int).SetUint64(distributedDay)).Uint64(),
+			SupplyAmount:    supplyAmount.Uint64(),
+			BorrowAmount:    borrowAmount.Uint64(),
+			InsuranceAmount: insuranceAmount.Uint64(),
+			Total:           totalDistribution.Uint64(),
 		}
 		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
 	}
@@ -126,12 +124,12 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 			return nil, fmt.Errorf("PoolDistribution, this.AssetStoredPrice error: %s", err)
 		}
 		// supplyAmount * price
-		distribution.SupplyAmount += new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		distribution.SupplyAmount += new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)).Uint64()
 		// borrowAmount * price
-		distribution.BorrowAmount += new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		distribution.BorrowAmount += new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)).Uint64()
 		// insuranceAmount * price
-		distribution.InsuranceAmount += new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		distribution.Total += new(big.Int).Div(totalDistribution, WingDecimal).Uint64()
+		distribution.InsuranceAmount += new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)).Uint64()
+		distribution.Total += totalDistribution.Uint64()
 	}
 	distribution.Name = "Flash"
 	distribution.Icon = this.cfg.IconMap[distribution.Name]
@@ -154,7 +152,7 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolBanner, this.getTotalDistribution error: %s", err)
 		}
-		total += new(big.Int).Div(totalDistribution, WingDecimal).Uint64()
+		total += totalDistribution.Uint64()
 	}
 	today := governance.DailyDistibute[index]
 	var share uint64 = 0
@@ -199,9 +197,9 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 		flashPoolDetail.TotalSupply += supplyDollar
 		flashPoolDetail.TotalBorrow += borrowDollar
 		flashPoolDetail.TotalInsurance += insuranceDollar
@@ -278,9 +276,9 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 		flashPoolDetail.TotalSupply += supplyDollar
 		flashPoolDetail.TotalBorrow += borrowDollar
 		flashPoolDetail.TotalInsurance += insuranceDollar
@@ -317,9 +315,9 @@ func (this *FlashPoolManager) FlashPoolMarketStore() error {
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		supplyDollar := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		borrowDollar := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		insuranceDollar := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 		flashPoolMarket.Name = name
 		flashPoolMarket.TotalSupply = supplyDollar
 		flashPoolMarket.TotalBorrow = borrowDollar
@@ -410,9 +408,9 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		market.TotalSupply = new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		market.TotalBorrow = new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		market.TotalInsurance = new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		market.TotalSupply = new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		market.TotalBorrow = new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		market.TotalInsurance = new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 
 		market.SupplyApy = supplyApy
 		market.BorrowApy = borrowApy
@@ -492,7 +490,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.AssetStoredPrice error: %s", err)
 		}
 		// borrowAmount * price
-		totalBorrowBalance += new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		totalBorrowBalance += new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 	}
 	userFlashPoolOverview.BorrowBalance = totalBorrowBalance
 
@@ -516,9 +514,9 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		supplyAmountU64 := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		borrowAmountU64 := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
-		insuranceAmountU64 := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), FrontDecimal).Uint64()
+		supplyAmountU64 := new(big.Int).Div(new(big.Int).Mul(supplyAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		borrowAmountU64 := new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
+		insuranceAmountU64 := new(big.Int).Div(new(big.Int).Mul(insuranceAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 		userFlashPoolOverview.SupplyBalance += supplyAmountU64
 		userFlashPoolOverview.InsuranceBalance += insuranceAmountU64
 		supplyApy, err := this.getSupplyApy(address)
@@ -552,7 +550,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 				Name:          this.cfg.AssetMap[address.ToHexString()],
 				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyDollar:  supplyAmountU64,
-				SupplyBalance: new(big.Int).Div(supplyAmount, FrontDecimal).Uint64(),
+				SupplyBalance: supplyAmount.Uint64(),
 				Apy:           supplyApy,
 				IfCollateral:  isAssetIn,
 			}
@@ -563,7 +561,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 				Name:          this.cfg.AssetMap[address.ToHexString()],
 				Icon:          this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				BorrowDollar:  borrowAmountU64,
-				BorrowBalance: new(big.Int).Div(borrowAmount, FrontDecimal).Uint64(),
+				BorrowBalance: borrowAmount.Uint64(),
 				Apy:           borrowApy,
 				Limit:         borrowAmountU64 * PercentageDecimal / totalBorrowBalance,
 			}
@@ -574,7 +572,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				InsuranceDollar:  insuranceAmountU64,
-				InsuranceBalance: new(big.Int).Div(insuranceAmount, FrontDecimal).Uint64(),
+				InsuranceBalance: insuranceAmount.Uint64(),
 				Apy:              insuranceApy,
 			}
 			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
@@ -594,20 +592,19 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 				Icon:            this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyApy:       supplyApy,
 				BorrowApy:       borrowApy,
-				BorrowLiquidity: new(big.Int).Div(totalBorrowAmount, FrontDecimal).Uint64(),
+				BorrowLiquidity: totalBorrowAmount.Uint64(),
 				InsuranceApy:    insuranceApy,
-				InsuranceAmount: new(big.Int).Div(totalInsuranceAmount, FrontDecimal).Uint64(),
+				InsuranceAmount: totalInsuranceAmount.Uint64(),
 			}
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
 	}
 
-	marketMeta, err := this.getMarketMeta()
-	if err == nil {
-		// assetInSupplyDollar(already multiply 100) * CollateralFactor / FrontDecimal
-		userFlashPoolOverview.BorrowLimit = new(big.Int).Div(new(big.Int).Mul(new(big.Int).SetUint64(assetInSupplyDollar),
-			marketMeta.CollateralFactor.ToBigInt()), FrontDecimal).Uint64()
+	accountLiquidity, err := this.getAccountLiquidity(account)
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getAccountLiquidity error: %s", err)
 	}
+	userFlashPoolOverview.BorrowLimit = accountLiquidity.Liquidity.ToBigInt().Uint64()
 	if userFlashPoolOverview.SupplyBalance+userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance != 0 {
 		userFlashPoolOverview.NetApy = userFlashPoolOverview.NetApy / int64(userFlashPoolOverview.SupplyBalance+
 			userFlashPoolOverview.BorrowBalance+userFlashPoolOverview.InsuranceBalance)

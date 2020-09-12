@@ -20,14 +20,7 @@ func (this *Service) trackEvent(height uint32) (bool, []string, error) {
 			if !ok {
 				continue
 			}
-			listen := false
-			for _, v := range this.listeningAddressList {
-				log.Errorf("###%s", v.ToHexString())
-				if notify.ContractAddress == v.ToHexString() {
-					listen = true
-				}
-			}
-			if !listen {
+			if !listContains(this.listeningAddressList, notify.ContractAddress) {
 				continue
 			}
 			name, _ := states[0].(string)
@@ -43,6 +36,12 @@ func (this *Service) trackEvent(height uint32) (bool, []string, error) {
 				if err != nil {
 					continue
 				} else {
+					if listContains(this.cfg.SystemContract, a) {
+						continue
+					}
+					if listContains(accounts, a) {
+						continue
+					}
 					accounts = append(accounts, a)
 				}
 			}
@@ -55,7 +54,8 @@ func (this *Service) PriceFeed() error {
 	for _, v := range ASSET {
 		data, err := this.fpMgr.AssetPrice(v)
 		if err != nil {
-			return fmt.Errorf("PriceFeed, this.fpMgr.AssetPrice error: %s", err)
+			log.Errorf("PriceFeed, this.fpMgr.AssetPrice error: %s", err)
+			return err
 		}
 		price := &store.Price{
 			Name:  v,
@@ -63,34 +63,45 @@ func (this *Service) PriceFeed() error {
 		}
 		err = this.store.SavePrice(price)
 		if err != nil {
-			return fmt.Errorf("PriceFeed, this.store.SavePrice error: %s", err)
+			log.Errorf("PriceFeed, this.store.SavePrice error: %s", err)
+			return err
 		}
 	}
 	return nil
 }
 
-func (this *Service) StoreFlashPoolOverview(account string) error {
+func (this *Service) StoreFlashPoolOverview(account string) {
 	userFlashPoolOverview, err := this.fpMgr.UserFlashPoolOverviewForStore(account)
 	if err != nil {
-		return fmt.Errorf("StoreFlashPoolOverview, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
+		log.Errorf("StoreFlashPoolOverview, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
 	}
 	err = this.store.SaveUserFlashPoolOverview(account, userFlashPoolOverview)
 	if err != nil {
-		return fmt.Errorf("StoreFlashPoolOverview, this.store.SaveUserFlashPoolOverview error: %s", err)
+		log.Errorf("StoreFlashPoolOverview, this.store.SaveUserFlashPoolOverview error: %s", err)
 	}
-	return nil
 }
 
 func (this *Service) StoreFlashPoolAllMarket() error {
 	flashPoolAllMarket, err := this.fpMgr.FlashPoolAllMarketForStore()
 	if err != nil {
-		return fmt.Errorf("StoreFlashPoolAllMarket, this.fpMgr.FlashPoolAllMarketForStore error: %s", err)
+		log.Errorf("StoreFlashPoolAllMarket, this.fpMgr.FlashPoolAllMarketForStore error: %s", err)
+		return err
 	}
 	for _, v := range flashPoolAllMarket.FlashPoolAllMarket {
 		err = this.store.SaveFlashMarket(v)
 		if err != nil {
-			return fmt.Errorf("StoreFlashPoolOverview, this.store.SaveFlashMarket error: %s", err)
+			log.Errorf("StoreFlashPoolOverview, this.store.SaveFlashMarket error: %s", err)
+			return err
 		}
 	}
 	return nil
+}
+
+func listContains(list []string, arg string) bool {
+	for _, v := range list {
+		if arg == v {
+			return true
+		}
+	}
+	return false
 }
