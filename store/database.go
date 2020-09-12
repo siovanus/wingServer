@@ -166,8 +166,11 @@ type UserFlashPoolOverview struct {
 
 func (client Client) LoadUserFlashPoolOverview(userAddress string) (*common.UserFlashPoolOverview, error) {
 	var userFlashPoolOverview UserFlashPoolOverview
-	err := client.db.Where(UserFlashPoolOverview{UserAddress: userAddress}).Last(&userFlashPoolOverview).Error
 	output := new(common.UserFlashPoolOverview)
+	err := client.db.Where(UserFlashPoolOverview{UserAddress: userAddress}).Last(&userFlashPoolOverview).Error
+	if err != nil {
+		return output, err
+	}
 	info, err := hex.DecodeString(userFlashPoolOverview.Info)
 	if err != nil {
 		return output, nil

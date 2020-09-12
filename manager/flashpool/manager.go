@@ -346,6 +346,19 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadFlashMarket error: %s", err)
 		}
+		latestFlashPoolMarket, err := this.store.LoadLatestFlashPoolMarket(market.Name)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
+		}
+		if market.TotalSupply != 0 {
+			market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
+		}
+		if market.TotalBorrow != 0 {
+			market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / market.TotalBorrow
+		}
+		if market.TotalInsurance != 0 {
+			market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / market.TotalInsurance
+		}
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, &market)
 	}
 	return flashPoolAllMarket, nil
@@ -404,20 +417,6 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		market.SupplyApy = supplyApy
 		market.BorrowApy = borrowApy
 		market.InsuranceApy = insuranceApy
-
-		latestFlashPoolMarket, err := this.store.LoadLatestFlashPoolMarket(market.Name)
-		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.store.LoadLatestFlashPoolMarket error: %s", err)
-		}
-		if market.TotalSupply != 0 {
-			market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
-		}
-		if market.TotalBorrow != 0 {
-			market.TotalBorrowRate = (market.TotalBorrow - latestFlashPoolMarket.TotalBorrow) * 100 / market.TotalBorrow
-		}
-		if market.TotalInsurance != 0 {
-			market.TotalInsuranceRate = (market.TotalInsurance - latestFlashPoolMarket.TotalInsurance) * 100 / market.TotalInsurance
-		}
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
 	return flashPoolAllMarket, nil

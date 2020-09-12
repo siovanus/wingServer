@@ -93,6 +93,18 @@ func (this *Service) Snapshot() {
 }
 
 func (this *Service) TrackEvent() {
+	//init
+	err := this.PriceFeed()
+	if err != nil {
+		log.Errorf("TrackEvent, this.PriceFeed error:", err)
+		os.Exit(1)
+	}
+	err = this.StoreFlashPoolAllMarket()
+	if err != nil {
+		log.Errorf("TrackEvent, this.StoreFlashPoolAllMarket error:", err)
+		os.Exit(1)
+	}
+
 	trackHeight, err := this.store.LoadTrackHeight()
 	if err != nil {
 		log.Infof("TrackEvent, this.store.LoadTrackHeight error: %s", err)
@@ -110,13 +122,15 @@ func (this *Service) TrackEvent() {
 			log.Errorf("TrackEvent, this.sideSdk.GetCurrentBlockHeight error:", err)
 		}
 		for i := this.trackHeight + 1; i <= currentHeight; i++ {
-			ifOracle, account, err := this.trackEvent(i)
+			log.Infof("TrackEvent, parse block: %d", i)
+			ifOracle, accounts, err := this.trackEvent(i)
 			if err != nil {
 				log.Errorf("TrackEvent, this.TrackOracle error:", err)
 				break
 			}
 
 			if ifOracle {
+				log.Infof("TrackEvent, this.PriceFeed")
 				err = this.PriceFeed()
 				if err != nil {
 					log.Errorf("TrackEvent, this.PriceFeed error:", err)
@@ -124,16 +138,19 @@ func (this *Service) TrackEvent() {
 				}
 			}
 
-			if account != "" {
-				err = this.StoreFlashPoolOverview(account)
-				if err != nil {
-					log.Errorf("TrackEvent, this.StoreFlashPoolOverview error:", err)
-					break
-				}
-				err = this.StoreFlashPoolAllMarket()
-				if err != nil {
-					log.Errorf("TrackEvent, this.StoreFlashPoolAllMarket error:", err)
-					break
+			if len(accounts) != 0 {
+				for _, v := range accounts {
+					log.Infof("TrackEvent, account: %s", v)
+					err = this.StoreFlashPoolOverview(v)
+					if err != nil {
+						log.Errorf("TrackEvent, this.StoreFlashPoolOverview error:", err)
+						break
+					}
+					err = this.StoreFlashPoolAllMarket()
+					if err != nil {
+						log.Errorf("TrackEvent, this.StoreFlashPoolAllMarket error:", err)
+						break
+					}
 				}
 			}
 

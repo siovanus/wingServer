@@ -25,6 +25,7 @@ type Config struct {
 	OracleMap          map[string]string `json:"oracle_map"`
 	TrackEventInterval uint64            `json:"track_event_interval"`
 	InitTrackHeight    uint64            `json:"init_track_height"`
+	SystemContract     []string          `json:"system_contract"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

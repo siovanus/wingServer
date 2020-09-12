@@ -113,6 +113,7 @@ func startServer(ctx *cli.Context) {
 	}
 	log.Infof("init svr success")
 	serv := service.NewService(sdk, govMgr, fpMgr, store, servConfig)
+	serv.AddListeningAddressList()
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 
 	go serv.Snapshot()

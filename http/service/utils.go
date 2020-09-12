@@ -3,16 +3,17 @@ package service
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
 )
 
-func (this *Service) trackEvent(height uint32) (bool, string, error) {
+func (this *Service) trackEvent(height uint32) (bool, []string, error) {
+	accounts := []string{}
 	events, err := this.sdk.GetSmartContractEventByBlock(height)
 	if err != nil {
-		return false, "", fmt.Errorf("TrackOracle, this.sdk.GetSmartContractEventByBlock error:%s", err)
+		return false, accounts, fmt.Errorf("TrackOracle, this.sdk.GetSmartContractEventByBlock error:%s", err)
 	}
 	flag := false
-	account := ""
 	for _, event := range events {
 		for _, notify := range event.Notify {
 			states, ok := notify.States.([]interface{})
@@ -21,6 +22,7 @@ func (this *Service) trackEvent(height uint32) (bool, string, error) {
 			}
 			listen := false
 			for _, v := range this.listeningAddressList {
+				log.Errorf("###%s", v.ToHexString())
 				if notify.ContractAddress == v.ToHexString() {
 					listen = true
 				}
@@ -41,13 +43,12 @@ func (this *Service) trackEvent(height uint32) (bool, string, error) {
 				if err != nil {
 					continue
 				} else {
-					account = a
+					accounts = append(accounts, a)
 				}
 			}
-
 		}
 	}
-	return flag, account, nil
+	return flag, accounts, nil
 }
 
 func (this *Service) PriceFeed() error {
