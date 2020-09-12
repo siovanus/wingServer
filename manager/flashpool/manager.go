@@ -481,7 +481,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		totalBorrowBalance += new(big.Int).Div(new(big.Int).Mul(borrowAmount, new(big.Int).SetUint64(price)), PriceDecimal).Uint64()
 	}
 	userFlashPoolOverview.BorrowBalance = totalBorrowBalance
-	var netApy *big.Int
+	netApy := new(big.Int).SetUint64(0)
 
 	for _, address := range allMarkets {
 		supplyAmount, err := this.getSupplyAmountByAccount(address, account)
