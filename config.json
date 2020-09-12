@@ -3,15 +3,15 @@
   "port": 10337,
   "governance_address": "2974e93cd97e047086a66a0ab5892593649326ed",
   "wing_address": "ef79ae5d85ec819cfd51eb23d4c242fa70f713e7",
-  "flash_pool_address": "9456ea87825f0abff9419fa57d9a46a7930910ae",
+  "flash_pool_address": "6e34815bfffe0033e22824053397b7b4fa2227d9",
   "oracle_address": "356fb121f0812e4be51d5668d3d26832d2121695",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "1c178d3e0dbb488e4f80ad25585da47534128114": "oWBTC",
-    "4f9fb2e40000e0ee0068902919b7e1761795233b": "oETH",
-    "091144e888047adafcf643c4b86d3c11fd309046": "oUSDT",
-    "fd92c130737671b4934d19591805636eb7b54439": "oDAI",
-    "9f2addb8e97afea23f42714a273845c5a185cee1": "ONTd"
+    "5c1ae728eee9cb4272b3552c0ec8a66aa047b992": "oWBTC",
+    "0a8ddbcc9fb7db29c83903aa752db615ba96dbce": "oETH",
+    "81c1cd5a84d3ba6a2ff18dc388cdff820265d20f": "oUSDT",
+    "28d7ff54414ed8f944eafa7a77c7c594139ee155": "oDAI",
+    "7967cdbf395f2ef4685612b451ed32780d88199e": "ONTd"
   },
   "icon_map": {
     "ONTd":  "https://i.postimg.cc/t4tTXLbH/ontd-2x.png",
@@ -23,35 +23,12 @@
     "Flash": "http://106.75.209.209/icon/flash_icon.svg"
   },
   "oracle_map": {
-    "1c178d3e0dbb488e4f80ad25585da47534128114": "BTC",
-    "4f9fb2e40000e0ee0068902919b7e1761795233b": "ETH",
-    "091144e888047adafcf643c4b86d3c11fd309046": "USDT",
-    "fd92c130737671b4934d19591805636eb7b54439": "DAI",
-    "9f2addb8e97afea23f42714a273845c5a185cee1": "ONT"
+    "5c1ae728eee9cb4272b3552c0ec8a66aa047b992": "BTC",
+    "0a8ddbcc9fb7db29c83903aa752db615ba96dbce": "ETH",
+    "81c1cd5a84d3ba6a2ff18dc388cdff820265d20f": "USDT",
+    "28d7ff54414ed8f944eafa7a77c7c594139ee155": "DAI",
+    "7967cdbf395f2ef4685612b451ed32780d88199e": "ONT"
   },
   "track_event_interval": 1,
-  "init_track_height": 13671504,
-  "system_contract": [
-    "APoGJ4SsEXairLD9sECKvP1suBsCWDRxKC",
-    "AdPp1FbZw6JWygtWeH1mymV5Cc4sNZDkD6",
-    "AXeESB8omc1onYS5gNbiDaXCqHEKe7uzwv",
-    "AVNAmmy5PSgE4st7aAyeZUDA8Lcz3xLxNF",
-    "Acqhf7V2Tbi8Ui76ThadX4ri8LdfjQvTPV",
-    "ANRhuJb9Y51SdqEtdyjWcJG97GGoK1UeXw",
-    "ASPLA7qfEJ3WiyEvK6E8tcdfjyjkF9BPPu",
-    "AQ9sxiHrALXyMmyskXdXLTMYaKZBHnp3c8",
-    "AHeHnMS2krsDzifww12WXUL7SLuHNmFHna",
-    "AUbAEv8JCeSQsSXPC3XivCtJwS7TYkgRoN",
-    "AX7WGjGF9PE9WudSDYMzxyDMKV4w4j5YBY",
-    "AMAa989dgUFUpycu4PAtB9gxow4zsYxgd8",
-    "Aab3VKKfVzphnx83LLBEV53YFJHtPneqWa",
-    "AcMccok3UdP9BfEmKeFMzfRiqpUty4sUty",
-    "AcMq64T1Ge64755eCuuStzGCS8mZAEUcGT",
-    "AciJHW6Jn7EBP1n5bNpv5fXDwH6B7X3hyY",
-    "APdhmFEQBaJzj2yC5xHSuwdVEwjvvpFSw7",
-    "ANCygWzSXzG6VruVyW7gZJz25gE3gZwgoZ",
-    "ARV4p6XnGh95EsGe8Nio5CmWPoPnnT7wxu",
-    "AeYnkzUdv1ZyRcpghzRcuM6n6N1NGgztFb",
-    "ALzgUUXMbthr4gPVxtTnm3zQF3uybM7k3N"
-  ]
+  "init_track_height": 13671504
 }

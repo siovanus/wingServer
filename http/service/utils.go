@@ -7,7 +7,7 @@ import (
 	"github.com/siovanus/wingServer/store"
 )
 
-func (this *Service) trackEvent(height uint32) (bool, []string, error) {
+func (this *Service) trackSnapshotEvent(height uint32) (bool, []string, error) {
 	accounts := []string{}
 	events, err := this.sdk.GetSmartContractEventByBlock(height)
 	if err != nil {
@@ -27,22 +27,31 @@ func (this *Service) trackEvent(height uint32) (bool, []string, error) {
 			if name == "PutUnderlyingPrice" {
 				flag = true
 			}
+
 			if len(states) > 1 {
 				a, ok := states[1].(string)
-				if !ok {
-					continue
+				if ok {
+					address, err := common.AddressFromBase58(a)
+					if err == nil {
+						if !listContains(this.listeningAddressList, address.ToHexString()) {
+							if !listContains(accounts, a) {
+								accounts = append(accounts, a)
+							}
+						}
+					}
 				}
-				_, err = common.AddressFromBase58(a)
-				if err != nil {
-					continue
-				} else {
-					if listContains(this.cfg.SystemContract, a) {
-						continue
+			}
+			if len(states) > 2 {
+				a, ok := states[2].(string)
+				if ok {
+					address, err := common.AddressFromBase58(a)
+					if err == nil {
+						if !listContains(this.listeningAddressList, address.ToHexString()) {
+							if !listContains(accounts, a) {
+								accounts = append(accounts, a)
+							}
+						}
 					}
-					if listContains(accounts, a) {
-						continue
-					}
-					accounts = append(accounts, a)
 				}
 			}
 		}

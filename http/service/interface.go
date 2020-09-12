@@ -24,4 +24,5 @@ type FlashPoolManager interface {
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 	UserFlashPoolOverviewForStore(account string) (*common.UserFlashPoolOverview, error)
 	GetAllMarkets() ([]ocommon.Address, error)
+	GetInsuranceAddress(ocommon.Address) (ocommon.Address, error)
 }

@@ -161,6 +161,7 @@ type UserFlashPoolOverview struct {
 	InsuranceBalance uint64
 	BorrowLimit      uint64
 	NetApy           int64
+	WingAccrued      uint64
 	Info             string
 }
 
@@ -185,6 +186,7 @@ func (client Client) LoadUserFlashPoolOverview(userAddress string) (*common.User
 	output.InsuranceBalance = userFlashPoolOverview.InsuranceBalance
 	output.BorrowLimit = userFlashPoolOverview.BorrowLimit
 	output.NetApy = userFlashPoolOverview.NetApy
+	output.WingAccrued = userFlashPoolOverview.WingAccrued
 	return output, err
 }
 
@@ -198,6 +200,7 @@ func (client Client) SaveUserFlashPoolOverview(userAddress string, input *common
 		InsuranceBalance: input.InsuranceBalance,
 		BorrowLimit:      input.BorrowLimit,
 		NetApy:           input.NetApy,
+		WingAccrued:      input.WingAccrued,
 		Info:             hex.EncodeToString(sink.Bytes()),
 	}
 	return client.db.Save(userFlashPoolOverview).Error

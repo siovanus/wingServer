@@ -34,8 +34,17 @@ func (this *Service) AddListeningAddressList() {
 	}
 	for _, v := range allMarkets {
 		this.listeningAddressList = append(this.listeningAddressList, v.ToHexString())
+		addr, err := this.fpMgr.GetInsuranceAddress(v)
+		if err != nil {
+			log.Errorf("AddListeningAddressList, this.fpMgr.GetInsuranceAddress error: %s", err)
+			os.Exit(1)
+		}
+		this.listeningAddressList = append(this.listeningAddressList, addr.ToHexString())
 	}
+	this.listeningAddressList = append(this.listeningAddressList, this.cfg.WingAddress)
+	this.listeningAddressList = append(this.listeningAddressList, this.cfg.GovernanceAddress)
 	this.listeningAddressList = append(this.listeningAddressList, this.cfg.OracleAddress)
+	this.listeningAddressList = append(this.listeningAddressList, this.cfg.FlashPoolAddress)
 }
 
 func (this *Service) Close() {
@@ -111,8 +120,9 @@ func (this *Service) TrackEvent() {
 			os.Exit(1)
 		}
 		this.trackHeight = currentHeight
+	} else {
+		this.trackHeight = trackHeight
 	}
-	this.trackHeight = trackHeight
 	for {
 		currentHeight, err := this.sdk.GetCurrentBlockHeight()
 		if err != nil {
@@ -120,7 +130,7 @@ func (this *Service) TrackEvent() {
 		}
 		for i := this.trackHeight + 1; i <= currentHeight; i++ {
 			log.Infof("TrackEvent, parse block: %d", i)
-			ifOracle, accounts, err := this.trackEvent(i)
+			ifOracle, accounts, err := this.trackSnapshotEvent(i)
 			if err != nil {
 				log.Errorf("TrackEvent, this.TrackOracle error:", err)
 				break

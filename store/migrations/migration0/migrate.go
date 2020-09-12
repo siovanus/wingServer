@@ -39,6 +39,7 @@ type UserFlashPoolOverview struct {
 	InsuranceBalance uint64
 	BorrowLimit      uint64
 	NetApy           int64
+	WingAccrued      uint64
 	Info             string
 }
 
