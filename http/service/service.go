@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/ontio/ontology/common"
 	"os"
 	"time"
 
@@ -11,18 +12,33 @@ import (
 )
 
 type Service struct {
-	sdk         *sdk.OntologySdk
-	cfg         *config.Config
-	govMgr      GovernanceManager
-	fpMgr       FlashPoolManager
-	store       *store.Client
-	trackHeight uint32
+	sdk                  *sdk.OntologySdk
+	cfg                  *config.Config
+	govMgr               GovernanceManager
+	fpMgr                FlashPoolManager
+	store                *store.Client
+	trackHeight          uint32
+	listeningAddressList []common.Address
 }
 
 var ASSET = []string{"ONT", "BTC", "ETH", "DAI"}
 
 func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client, cfg *config.Config) *Service {
-	return &Service{sdk: sdk, govMgr: govMgr, fpMgr: fpMgr, store: store}
+	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, store: store}
+}
+
+func (this *Service) AddListeningAddressList() {
+	oracleAddress, err := common.AddressFromHexString(this.cfg.OracleAddress)
+	if err != nil {
+		log.Errorf("AddListeningAddressList, common.AddressFromHexString error: %s", err)
+		os.Exit(1)
+	}
+	allMarkets, err := this.fpMgr.GetAllMarkets()
+	if err != nil {
+		log.Errorf("AddListeningAddressList, this.fpMgr.GetAllMarkets error: %s", err)
+		os.Exit(1)
+	}
+	this.listeningAddressList = append(allMarkets, oracleAddress)
 }
 
 func (this *Service) Close() {
@@ -94,12 +110,13 @@ func (this *Service) TrackEvent() {
 			log.Errorf("TrackEvent, this.sideSdk.GetCurrentBlockHeight error:", err)
 		}
 		for i := this.trackHeight + 1; i <= currentHeight; i++ {
-			ok, err := this.TrackOracle(i)
+			ifOracle, account, err := this.trackEvent(i)
 			if err != nil {
 				log.Errorf("TrackEvent, this.TrackOracle error:", err)
 				break
 			}
-			if ok {
+
+			if ifOracle {
 				err = this.PriceFeed()
 				if err != nil {
 					log.Errorf("TrackEvent, this.PriceFeed error:", err)
@@ -107,15 +124,15 @@ func (this *Service) TrackEvent() {
 				}
 			}
 
-			account, err := this.TrackFlash(i)
-			if err != nil {
-				log.Errorf("TrackEvent, this.TrackFlash error:", err)
-				break
-			}
 			if account != "" {
 				err = this.StoreFlashPoolOverview(account)
 				if err != nil {
 					log.Errorf("TrackEvent, this.StoreFlashPoolOverview error:", err)
+					break
+				}
+				err = this.StoreFlashPoolAllMarket()
+				if err != nil {
+					log.Errorf("TrackEvent, this.StoreFlashPoolAllMarket error:", err)
 					break
 				}
 			}

@@ -60,9 +60,9 @@ func (this *FlashPoolManager) AssetStoredPrice(asset string) (uint64, error) {
 }
 
 func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error) {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("FlashPoolMarketDistribution, this.GetAllMarkets error: %s", err)
 	}
 	flashPoolMarketDistribution := make([]*common.Distribution, 0)
 	for _, address := range allMarkets {
@@ -99,9 +99,9 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 }
 
 func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("PoolDistribution, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("PoolDistribution, this.GetAllMarkets error: %s", err)
 	}
 	distribution := new(common.Distribution)
 	for _, address := range allMarkets {
@@ -144,9 +144,9 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 	distributed := uint64(time.Now().Unix()) - governance.GenesisTime
 	index := distributed/governance.YearSecond + 1
 
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolBanner, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("FlashPoolBanner, this.GetAllMarkets error: %s", err)
 	}
 	var total uint64 = 0
 	for _, address := range allMarkets {
@@ -170,9 +170,9 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 }
 
 func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error) {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolDetail, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("FlashPoolDetail, this.GetAllMarkets error: %s", err)
 	}
 	flashPoolDetail := &common.FlashPoolDetail{
 		SupplyMarketRank:    make([]*common.MarketFund, 0),
@@ -253,9 +253,9 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 }
 
 func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail, error) {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolDetailForStore, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("FlashPoolDetailForStore, this.GetAllMarkets error: %s", err)
 	}
 	flashPoolDetail := new(store.FlashPoolDetail)
 	for _, address := range allMarkets {
@@ -290,9 +290,9 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 }
 
 func (this *FlashPoolManager) FlashPoolMarketStore() error {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return fmt.Errorf("FlashPoolMarketStore, this.getAllMarkets error: %s", err)
+		return fmt.Errorf("FlashPoolMarketStore, this.GetAllMarkets error: %s", err)
 	}
 	timestamp := uint64(time.Now().Unix())
 	for _, address := range allMarkets {
@@ -334,9 +334,27 @@ func (this *FlashPoolManager) FlashPoolMarketStore() error {
 }
 
 func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, error) {
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolAllMarket, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("FlashPoolAllMarket, this.GetAllMarkets error: %s", err)
+	}
+	flashPoolAllMarket := &common.FlashPoolAllMarket{
+		FlashPoolAllMarket: make([]*common.Market, 0),
+	}
+	for _, address := range allMarkets {
+		market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadFlashMarket error: %s", err)
+		}
+		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, &market)
+	}
+	return flashPoolAllMarket, nil
+}
+
+func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAllMarket, error) {
+	allMarkets, err := this.GetAllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.GetAllMarkets error: %s", err)
 	}
 	flashPoolAllMarket := &common.FlashPoolAllMarket{
 		FlashPoolAllMarket: make([]*common.Market, 0),
@@ -344,32 +362,32 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 	for _, address := range allMarkets {
 		supplyAmount, err := this.getSupplyAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
 		}
 		borrowAmount, err := this.getBorrowAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
 		}
 		insuranceAmount, err := this.getInsuranceAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyAmount error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
 		}
 		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.AssetStoredPrice error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.AssetStoredPrice error: %s", err)
 		}
 
 		supplyApy, err := this.getSupplyApy(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getSupplyApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyApy error: %s", err)
 		}
 		borrowApy, err := this.getBorrowApy(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getBorrowApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowApy error: %s", err)
 		}
 		insuranceApy, err := this.getInsuranceApy(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.getInsuranceApy error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getInsuranceApy error: %s", err)
 		}
 
 		market := new(common.Market)
@@ -389,7 +407,7 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 
 		latestFlashPoolMarket, err := this.store.LoadLatestFlashPoolMarket(market.Name)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.store.LoadLatestFlashPoolMarket error: %s", err)
 		}
 		if market.TotalSupply != 0 {
 			market.TotalSupplyRate = (market.TotalSupply - latestFlashPoolMarket.TotalSupply) * 100 / market.TotalSupply
@@ -406,7 +424,7 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 }
 
 func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.UserFlashPoolOverview, error) {
-	userFlashPoolOverview , err := this.store.LoadUserFlashPoolOverview(accountStr)
+	userFlashPoolOverview, err := this.store.LoadUserFlashPoolOverview(accountStr)
 	if err != nil {
 		userFlashPoolOverview := &common.UserFlashPoolOverview{
 			CurrentSupply:    make([]*common.Supply, 0),
@@ -414,40 +432,29 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 			CurrentInsurance: make([]*common.Insurance, 0),
 			AllMarket:        make([]*common.UserMarket, 0),
 		}
-		allMarkets, err := this.getAllMarkets()
+		allMarkets, err := this.GetAllMarkets()
 		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverview, this.getAllMarkets error: %s", err)
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.GetAllMarkets error: %s", err)
 		}
 		for _, address := range allMarkets {
-			//TODO read from db
-			//supplyApy, err := this.getSupplyApy(address)
-			//if err != nil {
-			//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyApy error: %s", err)
-			//}
-			//borrowApy, err := this.getBorrowApy(address)
-			//if err != nil {
-			//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowApy error: %s", err)
-			//}
-			//insuranceApy, err := this.getInsuranceApy(address)
-			//if err != nil {
-			//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getInsuranceApy error: %s", err)
-			//}
-			//totalBorrowAmount, err := this.getBorrowAmount(address)
-			//if err != nil {
-			//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getSupplyAmount error: %s", err)
-			//}
-			//totalInsuranceAmount, err := this.getInsuranceAmount(address)
-			//if err != nil {
-			//	return nil, fmt.Errorf("UserFlashPoolOverview, this.getInsuranceAmount error: %s", err)
-			//}
+			market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
+			if err != nil {
+				return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadFlashMarket error: %s", err)
+			}
+			supplyApy := market.SupplyApy
+			borrowApy := market.BorrowApy
+			insuranceApy := market.InsuranceApy
+			totalBorrowAmount := market.TotalBorrow
+			totalInsuranceAmount := market.TotalInsurance
+
 			userMarket := &common.UserMarket{
 				Name:            this.cfg.AssetMap[address.ToHexString()],
 				Icon:            this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyApy:       supplyApy,
 				BorrowApy:       borrowApy,
-				BorrowLiquidity: new(big.Int).Div(totalBorrowAmount, FrontDecimal).Uint64(),
+				BorrowLiquidity: totalBorrowAmount,
 				InsuranceApy:    insuranceApy,
-				InsuranceAmount: new(big.Int).Div(totalInsuranceAmount, FrontDecimal).Uint64(),
+				InsuranceAmount: totalInsuranceAmount,
 			}
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
@@ -462,9 +469,9 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 	if err != nil {
 		return nil, fmt.Errorf("UserFlashPoolOverviewForStore, ocommon.AddressFromBase58 error: %s", err)
 	}
-	allMarkets, err := this.getAllMarkets()
+	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getAllMarkets error: %s", err)
+		return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.GetAllMarkets error: %s", err)
 	}
 	assetsIn, _ := this.getAssetsIn(account)
 	userFlashPoolOverview := &common.UserFlashPoolOverview{

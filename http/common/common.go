@@ -432,7 +432,7 @@ type FlashPoolAllMarket struct {
 
 type Market struct {
 	Icon               string
-	Name               string
+	Name               string `gorm:"primary_key"`
 	TotalSupply        uint64
 	TotalSupplyRate    uint64
 	SupplyApy          uint64

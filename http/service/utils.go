@@ -6,53 +6,48 @@ import (
 	"github.com/siovanus/wingServer/store"
 )
 
-func (this *Service) TrackOracle(height uint32) (bool, error) {
+func (this *Service) trackEvent(height uint32) (bool, string, error) {
 	events, err := this.sdk.GetSmartContractEventByBlock(height)
 	if err != nil {
-		return false, fmt.Errorf("TrackOracle, this.sdk.GetSmartContractEventByBlock error:%s", err)
+		return false, "", fmt.Errorf("TrackOracle, this.sdk.GetSmartContractEventByBlock error:%s", err)
 	}
+	flag := false
+	account := ""
 	for _, event := range events {
 		for _, notify := range event.Notify {
 			states, ok := notify.States.([]interface{})
 			if !ok {
 				continue
 			}
-			if notify.ContractAddress != this.cfg.OracleAddress {
+			listen := false
+			for _, v := range this.listeningAddressList {
+				if notify.ContractAddress == v.ToHexString() {
+					listen = true
+				}
+			}
+			if !listen {
 				continue
 			}
 			name, _ := states[0].(string)
 			if name == "PutUnderlyingPrice" {
-				return true, nil
+				flag = true
 			}
-		}
-	}
-	return false, nil
-}
+			if len(states) > 1 {
+				a, ok := states[1].(string)
+				if !ok {
+					continue
+				}
+				_, err = common.AddressFromBase58(a)
+				if err != nil {
+					continue
+				} else {
+					account = a
+				}
+			}
 
-func (this *Service) TrackFlash(height uint32) (string, error) {
-	events, err := this.sdk.GetSmartContractEventByBlock(height)
-	if err != nil {
-		return "", fmt.Errorf("TrackOracle, this.sdk.GetSmartContractEventByBlock error:%s", err)
-	}
-	for _, event := range events {
-		for _, notify := range event.Notify {
-			states, ok := notify.States.([]interface{})
-			if !ok {
-				continue
-			}
-			if notify.ContractAddress != this.cfg.OracleAddress {
-				continue
-			}
-			account := states[1].(string)
-			_, err = common.AddressFromBase58(account)
-			if err != nil {
-				continue
-			} else {
-				return account, nil
-			}
 		}
 	}
-	return "", nil
+	return flag, account, nil
 }
 
 func (this *Service) PriceFeed() error {
@@ -74,13 +69,27 @@ func (this *Service) PriceFeed() error {
 }
 
 func (this *Service) StoreFlashPoolOverview(account string) error {
-	userFlashPoolOverview, err := this.fpMgr.UserFlashPoolOverview(account)
+	userFlashPoolOverview, err := this.fpMgr.UserFlashPoolOverviewForStore(account)
 	if err != nil {
-		return fmt.Errorf("StoreFlashPoolOverview, this.fpMgr.UserFlashPoolOverview error: %s", err)
+		return fmt.Errorf("StoreFlashPoolOverview, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
 	}
 	err = this.store.SaveUserFlashPoolOverview(account, userFlashPoolOverview)
 	if err != nil {
 		return fmt.Errorf("StoreFlashPoolOverview, this.store.SaveUserFlashPoolOverview error: %s", err)
+	}
+	return nil
+}
+
+func (this *Service) StoreFlashPoolAllMarket() error {
+	flashPoolAllMarket, err := this.fpMgr.FlashPoolAllMarketForStore()
+	if err != nil {
+		return fmt.Errorf("StoreFlashPoolAllMarket, this.fpMgr.FlashPoolAllMarketForStore error: %s", err)
+	}
+	for _, v := range flashPoolAllMarket.FlashPoolAllMarket {
+		err = this.store.SaveFlashMarket(v)
+		if err != nil {
+			return fmt.Errorf("StoreFlashPoolOverview, this.store.SaveFlashMarket error: %s", err)
+		}
 	}
 	return nil
 }

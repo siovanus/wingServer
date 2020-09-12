@@ -199,3 +199,13 @@ func (client Client) SaveUserFlashPoolOverview(userAddress string, input *common
 	}
 	return client.db.Save(userFlashPoolOverview).Error
 }
+
+func (client Client) LoadFlashMarket(name string) (common.Market, error) {
+	var market common.Market
+	err := client.db.Where(common.Market{Name: name}).Last(&market).Error
+	return market, err
+}
+
+func (client Client) SaveFlashMarket(market *common.Market) error {
+	return client.db.Save(market).Error
+}

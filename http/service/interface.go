@@ -1,6 +1,7 @@
 package service
 
 import (
+	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/store"
 )
@@ -19,6 +20,8 @@ type FlashPoolManager interface {
 	FlashPoolDetailForStore() (*store.FlashPoolDetail, error)
 	FlashPoolMarketStore() error
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
+	FlashPoolAllMarketForStore() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
 	UserFlashPoolOverviewForStore(account string) (*common.UserFlashPoolOverview, error)
+	GetAllMarkets() ([]ocommon.Address, error)
 }

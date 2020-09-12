@@ -19,7 +19,7 @@ func (this *FlashPoolManager) assetPrice(asset string) (uint64, error) {
 	return r.Uint64(), nil
 }
 
-func (this *FlashPoolManager) getAllMarkets() ([]common.Address, error) {
+func (this *FlashPoolManager) GetAllMarkets() ([]common.Address, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress,
 		"allMarkets", []interface{}{})
 	if err != nil {

@@ -3,6 +3,7 @@ package migration0
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
+	"github.com/siovanus/wingServer/http/common"
 )
 
 type FlashPoolDetail struct {
@@ -64,6 +65,11 @@ func Migrate(tx *gorm.DB) error {
 	}
 
 	err = tx.AutoMigrate(UserFlashPoolOverview{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate UserFlashPoolOverview")
+	}
+
+	err = tx.AutoMigrate(common.Market{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate UserFlashPoolOverview")
 	}
