@@ -3,15 +3,15 @@
   "port": 10337,
   "governance_address": "2974e93cd97e047086a66a0ab5892593649326ed",
   "wing_address": "ef79ae5d85ec819cfd51eb23d4c242fa70f713e7",
-  "flash_pool_address": "6e34815bfffe0033e22824053397b7b4fa2227d9",
-  "oracle_address": "356fb121f0812e4be51d5668d3d26832d2121695",
+  "flash_pool_address": "ee06817f0bd3acba76a8bc4d5810cef1c90fb05a",
+  "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "5c1ae728eee9cb4272b3552c0ec8a66aa047b992": "oWBTC",
-    "0a8ddbcc9fb7db29c83903aa752db615ba96dbce": "oETH",
-    "81c1cd5a84d3ba6a2ff18dc388cdff820265d20f": "oUSDT",
-    "28d7ff54414ed8f944eafa7a77c7c594139ee155": "oDAI",
-    "7967cdbf395f2ef4685612b451ed32780d88199e": "ONTd"
+    "669dbc0ce0a11a4e8ccd9549c08d4218f8eebe98": "oWBTC",
+    "21e851597e687d49b8b983ac4fe2b5c13d350e15": "oETH",
+    "7f9b0f296b2244d802c0ecb2c0963e5afca37a44": "oUSDT",
+    "beb86a0ada439bf99a419d9576e12354f2e32452": "oDAI",
+    "627d62b5727558c067769f14c7b5d9dd367f0f0d": "ONTd"
   },
   "icon_map": {
     "ONTd":  "https://i.postimg.cc/t4tTXLbH/ontd-2x.png",
@@ -23,11 +23,22 @@
     "Flash": "http://106.75.209.209/icon/flash_icon.svg"
   },
   "oracle_map": {
-    "5c1ae728eee9cb4272b3552c0ec8a66aa047b992": "BTC",
-    "0a8ddbcc9fb7db29c83903aa752db615ba96dbce": "ETH",
-    "81c1cd5a84d3ba6a2ff18dc388cdff820265d20f": "USDT",
-    "28d7ff54414ed8f944eafa7a77c7c594139ee155": "DAI",
-    "7967cdbf395f2ef4685612b451ed32780d88199e": "ONT"
+    "669dbc0ce0a11a4e8ccd9549c08d4218f8eebe98": "BTC",
+    "21e851597e687d49b8b983ac4fe2b5c13d350e15": "ETH",
+    "7f9b0f296b2244d802c0ecb2c0963e5afca37a44": "USDT",
+    "beb86a0ada439bf99a419d9576e12354f2e32452": "DAI",
+    "627d62b5727558c067769f14c7b5d9dd367f0f0d": "ONT"
+  },
+  "token_decimal":{
+    "percentage": 4,
+    "oUSDT": 6,
+    "ONTd": 9,
+    "oDAI": 18,
+    "oWBTC": 8,
+    "oETH": 18,
+    "WING": 9,
+    "oracle": 9,
+    "flash": 9
   },
   "track_event_interval": 1,
   "init_track_height": 13671504

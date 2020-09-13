@@ -12,7 +12,7 @@ type GovernanceManager interface {
 }
 
 type FlashPoolManager interface {
-	AssetPrice(asset string) (uint64, error)
+	AssetPrice(asset string) (string, error)
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
 	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*common.FlashPoolBanner, error)

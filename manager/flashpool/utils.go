@@ -6,17 +6,17 @@ import (
 	"math/big"
 )
 
-func (this *FlashPoolManager) assetPrice(asset string) (uint64, error) {
+func (this *FlashPoolManager) assetPrice(asset string) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.oracleAddress,
 		"getUnderlyingPrice", []interface{}{asset})
 	if err != nil {
-		return 0, fmt.Errorf("assetPrice, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("assetPrice, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToInteger()
 	if err != nil {
-		return 0, fmt.Errorf("assetPrice, preExecResult.Result.ToInteger error: %s", err)
+		return nil, fmt.Errorf("assetPrice, preExecResult.Result.ToInteger error: %s", err)
 	}
-	return r.Uint64(), nil
+	return r, nil
 }
 
 func (this *FlashPoolManager) GetAllMarkets() ([]common.Address, error) {
@@ -216,41 +216,41 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 	return amount.ToBigInt(), nil
 }
 
-func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (uint64, error) {
+func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"supplyRatePerBlock", []interface{}{})
 	if err != nil {
-		return 0, fmt.Errorf("getSupplyApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("getSupplyApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
 	if err != nil {
-		return 0, fmt.Errorf("getSupplyApy, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("getSupplyApy, preExecResult.Result.ToByteArray error: %s", err)
 	}
 	source := common.NewZeroCopySource(r)
 	ratePerBlock, eof := source.NextI128()
 	if eof {
-		return 0, fmt.Errorf("getSupplyApy, source.NextI128 error")
+		return nil, fmt.Errorf("getSupplyApy, source.NextI128 error")
 	}
-	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear))
 	return result, nil
 }
 
-func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (uint64, error) {
+func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"borrowRatePerBlock", []interface{}{})
 	if err != nil {
-		return 0, fmt.Errorf("getBorrowApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("getBorrowApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
 	if err != nil {
-		return 0, fmt.Errorf("getBorrowApy, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("getBorrowApy, preExecResult.Result.ToByteArray error: %s", err)
 	}
 	source := common.NewZeroCopySource(r)
 	ratePerBlock, eof := source.NextI128()
 	if eof {
-		return 0, fmt.Errorf("getBorrowApy, source.NextI128 error")
+		return nil, fmt.Errorf("getBorrowApy, source.NextI128 error")
 	}
-	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear))
 	return result, nil
 }
 
@@ -271,27 +271,27 @@ func (this *FlashPoolManager) GetInsuranceAddress(contractAddress common.Address
 	return insuranceAddress, nil
 }
 
-func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (uint64, error) {
+func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (*big.Int, error) {
 	insuranceAddress, err := this.GetInsuranceAddress(contractAddress)
 	if err != nil {
-		return 0, fmt.Errorf("getInsuranceApy, this.getInsuranceAddress error: %s", err)
+		return nil, fmt.Errorf("getInsuranceApy, this.getInsuranceAddress error: %s", err)
 	}
 
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
 		"supplyRatePerBlock", []interface{}{})
 	if err != nil {
-		return 0, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
 	if err != nil {
-		return 0, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
 	}
 	source := common.NewZeroCopySource(r)
 	ratePerBlock, eof := source.NextI128()
 	if eof {
-		return 0, fmt.Errorf("getInsuranceApy, source.NextI128 error")
+		return nil, fmt.Errorf("getInsuranceApy, source.NextI128 error")
 	}
-	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear)).Uint64()
+	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear))
 	return result, nil
 }
 

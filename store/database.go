@@ -86,9 +86,9 @@ func (client Client) Close() error {
 
 type FlashPoolDetail struct {
 	Timestamp      uint64 `gorm:"primary_key"`
-	TotalSupply    uint64
-	TotalBorrow    uint64
-	TotalInsurance uint64
+	TotalSupply    string
+	TotalBorrow    string
+	TotalInsurance string
 }
 
 func (client Client) LoadLatestFlashPoolDetail() (FlashPoolDetail, error) {
@@ -105,9 +105,9 @@ type FlashPoolMarket struct {
 	ID             uint64
 	Name           string
 	Timestamp      uint64
-	TotalSupply    uint64
-	TotalBorrow    uint64
-	TotalInsurance uint64
+	TotalSupply    string
+	TotalBorrow    string
+	TotalInsurance string
 }
 
 func (client Client) LoadLatestFlashPoolMarket(name string) (FlashPoolMarket, error) {
@@ -122,7 +122,7 @@ func (client Client) SaveFlashPoolMarket(flashPoolMarket *FlashPoolMarket) error
 
 type Price struct {
 	Name  string `gorm:"primary_key"`
-	Price uint64
+	Price string
 }
 
 func (client Client) LoadPrice(name string) (Price, error) {
@@ -156,12 +156,12 @@ func (client Client) SaveTrackHeight(height uint32) error {
 
 type UserFlashPoolOverview struct {
 	UserAddress      string `gorm:"primary_key"`
-	SupplyBalance    uint64
-	BorrowBalance    uint64
-	InsuranceBalance uint64
-	BorrowLimit      uint64
-	NetApy           int64
-	WingAccrued      uint64
+	SupplyBalance    string
+	BorrowBalance    string
+	InsuranceBalance string
+	BorrowLimit      string
+	NetApy           string
+	WingAccrued      string
 	Info             string
 }
 

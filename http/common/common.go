@@ -47,17 +47,17 @@ type AssetPriceRequest struct {
 
 type AssetPriceResponse struct {
 	Id    string
-	Price uint64
+	Price string
 }
 
 type GovBannerOverview struct {
-	Remain20 uint64
-	Remain80 uint64
+	Remain20 string
+	Remain80 string
 }
 
 type GovBanner struct {
-	Daily       uint64
-	Distributed uint64
+	Daily       string
+	Distributed string
 }
 
 type FlashPoolMarketDistribution struct {
@@ -71,40 +71,40 @@ type PoolDistribution struct {
 type Distribution struct {
 	Icon            string
 	Name            string
-	PerDay          uint64
-	SupplyAmount    uint64
-	BorrowAmount    uint64
-	InsuranceAmount uint64
-	Total           uint64
+	PerDay          string
+	SupplyAmount    string
+	BorrowAmount    string
+	InsuranceAmount string
+	Total           string
 }
 
 type FlashPoolBanner struct {
-	Today uint64
-	Share uint64
-	Total uint64
+	Today string
+	Share string
+	Total string
 }
 
 type FlashPoolDetail struct {
-	TotalSupply       uint64
-	TotalSupplyRate   int64
+	TotalSupply       string
+	TotalSupplyRate   string
 	SupplyMarketRank  []*MarketFund
-	SupplyVolumeDaily int64
+	SupplyVolumeDaily string
 
-	TotalBorrow       uint64
-	TotalBorrowRate   int64
+	TotalBorrow       string
+	TotalBorrowRate   string
 	BorrowMarketRank  []*MarketFund
-	BorrowVolumeDaily int64
+	BorrowVolumeDaily string
 
-	TotalInsurance       uint64
-	TotalInsuranceRate   int64
+	TotalInsurance       string
+	TotalInsuranceRate   string
 	InsuranceMarketRank  []*MarketFund
-	InsuranceVolumeDaily int64
+	InsuranceVolumeDaily string
 }
 
 type MarketFund struct {
 	Icon string
 	Name string
-	Fund uint64
+	Fund string
 }
 
 type UserFlashPoolOverviewRequest struct {
@@ -119,12 +119,12 @@ type UserFlashPoolOverviewResponse struct {
 }
 
 type UserFlashPoolOverview struct {
-	SupplyBalance    uint64
-	BorrowBalance    uint64
-	InsuranceBalance uint64
-	BorrowLimit      uint64
-	NetApy           int64
-	WingAccrued      uint64
+	SupplyBalance    string
+	BorrowBalance    string
+	InsuranceBalance string
+	BorrowLimit      string
+	NetApy           string
+	WingAccrued      string
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow
@@ -222,26 +222,26 @@ func (this *UserFlashPoolOverview) HalfDeserialization(source *common.ZeroCopySo
 type Supply struct {
 	Icon                  string
 	Name                  string
-	SupplyDollar          uint64
-	SupplyBalance         uint64
-	Apy                   uint64
-	CollateralFactor      uint64
-	SupplyDistribution    uint64
-	BorrowDistribution    uint64
-	InsuranceDistribution uint64
+	SupplyDollar          string
+	SupplyBalance         string
+	Apy                   string
+	CollateralFactor      string
+	SupplyDistribution    string
+	BorrowDistribution    string
+	InsuranceDistribution string
 	IfCollateral          bool
 }
 
 func (this *Supply) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteUint64(this.SupplyDollar)
-	sink.WriteUint64(this.SupplyBalance)
-	sink.WriteUint64(this.Apy)
-	sink.WriteUint64(this.CollateralFactor)
-	sink.WriteUint64(this.SupplyDistribution)
-	sink.WriteUint64(this.BorrowDistribution)
-	sink.WriteUint64(this.InsuranceDistribution)
+	sink.WriteString(this.SupplyDollar)
+	sink.WriteString(this.SupplyBalance)
+	sink.WriteString(this.Apy)
+	sink.WriteString(this.CollateralFactor)
+	sink.WriteString(this.SupplyDistribution)
+	sink.WriteString(this.BorrowDistribution)
+	sink.WriteString(this.InsuranceDistribution)
 	sink.WriteBool(this.IfCollateral)
 }
 
@@ -254,32 +254,32 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
 	}
-	supplyDollar, eof := source.NextUint64()
-	if eof {
+	supplyDollar, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("supplyDollar deserialization error eof")
 	}
-	supplyBalance, eof := source.NextUint64()
-	if eof {
+	supplyBalance, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("supplyBalance deserialization error eof")
 	}
-	apy, eof := source.NextUint64()
-	if eof {
+	apy, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("apy deserialization error eof")
 	}
-	collateralFactor, eof := source.NextUint64()
-	if eof {
+	collateralFactor, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("collateralFactor deserialization error eof")
 	}
-	supplyDistribution, eof := source.NextUint64()
-	if eof {
+	supplyDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("supplyDistribution deserialization error eof")
 	}
-	borrowDistribution, eof := source.NextUint64()
-	if eof {
+	borrowDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("borrowDistribution deserialization error eof")
 	}
-	insuranceDistribution, eof := source.NextUint64()
-	if eof {
+	insuranceDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("insuranceDistribution deserialization error eof")
 	}
 	ifCollateral, irregular, eof := source.NextBool()
@@ -302,27 +302,27 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 type Borrow struct {
 	Icon                  string
 	Name                  string
-	BorrowDollar          uint64
-	BorrowBalance         uint64
-	Apy                   uint64
-	Limit                 uint64
-	CollateralFactor      uint64
-	SupplyDistribution    uint64
-	BorrowDistribution    uint64
-	InsuranceDistribution uint64
+	BorrowDollar          string
+	BorrowBalance         string
+	Apy                   string
+	Limit                 string
+	CollateralFactor      string
+	SupplyDistribution    string
+	BorrowDistribution    string
+	InsuranceDistribution string
 }
 
 func (this *Borrow) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteUint64(this.BorrowDollar)
-	sink.WriteUint64(this.BorrowBalance)
-	sink.WriteUint64(this.Apy)
-	sink.WriteUint64(this.Limit)
-	sink.WriteUint64(this.CollateralFactor)
-	sink.WriteUint64(this.SupplyDistribution)
-	sink.WriteUint64(this.BorrowDistribution)
-	sink.WriteUint64(this.InsuranceDistribution)
+	sink.WriteString(this.BorrowDollar)
+	sink.WriteString(this.BorrowBalance)
+	sink.WriteString(this.Apy)
+	sink.WriteString(this.Limit)
+	sink.WriteString(this.CollateralFactor)
+	sink.WriteString(this.SupplyDistribution)
+	sink.WriteString(this.BorrowDistribution)
+	sink.WriteString(this.InsuranceDistribution)
 }
 
 func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
@@ -334,36 +334,36 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
 	}
-	borrowDollar, eof := source.NextUint64()
-	if eof {
+	borrowDollar, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("borrowDollar deserialization error eof")
 	}
-	borrowBalance, eof := source.NextUint64()
-	if eof {
+	borrowBalance, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("borrowBalance deserialization error eof")
 	}
-	apy, eof := source.NextUint64()
-	if eof {
+	apy, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("apy deserialization error eof")
 	}
-	limit, eof := source.NextUint64()
-	if eof {
+	limit, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("limit deserialization error eof")
 	}
-	collateralFactor, eof := source.NextUint64()
-	if eof {
+	collateralFactor, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("collateralFactor deserialization error eof")
 	}
-	supplyDistribution, eof := source.NextUint64()
-	if eof {
+	supplyDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("supplyDistribution deserialization error eof")
 	}
-	borrowDistribution, eof := source.NextUint64()
-	if eof {
+	borrowDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("borrowDistribution deserialization error eof")
 	}
-	insuranceDistribution, eof := source.NextUint64()
-	if eof {
+	insuranceDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("insuranceDistribution deserialization error eof")
 	}
 	this.Icon = icon
@@ -382,25 +382,25 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 type Insurance struct {
 	Icon                  string
 	Name                  string
-	InsuranceDollar       uint64
-	InsuranceBalance      uint64
-	Apy                   uint64
-	CollateralFactor      uint64
-	SupplyDistribution    uint64
-	BorrowDistribution    uint64
-	InsuranceDistribution uint64
+	InsuranceDollar       string
+	InsuranceBalance      string
+	Apy                   string
+	CollateralFactor      string
+	SupplyDistribution    string
+	BorrowDistribution    string
+	InsuranceDistribution string
 }
 
 func (this *Insurance) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteUint64(this.InsuranceDollar)
-	sink.WriteUint64(this.InsuranceBalance)
-	sink.WriteUint64(this.Apy)
-	sink.WriteUint64(this.CollateralFactor)
-	sink.WriteUint64(this.SupplyDistribution)
-	sink.WriteUint64(this.BorrowDistribution)
-	sink.WriteUint64(this.InsuranceDistribution)
+	sink.WriteString(this.InsuranceDollar)
+	sink.WriteString(this.InsuranceBalance)
+	sink.WriteString(this.Apy)
+	sink.WriteString(this.CollateralFactor)
+	sink.WriteString(this.SupplyDistribution)
+	sink.WriteString(this.BorrowDistribution)
+	sink.WriteString(this.InsuranceDistribution)
 }
 
 func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
@@ -412,32 +412,32 @@ func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
 	}
-	insuranceDollar, eof := source.NextUint64()
-	if eof {
+	insuranceDollar, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("insuranceDollar deserialization error eof")
 	}
-	insuranceBalance, eof := source.NextUint64()
-	if eof {
+	insuranceBalance, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("insuranceBalance deserialization error eof")
 	}
-	apy, eof := source.NextUint64()
-	if eof {
+	apy, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("apy deserialization error eof")
 	}
-	collateralFactor, eof := source.NextUint64()
-	if eof {
+	collateralFactor, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("collateralFactor deserialization error eof")
 	}
-	supplyDistribution, eof := source.NextUint64()
-	if eof {
+	supplyDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("supplyDistribution deserialization error eof")
 	}
-	borrowDistribution, eof := source.NextUint64()
-	if eof {
+	borrowDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("borrowDistribution deserialization error eof")
 	}
-	insuranceDistribution, eof := source.NextUint64()
-	if eof {
+	insuranceDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
 		return fmt.Errorf("insuranceDistribution deserialization error eof")
 	}
 	this.Icon = icon
@@ -455,30 +455,30 @@ func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
 type UserMarket struct {
 	Icon                  string
 	Name                  string
-	SupplyApy             uint64
-	BorrowApy             uint64
-	BorrowLiquidity       uint64
-	InsuranceApy          uint64
-	InsuranceAmount       uint64
-	CollateralFactor      uint64
-	SupplyDistribution    uint64
-	BorrowDistribution    uint64
-	InsuranceDistribution uint64
+	SupplyApy             string
+	BorrowApy             string
+	BorrowLiquidity       string
+	InsuranceApy          string
+	InsuranceAmount       string
+	CollateralFactor      string
+	SupplyDistribution    string
+	BorrowDistribution    string
+	InsuranceDistribution string
 	IfCollateral          bool
 }
 
 func (this *UserMarket) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteUint64(this.SupplyApy)
-	sink.WriteUint64(this.BorrowApy)
-	sink.WriteUint64(this.BorrowLiquidity)
-	sink.WriteUint64(this.InsuranceApy)
-	sink.WriteUint64(this.InsuranceAmount)
-	sink.WriteUint64(this.CollateralFactor)
-	sink.WriteUint64(this.SupplyDistribution)
-	sink.WriteUint64(this.BorrowDistribution)
-	sink.WriteUint64(this.InsuranceDistribution)
+	sink.WriteString(this.SupplyApy)
+	sink.WriteString(this.BorrowApy)
+	sink.WriteString(this.BorrowLiquidity)
+	sink.WriteString(this.InsuranceApy)
+	sink.WriteString(this.InsuranceAmount)
+	sink.WriteString(this.CollateralFactor)
+	sink.WriteString(this.SupplyDistribution)
+	sink.WriteString(this.BorrowDistribution)
+	sink.WriteString(this.InsuranceDistribution)
 	sink.WriteBool(this.IfCollateral)
 }
 
@@ -491,41 +491,41 @@ func (this *UserMarket) Deserialization(source *common.ZeroCopySource) error {
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
 	}
-	supplyApy, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("supplyApy deserialization error eof")
+	supplyApy, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	borrowApy, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("borrowApy deserialization error eof")
+	borrowApy, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	borrowLiquidity, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("borrowLiquidity deserialization error eof")
+	borrowLiquidity, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	insuranceApy, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("insuranceApy deserialization error eof")
+	insuranceApy, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	insuranceAmount, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("insuranceAmount deserialization error eof")
+	insuranceAmount, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	collateralFactor, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("collateralFactor deserialization error eof")
+	collateralFactor, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	supplyDistribution, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("supplyDistribution deserialization error eof")
+	supplyDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	borrowDistribution, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("borrowDistribution deserialization error eof")
+	borrowDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
-	insuranceDistribution, eof := source.NextUint64()
-	if eof {
-		return fmt.Errorf("insuranceDistribution deserialization error eof")
+	insuranceDistribution, _, irregular, eof := source.NextString()
+	if irregular || eof {
+		return fmt.Errorf("icon deserialization error eof")
 	}
 	ifCollateral, irregular, eof := source.NextBool()
 	if irregular || eof {
@@ -551,18 +551,22 @@ type FlashPoolAllMarket struct {
 }
 
 type Market struct {
-	Icon               string
-	Name               string `gorm:"primary_key"`
-	TotalSupply        uint64
-	TotalSupplyRate    uint64
-	SupplyApy          uint64
-	SupplyApyRate      uint64
-	TotalBorrow        uint64
-	TotalBorrowRate    uint64
-	BorrowApy          uint64
-	BorrowApyRate      uint64
-	TotalInsurance     uint64
-	TotalInsuranceRate uint64
-	InsuranceApy       uint64
-	InsuranceApyRate   uint64
+	Icon                  string
+	Name                  string `gorm:"primary_key"`
+	TotalSupply           string
+	TotalSupplyRate       string
+	SupplyApy             string
+	SupplyApyRate         string
+	TotalBorrow           string
+	TotalBorrowRate       string
+	BorrowApy             string
+	BorrowApyRate         string
+	TotalInsurance        string
+	TotalInsuranceRate    string
+	InsuranceApy          string
+	InsuranceApyRate      string
+	CollateralFactor      string
+	SupplyDistribution    string
+	BorrowDistribution    string
+	InsuranceDistribution string
 }

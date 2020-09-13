@@ -26,6 +26,7 @@ type Config struct {
 	TrackEventInterval uint64            `json:"track_event_interval"`
 	InitTrackHeight    uint64            `json:"init_track_height"`
 	SystemContract     []string          `json:"system_contract"`
+	TokenDecimal       map[string]uint64 `json:"token_decimal"`
 }
 
 func NewConfig(fileName string) (*Config, error) {
