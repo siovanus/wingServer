@@ -141,7 +141,7 @@ func (this *FlashPoolManager) getInsuranceAmountByAccount(contractAddress, accou
 
 func (this *FlashPoolManager) getSupplyAmount(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
-		"totalSupply", []interface{}{})
+		"getCash", []interface{}{})
 	if err != nil {
 		return nil, fmt.Errorf("getSupplyAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
@@ -176,8 +176,13 @@ func (this *FlashPoolManager) getBorrowAmount(contractAddress common.Address) (*
 }
 
 func (this *FlashPoolManager) getInsuranceAmount(contractAddress common.Address) (*big.Int, error) {
-	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
-		"totalInsurance", []interface{}{})
+	insuranceAddress, err := this.GetInsuranceAddress(contractAddress)
+	if err != nil {
+		return nil, fmt.Errorf("getInsuranceAmount, this.getInsuranceAddress error: %s", err)
+	}
+
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
+		"getCash", []interface{}{})
 	if err != nil {
 		return nil, fmt.Errorf("getInsuranceAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
@@ -391,6 +396,7 @@ func DeserializeAccountLiquidity(data []byte) (*AccountLiquidity, error) {
 	}, nil
 }
 
+// how much user can borrow
 func (this *FlashPoolManager) getAccountLiquidity(account common.Address) (*AccountLiquidity, error) {
 	method := "getAccountLiquidity"
 	params := []interface{}{account}
