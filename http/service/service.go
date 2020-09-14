@@ -20,7 +20,7 @@ type Service struct {
 	listeningAddressList []string
 }
 
-var ASSET = []string{"ONT", "BTC", "ETH", "DAI"}
+var ASSET = []string{"ONTd", "WBTC", "renBTC", "USDC"}
 
 func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client, cfg *config.Config) *Service {
 	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, store: store}
@@ -156,6 +156,6 @@ func (this *Service) TrackEvent() {
 				break
 			}
 		}
-		time.Sleep(time.Duration(this.cfg.TrackEventInterval) * time.Second)
+		time.Sleep(time.Second * time.Duration(this.cfg.ScanInterval))
 	}
 }

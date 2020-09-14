@@ -1,45 +1,42 @@
 {
-  "json_rpc_address": "http://polaris2.ont.io:20336",
+  "json_rpc_address": "http://polaris4.ont.io:20336",
   "port": 10337,
-  "governance_address": "7b5553509adb056d6422827442bc9d9a675abf75",
-  "wing_address": "ef79ae5d85ec819cfd51eb23d4c242fa70f713e7",
-  "flash_pool_address": "5a86c02cd0a1fd55fc9d3b58954a3d041648b96b",
+  "governance_address": "ecbc65c3dd5f33a6338e4f3f7828c1b7c44ec167",
+  "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
+  "flash_pool_address": "36e395b707c13addd72962965135f943ebe5c84c",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "96fce60e98789a9a2f039faefe6b7661e84a2635": "oWBTC",
-    "8addb42a1201ab95259c4d5eb61dcdc5b80f516e": "oETH",
-    "688d9f6334a06f2ca053281f880f07f55c669513": "oUSDT",
-    "325f354d9af3bf33582f9afb7c8f103d27a1bfbd": "oDAI",
-    "fcd78ad03e37b21f9d93796857ca7b0e3f4bbfae": "ONTd"
+    "eba57090406572bfbc8a121314b08b336eb8b05a": "pWBTC",
+    "f0ce20f2f10d280b4791e7e24945040fadb27e9c": "prenBTC",
+    "fbf7ffdb49e6a4c4226d26e27973cb7a812ab427": "pUSDC",
+    "217812b3b7d66ae2bd0b429a354ef1fbadd94c95": "ONTd"
   },
   "icon_map": {
     "ONTd":  "https://i.postimg.cc/t4tTXLbH/ontd-2x.png",
-    "oETH":  "https://i.postimg.cc/P58W2f1Q/oETH-2x.png",
-    "oUSDT": "https://i.postimg.cc/RVhQJLF8/oUSDT-2x.png",
-    "oWBTC": "https://i.postimg.cc/qMFcs667/oWBTC-2x.png",
-    "oDAI":  "https://i.postimg.cc/7L3grBsC/oDAI-2x.png",
-    "oUSDC": "https://i.postimg.cc/6QJdSs0J/oUSDC-2x.png",
+    "pETH":  "https://i.postimg.cc/P58W2f1Q/oETH-2x.png",
+    "pUSDT": "https://i.postimg.cc/RVhQJLF8/oUSDT-2x.png",
+    "pWBTC": "https://i.postimg.cc/qMFcs667/oWBTC-2x.png",
+    "prenBTC": "https://i.postimg.cc/qMFcs667/oWBTC-2x.png",
+    "pDAI":  "https://i.postimg.cc/7L3grBsC/oDAI-2x.png",
+    "pUSDC": "https://i.postimg.cc/6QJdSs0J/oUSDC-2x.png",
     "Flash": "http://106.75.209.209/icon/flash_icon.svg"
   },
   "oracle_map": {
-    "96fce60e98789a9a2f039faefe6b7661e84a2635": "BTC",
-    "8addb42a1201ab95259c4d5eb61dcdc5b80f516e": "ETH",
-    "688d9f6334a06f2ca053281f880f07f55c669513": "USDT",
-    "325f354d9af3bf33582f9afb7c8f103d27a1bfbd": "DAI",
-    "fcd78ad03e37b21f9d93796857ca7b0e3f4bbfae": "ONT"
+    "eba57090406572bfbc8a121314b08b336eb8b05a": "WBTC",
+    "f0ce20f2f10d280b4791e7e24945040fadb27e9c": "renBTC",
+    "fbf7ffdb49e6a4c4226d26e27973cb7a812ab427": "USDT",
+    "217812b3b7d66ae2bd0b429a354ef1fbadd94c95": "ONTd"
   },
   "token_decimal":{
     "percentage": 4,
-    "oUSDT": 6,
     "ONTd": 9,
-    "oDAI": 18,
-    "oWBTC": 8,
-    "oETH": 18,
+    "pUSDC": 6,
+    "pWBTC": 8,
+    "prenBTC": 8,
     "WING": 9,
-    "oracle": 9,
+    "oracle": 12,
     "flash": 9
   },
-  "track_event_interval": 1,
-  "init_track_height": 13671504
+  "scan_interval": 1
 }

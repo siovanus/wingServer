@@ -114,7 +114,6 @@ func (this *restServer) getUrlParams(r *http.Request) map[string]interface{} {
 
 //init get Handler
 func (this *restServer) initGetHandler() {
-
 	for k := range this.getMap {
 		this.router.Get(k, func(w http.ResponseWriter, r *http.Request) {
 			var resp map[string]interface{}

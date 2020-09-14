@@ -3,11 +3,24 @@ package governance
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	"math/big"
 )
 
 // get wing total supply
-func (this *GovernanceManager) getWingTotalSupply() (uint64, error) {
+func (this *GovernanceManager) getWingTotalSupply() (*big.Int, error) {
 	r, err := this.sdk.GetStorage(this.wingAddress, []byte("TotalSupply"))
+	if err != nil {
+		return nil, fmt.Errorf("getWingTotalSupply, this.sdk.GetStorage error: %s", err)
+	}
+	return common.BigIntFromNeoBytes(r), nil
+}
+
+func (this *GovernanceManager) getBalanceOf(accountStr string) (uint64, error) {
+	account, err := common.AddressFromBase58(accountStr)
+	if err != nil {
+		return 0, fmt.Errorf("getWingTotalSupply, common.AddressFromBase58 error: %s", err)
+	}
+	r, err := this.sdk.GetStorage(this.wingAddress, append([]byte{0x01}, account[:]...))
 	if err != nil {
 		return 0, fmt.Errorf("getWingTotalSupply, this.sdk.GetStorage error: %s", err)
 	}

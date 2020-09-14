@@ -18,7 +18,6 @@ import (
 
 const (
 	BlockPerYear      = 60 * 60 * 24 * 365 * 2 / 3
-	PercentageDecimal = 10000
 )
 
 type FlashPoolManager struct {
@@ -140,6 +139,7 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
 	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
 	distribution.PerDay = utils.ToStringByPrecise(new(big.Int).Div(d, distributedDay), this.cfg.TokenDecimal["WING"])
+	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
 	return distribution, nil
 }
 
@@ -601,10 +601,10 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getInsuranceApy error: %s", err)
 		}
-		a := new(big.Int).Mul(supplyDollar, supplyApy)
-		b := new(big.Int).Mul(insuranceDollar, insuranceApy)
-		c := new(big.Int).Mul(borrowDollar, borrowApy)
-		netApy = new(big.Int).Add(netApy, new(big.Int).Sub(new(big.Int).Add(a, b), c))
+		sa := new(big.Int).Mul(supplyDollar, supplyApy)
+		ia := new(big.Int).Mul(insuranceDollar, insuranceApy)
+		ba := new(big.Int).Mul(borrowDollar, borrowApy)
+		netApy = new(big.Int).Add(netApy, new(big.Int).Sub(new(big.Int).Add(sa, ia), ba))
 
 		isAssetIn := false
 		for _, a := range assetsIn {
@@ -637,7 +637,8 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			}
 			if b.Uint64() != 0 {
 				borrow.Limit = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(borrowDollar, new(big.Int).SetUint64(
-					this.cfg.TokenDecimal["percentage"])), b), this.cfg.TokenDecimal["percentage"])
+					uint64(math.Pow10(int(this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"]+
+						this.cfg.TokenDecimal["percentage"]))))), b), this.cfg.TokenDecimal["percentage"])
 			}
 			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
 		}

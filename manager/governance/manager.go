@@ -6,12 +6,13 @@ import (
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/utils"
 	"math/big"
 	"time"
 )
 
 const (
-	Total      = 10000000
+	Total      = 10000000000000000
 	YearSecond = 31536000
 	DaySecond  = 86400
 )
@@ -40,13 +41,18 @@ func NewGovernanceManager(contractAddress ocommon.Address, wingAddress string, s
 }
 
 func (this *GovernanceManager) GovBannerOverview() (*common.GovBannerOverview, error) {
+	balance, err := this.getBalanceOf("AUKZ3KL1FRRhgcijH6DBdBtswUdtmqL8Wo")
+	if err != nil {
+		return nil, fmt.Errorf("GovBannerOverview, this.getBalanceOf error: %s", err)
+	}
 	totalSupply, err := this.getWingTotalSupply()
 	if err != nil {
 		return nil, fmt.Errorf("GovBannerOverview, this.getWingTotalSupply error: %s", err)
 	}
 	return &common.GovBannerOverview{
-		Remain20: "0",
-		Remain80: new(big.Int).SetUint64(Total - totalSupply).String(),
+		Remain20: utils.ToStringByPrecise(new(big.Int).SetUint64(balance), this.cfg.TokenDecimal["WING"]),
+		Remain80: utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(Total), totalSupply),
+			this.cfg.TokenDecimal["WING"]),
 	}, nil
 }
 
