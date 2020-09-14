@@ -424,3 +424,29 @@ func (this *FlashPoolManager) getWingAccrued(account common.Address) (*big.Int, 
 	}
 	return res.Result.ToInteger()
 }
+
+func (this *FlashPoolManager) getClaimWing(holder common.Address) (*big.Int, error) {
+	method := "claimWing"
+	params := []interface{}{holder}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
+	if err != nil {
+		return nil, fmt.Errorf("ClaimWing, this.sdk.WasmVM.PreExecInvokeWasmVMContract: %s", err)
+	}
+	data, err := res.Result.ToByteArray()
+	if err != nil {
+		err = fmt.Errorf("ClaimWing: %s", err)
+		return nil, err
+	}
+	source := common.NewZeroCopySource(data)
+	distributedNum, eof := source.NextI128()
+	if eof {
+		err = fmt.Errorf("ClaimWing: read distributed eof")
+		return nil, err
+	}
+	remainsNum, eof := source.NextI128()
+	if eof {
+		err = fmt.Errorf("ClaimWing: read remains eof")
+		return nil, err
+	}
+	return new(big.Int).Add(distributedNum.ToBigInt(), remainsNum.ToBigInt()), nil
+}

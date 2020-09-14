@@ -12,4 +12,5 @@ type Web interface {
 	UserFlashPoolOverview(map[string]interface{}) map[string]interface{}
 
 	AssetPrice(map[string]interface{}) map[string]interface{}
+	ClaimWing(map[string]interface{}) map[string]interface{}
 }

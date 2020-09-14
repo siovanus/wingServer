@@ -1,17 +1,17 @@
 {
   "json_rpc_address": "http://polaris2.ont.io:20336",
   "port": 10337,
-  "governance_address": "2974e93cd97e047086a66a0ab5892593649326ed",
+  "governance_address": "7b5553509adb056d6422827442bc9d9a675abf75",
   "wing_address": "ef79ae5d85ec819cfd51eb23d4c242fa70f713e7",
-  "flash_pool_address": "ee06817f0bd3acba76a8bc4d5810cef1c90fb05a",
+  "flash_pool_address": "5a86c02cd0a1fd55fc9d3b58954a3d041648b96b",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "669dbc0ce0a11a4e8ccd9549c08d4218f8eebe98": "oWBTC",
-    "21e851597e687d49b8b983ac4fe2b5c13d350e15": "oETH",
-    "7f9b0f296b2244d802c0ecb2c0963e5afca37a44": "oUSDT",
-    "beb86a0ada439bf99a419d9576e12354f2e32452": "oDAI",
-    "627d62b5727558c067769f14c7b5d9dd367f0f0d": "ONTd"
+    "96fce60e98789a9a2f039faefe6b7661e84a2635": "oWBTC",
+    "8addb42a1201ab95259c4d5eb61dcdc5b80f516e": "oETH",
+    "688d9f6334a06f2ca053281f880f07f55c669513": "oUSDT",
+    "325f354d9af3bf33582f9afb7c8f103d27a1bfbd": "oDAI",
+    "fcd78ad03e37b21f9d93796857ca7b0e3f4bbfae": "ONTd"
   },
   "icon_map": {
     "ONTd":  "https://i.postimg.cc/t4tTXLbH/ontd-2x.png",
@@ -23,11 +23,11 @@
     "Flash": "http://106.75.209.209/icon/flash_icon.svg"
   },
   "oracle_map": {
-    "669dbc0ce0a11a4e8ccd9549c08d4218f8eebe98": "BTC",
-    "21e851597e687d49b8b983ac4fe2b5c13d350e15": "ETH",
-    "7f9b0f296b2244d802c0ecb2c0963e5afca37a44": "USDT",
-    "beb86a0ada439bf99a419d9576e12354f2e32452": "DAI",
-    "627d62b5727558c067769f14c7b5d9dd367f0f0d": "ONT"
+    "96fce60e98789a9a2f039faefe6b7661e84a2635": "BTC",
+    "8addb42a1201ab95259c4d5eb61dcdc5b80f516e": "ETH",
+    "688d9f6334a06f2ca053281f880f07f55c669513": "USDT",
+    "325f354d9af3bf33582f9afb7c8f103d27a1bfbd": "DAI",
+    "fcd78ad03e37b21f9d93796857ca7b0e3f4bbfae": "ONT"
   },
   "token_decimal":{
     "percentage": 4,

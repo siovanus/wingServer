@@ -227,3 +227,37 @@ func (this *Service) UserFlashPoolOverview(param map[string]interface{}) map[str
 	}
 	return m
 }
+
+func (this *Service) ClaimWing(param map[string]interface{}) map[string]interface{} {
+	req := &common.ClaimWingRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("ClaimWing: decode params failed, err: %s", err)
+	} else {
+		amount, err := this.fpMgr.ClaimWing(req.Address)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("ClaimWing error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = &common.ClaimWingResponse{
+				Id:      req.Id,
+				Address: req.Address,
+				Amount:  amount,
+			}
+			log.Infof("ClaimWing success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("ClaimWing: failed, err: %s", err)
+	} else {
+		log.Debug("ClaimWing: resp success")
+	}
+	return m
+}

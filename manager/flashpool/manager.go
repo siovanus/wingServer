@@ -690,3 +690,15 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 	}
 	return userFlashPoolOverview, nil
 }
+
+func (this *FlashPoolManager) ClaimWing(accountStr string) (string, error) {
+	account, err := ocommon.AddressFromBase58(accountStr)
+	if err != nil {
+		return "", fmt.Errorf("ClaimWing, ocommon.AddressFromBase58 error: %s", err)
+	}
+	amount, err := this.getClaimWing(account)
+	if err != nil {
+		return "", fmt.Errorf("ClaimWing, this.getClaimWing error: %s", err)
+	}
+	return utils.ToStringByPrecise(amount, this.cfg.TokenDecimal["WING"]), nil
+}

@@ -17,6 +17,7 @@ const (
 	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
 	ASSETPRICE = "/api/v1/assetprice"
+	CLAIMWING  = "/api/v1/claimwing"
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
 
 	ACTION_ASSETPRICE = "assetprice"
+	ACTION_CLAIMWING  = "claimwing"
 )
 
 type Response struct {
@@ -569,4 +571,15 @@ type Market struct {
 	SupplyDistribution    string
 	BorrowDistribution    string
 	InsuranceDistribution string
+}
+
+type ClaimWingRequest struct {
+	Id      string
+	Address string
+}
+
+type ClaimWingResponse struct {
+	Id      string
+	Address string
+	Amount  string
 }
