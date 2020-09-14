@@ -1,37 +1,35 @@
 {
   "json_rpc_address": "http://polaris4.ont.io:20336",
   "port": 10337,
-  "governance_address": "ecbc65c3dd5f33a6338e4f3f7828c1b7c44ec167",
+  "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
-  "flash_pool_address": "36e395b707c13addd72962965135f943ebe5c84c",
+  "flash_pool_address": "d034792f80deeacd983dc257d29784ea71a1d5ec",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "eba57090406572bfbc8a121314b08b336eb8b05a": "pWBTC",
-    "f0ce20f2f10d280b4791e7e24945040fadb27e9c": "prenBTC",
-    "fbf7ffdb49e6a4c4226d26e27973cb7a812ab427": "pUSDC",
-    "217812b3b7d66ae2bd0b429a354ef1fbadd94c95": "ONTd"
+    "b9f64ec9db8a3692f830b42fa34cfebf789accd4": "pWBTC",
+    "894ad88705d1510f21c35f7b7b21674a192f1d57": "prenBTC",
+    "e93a6e774bdfab36ee1252d693a0b054eccdbdc3": "pUSDC",
+    "ee79ceec7fbc85cc8992cfdfcda5502c29d0ced8": "ONTd"
   },
   "icon_map": {
-    "ONTd":  "https://i.postimg.cc/t4tTXLbH/ontd-2x.png",
-    "pETH":  "https://i.postimg.cc/P58W2f1Q/oETH-2x.png",
-    "pUSDT": "https://i.postimg.cc/RVhQJLF8/oUSDT-2x.png",
-    "pWBTC": "https://i.postimg.cc/qMFcs667/oWBTC-2x.png",
-    "prenBTC": "https://i.postimg.cc/qMFcs667/oWBTC-2x.png",
-    "pDAI":  "https://i.postimg.cc/7L3grBsC/oDAI-2x.png",
-    "pUSDC": "https://i.postimg.cc/6QJdSs0J/oUSDC-2x.png",
+    "ONTd":  "https://app.ont.io/wing/ONTd.svg",
+    "pWBTC": "https://app.ont.io/wing/pWBTC.svg",
+    "prenBTC": "https://app.ont.io/wing/prenBTC.svg",
+    "pUSDC": "https://app.ont.io/wing/pUSDC.svg",
     "Flash": "http://106.75.209.209/icon/flash_icon.svg"
   },
   "oracle_map": {
-    "eba57090406572bfbc8a121314b08b336eb8b05a": "WBTC",
-    "f0ce20f2f10d280b4791e7e24945040fadb27e9c": "renBTC",
-    "fbf7ffdb49e6a4c4226d26e27973cb7a812ab427": "USDT",
-    "217812b3b7d66ae2bd0b429a354ef1fbadd94c95": "ONTd"
+    "b9f64ec9db8a3692f830b42fa34cfebf789accd4": "WBTC",
+    "894ad88705d1510f21c35f7b7b21674a192f1d57": "renBTC",
+    "e93a6e774bdfab36ee1252d693a0b054eccdbdc3": "USDT",
+    "ee79ceec7fbc85cc8992cfdfcda5502c29d0ced8": "ONTd"
   },
   "token_decimal":{
     "percentage": 4,
     "ONTd": 9,
     "pUSDC": 6,
+    "pUSDT": 6,
     "pWBTC": 8,
     "prenBTC": 8,
     "WING": 9,

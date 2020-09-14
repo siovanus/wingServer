@@ -438,15 +438,10 @@ func (this *FlashPoolManager) getClaimWing(holder common.Address) (*big.Int, err
 		return nil, err
 	}
 	source := common.NewZeroCopySource(data)
-	distributedNum, eof := source.NextI128()
+	r, eof := source.NextI128()
 	if eof {
 		err = fmt.Errorf("ClaimWing: read distributed eof")
 		return nil, err
 	}
-	remainsNum, eof := source.NextI128()
-	if eof {
-		err = fmt.Errorf("ClaimWing: read remains eof")
-		return nil, err
-	}
-	return new(big.Int).Add(distributedNum.ToBigInt(), remainsNum.ToBigInt()), nil
+	return r.ToBigInt(), nil
 }

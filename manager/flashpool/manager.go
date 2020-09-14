@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	BlockPerYear      = 60 * 60 * 24 * 365 * 2 / 3
+	BlockPerYear = 60 * 60 * 24 * 365 * 2 / 3
 )
 
 type FlashPoolManager struct {
@@ -125,19 +125,19 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 			return nil, fmt.Errorf("PoolDistribution, this.AssetStoredPrice error: %s", err)
 		}
 		// supplyAmount * price
-		s = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["oUSDT"]), price))
+		s = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["pUSDT"]), price))
 		// borrowAmount * price
-		b = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["oUSDT"]), price))
+		b = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["pUSDT"]), price))
 		// insuranceAmount * price
-		i = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["oUSDT"]), price))
+		i = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["pUSDT"]), price))
 		d = new(big.Int).Add(d, totalDistribution)
 	}
 	distribution.Name = "Flash"
 	distribution.Icon = this.cfg.IconMap[distribution.Name]
 	distributedDay := new(big.Int).SetUint64((uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond)
-	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	distribution.PerDay = utils.ToStringByPrecise(new(big.Int).Div(d, distributedDay), this.cfg.TokenDecimal["WING"])
 	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
 	return distribution, nil
@@ -200,9 +200,9 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		supplyDollar := utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["oUSDT"])
-		borrowDollar := utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["oUSDT"])
-		insuranceDollar := utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["oUSDT"])
+		supplyDollar := utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["pUSDT"])
+		borrowDollar := utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["pUSDT"])
+		insuranceDollar := utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["pUSDT"])
 		s = new(big.Int).Add(s, supplyDollar)
 		b = new(big.Int).Add(b, borrowDollar)
 		i = new(big.Int).Add(i, insuranceDollar)
@@ -211,63 +211,63 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		flashPoolDetail.SupplyMarketRank = append(flashPoolDetail.SupplyMarketRank, &common.MarketFund{
 			Icon: this.cfg.IconMap[name],
 			Name: name,
-			Fund: utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["oUSDT"]),
+			Fund: utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pUSDT"]),
 		})
 		flashPoolDetail.BorrowMarketRank = append(flashPoolDetail.BorrowMarketRank, &common.MarketFund{
 			Icon: this.cfg.IconMap[name],
 			Name: name,
-			Fund: utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["oUSDT"]),
+			Fund: utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["pUSDT"]),
 		})
 		flashPoolDetail.InsuranceMarketRank = append(flashPoolDetail.InsuranceMarketRank, &common.MarketFund{
 			Icon: this.cfg.IconMap[name],
 			Name: name,
-			Fund: utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["oUSDT"]),
+			Fund: utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["pUSDT"]),
 		})
 	}
 	sort.SliceStable(flashPoolDetail.SupplyMarketRank, func(i, j int) bool {
-		a := utils.ToIntByPrecise(flashPoolDetail.SupplyMarketRank[i].Fund, this.cfg.TokenDecimal["oUSDT"])
-		b := utils.ToIntByPrecise(flashPoolDetail.SupplyMarketRank[j].Fund, this.cfg.TokenDecimal["oUSDT"])
+		a := utils.ToIntByPrecise(flashPoolDetail.SupplyMarketRank[i].Fund, this.cfg.TokenDecimal["pUSDT"])
+		b := utils.ToIntByPrecise(flashPoolDetail.SupplyMarketRank[j].Fund, this.cfg.TokenDecimal["pUSDT"])
 		return a.Uint64() > b.Uint64()
 	})
 	sort.SliceStable(flashPoolDetail.BorrowMarketRank, func(i, j int) bool {
-		a := utils.ToIntByPrecise(flashPoolDetail.BorrowMarketRank[i].Fund, this.cfg.TokenDecimal["oUSDT"])
-		b := utils.ToIntByPrecise(flashPoolDetail.BorrowMarketRank[j].Fund, this.cfg.TokenDecimal["oUSDT"])
+		a := utils.ToIntByPrecise(flashPoolDetail.BorrowMarketRank[i].Fund, this.cfg.TokenDecimal["pUSDT"])
+		b := utils.ToIntByPrecise(flashPoolDetail.BorrowMarketRank[j].Fund, this.cfg.TokenDecimal["pUSDT"])
 		return a.Uint64() > b.Uint64()
 	})
 	sort.SliceStable(flashPoolDetail.InsuranceMarketRank, func(i, j int) bool {
-		a := utils.ToIntByPrecise(flashPoolDetail.InsuranceMarketRank[i].Fund, this.cfg.TokenDecimal["oUSDT"])
-		b := utils.ToIntByPrecise(flashPoolDetail.InsuranceMarketRank[j].Fund, this.cfg.TokenDecimal["oUSDT"])
+		a := utils.ToIntByPrecise(flashPoolDetail.InsuranceMarketRank[i].Fund, this.cfg.TokenDecimal["pUSDT"])
+		b := utils.ToIntByPrecise(flashPoolDetail.InsuranceMarketRank[j].Fund, this.cfg.TokenDecimal["pUSDT"])
 		return a.Uint64() > b.Uint64()
 	})
 	preFlashPoolDetailStore, err := this.store.LoadLatestFlashPoolDetail()
 	if err != nil {
 		return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadLastestFlashPoolDetail error: %s", err)
 	}
-	flashPoolDetail.TotalSupply = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["oUSDT"])
-	flashPoolDetail.TotalBorrow = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["oUSDT"])
-	flashPoolDetail.TotalInsurance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["oUSDT"])
+	flashPoolDetail.TotalSupply = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"])
+	flashPoolDetail.TotalBorrow = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"])
+	flashPoolDetail.TotalInsurance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"])
 
-	flashPoolDetail.SupplyVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["oUSDT"]),
-		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalSupply, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["oUSDT"])
-	flashPoolDetail.BorrowVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["oUSDT"]),
-		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalBorrow, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["oUSDT"])
-	flashPoolDetail.InsuranceVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["oUSDT"]),
-		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalInsurance, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["oUSDT"])
+	flashPoolDetail.SupplyVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["pUSDT"]),
+		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalSupply, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["pUSDT"])
+	flashPoolDetail.BorrowVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["pUSDT"]),
+		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalBorrow, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["pUSDT"])
+	flashPoolDetail.InsuranceVolumeDaily = utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["pUSDT"]),
+		utils.ToIntByPrecise(preFlashPoolDetailStore.TotalInsurance, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["pUSDT"])
 
-	if utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+	if utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 		flashPoolDetail.TotalSupplyRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(utils.ToIntByPrecise(flashPoolDetail.SupplyVolumeDaily,
-			this.cfg.TokenDecimal["oUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-			utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+			this.cfg.TokenDecimal["pUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+			utils.ToIntByPrecise(flashPoolDetail.TotalSupply, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 	}
-	if utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+	if utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 		flashPoolDetail.TotalBorrowRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(utils.ToIntByPrecise(flashPoolDetail.BorrowVolumeDaily,
-			this.cfg.TokenDecimal["oUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-			utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+			this.cfg.TokenDecimal["pUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+			utils.ToIntByPrecise(flashPoolDetail.TotalBorrow, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 	}
-	if utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+	if utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 		flashPoolDetail.TotalInsuranceRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(utils.ToIntByPrecise(flashPoolDetail.InsuranceVolumeDaily,
-			this.cfg.TokenDecimal["oUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-			utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+			this.cfg.TokenDecimal["pUSDT"]), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+			utils.ToIntByPrecise(flashPoolDetail.TotalInsurance, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 	}
 	return flashPoolDetail, nil
 }
@@ -304,19 +304,19 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 		// borrowAmount * price
 		// insuranceAmount * price
 		supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		s = new(big.Int).Add(s, supplyDollar)
 		b = new(big.Int).Add(b, borrowDollar)
 		i = new(big.Int).Add(i, insuranceDollar)
 	}
 	flashPoolDetail.Timestamp = uint64(time.Now().Unix())
-	flashPoolDetail.TotalSupply = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-	flashPoolDetail.TotalBorrow = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-	flashPoolDetail.TotalInsurance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
+	flashPoolDetail.TotalSupply = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	flashPoolDetail.TotalBorrow = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	flashPoolDetail.TotalInsurance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	return flashPoolDetail, nil
 }
 
@@ -349,15 +349,15 @@ func (this *FlashPoolManager) FlashPoolMarketStore() error {
 		// borrowAmount * price
 		// insuranceAmount * price
 		supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		flashPoolMarket.Name = name
-		flashPoolMarket.TotalSupply = utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-		flashPoolMarket.TotalBorrow = utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-		flashPoolMarket.TotalInsurance = utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
+		flashPoolMarket.TotalSupply = utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+		flashPoolMarket.TotalBorrow = utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+		flashPoolMarket.TotalInsurance = utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 		flashPoolMarket.Timestamp = timestamp
 		err = this.store.SaveFlashPoolMarket(flashPoolMarket)
 		if err != nil {
@@ -384,23 +384,23 @@ func (this *FlashPoolManager) FlashPoolAllMarket() (*common.FlashPoolAllMarket, 
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarket, this.store.LoadLatestFlashPoolMarket error: %s", err)
 		}
-		if utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+		if utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 			market.TotalSupplyRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Sub(utils.ToIntByPrecise(market.TotalSupply,
-				this.cfg.TokenDecimal["oUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalSupply,
-				this.cfg.TokenDecimal["oUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-				utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+				this.cfg.TokenDecimal["pUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalSupply,
+				this.cfg.TokenDecimal["pUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+				utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 		}
-		if utils.ToIntByPrecise(market.TotalBorrow, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+		if utils.ToIntByPrecise(market.TotalBorrow, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 			market.TotalBorrowRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Sub(utils.ToIntByPrecise(market.TotalBorrow,
-				this.cfg.TokenDecimal["oUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalBorrow,
-				this.cfg.TokenDecimal["oUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-				utils.ToIntByPrecise(market.TotalBorrow, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+				this.cfg.TokenDecimal["pUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalBorrow,
+				this.cfg.TokenDecimal["pUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+				utils.ToIntByPrecise(market.TotalBorrow, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 		}
-		if utils.ToIntByPrecise(market.TotalInsurance, this.cfg.TokenDecimal["oUSDT"]).Uint64() != 0 {
+		if utils.ToIntByPrecise(market.TotalInsurance, this.cfg.TokenDecimal["pUSDT"]).Uint64() != 0 {
 			market.TotalInsuranceRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Sub(utils.ToIntByPrecise(market.TotalInsurance,
-				this.cfg.TokenDecimal["oUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalInsurance,
-				this.cfg.TokenDecimal["oUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-				utils.ToIntByPrecise(market.TotalInsurance, this.cfg.TokenDecimal["oUSDT"])), this.cfg.TokenDecimal["percentage"])
+				this.cfg.TokenDecimal["pUSDT"]), utils.ToIntByPrecise(latestFlashPoolMarket.TotalInsurance,
+				this.cfg.TokenDecimal["pUSDT"])), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
+				utils.ToIntByPrecise(market.TotalInsurance, this.cfg.TokenDecimal["pUSDT"])), this.cfg.TokenDecimal["percentage"])
 		}
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, &market)
 	}
@@ -543,9 +543,9 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		}
 		// borrowAmount * price
 		b = new(big.Int).Add(b, new(big.Int).Mul(utils.ToIntByPrecise(
-			utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"]), price))
+			utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"]), price))
 	}
-	userFlashPoolOverview.BorrowBalance = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
+	userFlashPoolOverview.BorrowBalance = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	netApy := new(big.Int).SetUint64(0)
 
 	s := new(big.Int).SetUint64(0)
@@ -581,11 +581,11 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		// borrowAmount * price
 		// insuranceAmount * price
 		supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
-			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["oUSDT"])
+			this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"])
 		s = new(big.Int).Add(s, supplyDollar)
 		i = new(big.Int).Add(i, insuranceDollar)
 		w = new(big.Int).Add(w, wingAccrued)
@@ -618,7 +618,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			supply := &common.Supply{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyDollar:     utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"]),
+				SupplyDollar:     utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				SupplyBalance:    utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
@@ -630,14 +630,14 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			borrow := &common.Borrow{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				BorrowDollar:     utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"]),
+				BorrowDollar:     utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
 			}
 			if b.Uint64() != 0 {
 				borrow.Limit = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(borrowDollar, new(big.Int).SetUint64(
-					uint64(math.Pow10(int(this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"]+
+					uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]+
 						this.cfg.TokenDecimal["percentage"]))))), b), this.cfg.TokenDecimal["percentage"])
 			}
 			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
@@ -646,7 +646,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			insurance := &common.Insurance{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				InsuranceDollar:  utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"]),
+				InsuranceDollar:  utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				InsuranceBalance: utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
@@ -677,8 +677,8 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
 	}
-	userFlashPoolOverview.SupplyBalance = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
-	userFlashPoolOverview.InsuranceBalance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["oUSDT"]+this.cfg.TokenDecimal["oracle"])
+	userFlashPoolOverview.SupplyBalance = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	userFlashPoolOverview.InsuranceBalance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	userFlashPoolOverview.WingAccrued = utils.ToStringByPrecise(w, this.cfg.TokenDecimal["WING"])
 	accountLiquidity, err := this.getAccountLiquidity(account)
 	if err != nil {
