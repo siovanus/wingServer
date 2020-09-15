@@ -17,7 +17,7 @@ const (
 	DaySecond  = 86400
 )
 
-var GenesisTime = uint64(time.Date(2020, time.September, 8, 0, 0, 0, 0, time.UTC).Unix())
+var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
 var DailyDistibute = []uint64{5184, 51840, 25920, 15552, 5184, 4320, 3456, 2592, 1728, 864, 864, 864, 864, 864}
 var DistributeTime = []uint64{3 * DaySecond, 5 * DaySecond, 5 * DaySecond, 5 * DaySecond, YearSecond - 18*DaySecond, YearSecond, YearSecond,
 	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256000}
