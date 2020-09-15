@@ -120,24 +120,21 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 		if err != nil {
 			return nil, fmt.Errorf("PoolDistribution, this.getTotalDistribution error: %s", err)
 		}
-		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
-		if err != nil {
-			return nil, fmt.Errorf("PoolDistribution, this.AssetStoredPrice error: %s", err)
-		}
+
 		// supplyAmount * price
-		s = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["pUSDT"]), price))
+		s = new(big.Int).Add(s, utils.ToIntByPrecise(supplyAmount, this.cfg.TokenDecimal["pUSDT"]))
 		// borrowAmount * price
-		b = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["pUSDT"]), price))
+		b = new(big.Int).Add(b, utils.ToIntByPrecise(borrowAmount, this.cfg.TokenDecimal["pUSDT"]))
 		// insuranceAmount * price
-		i = new(big.Int).Add(s, new(big.Int).Mul(utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["pUSDT"]), price))
+		i = new(big.Int).Add(i, utils.ToIntByPrecise(insuranceAmount, this.cfg.TokenDecimal["pUSDT"]))
 		d = new(big.Int).Add(d, totalDistribution)
 	}
 	distribution.Name = "Flash"
 	distribution.Icon = this.cfg.IconMap[distribution.Name]
 	distributedDay := new(big.Int).SetUint64((uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond)
-	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"])
+	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"])
+	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"])
 	distribution.PerDay = utils.ToStringByPrecise(new(big.Int).Div(d, distributedDay), this.cfg.TokenDecimal["WING"])
 	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
 	return distribution, nil
@@ -423,11 +420,11 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		}
 		borrowAmount, err := this.getBorrowAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowAmount error: %s", err)
 		}
 		insuranceAmount, err := this.getInsuranceAmount(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getInsuranceAmount error: %s", err)
 		}
 		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
