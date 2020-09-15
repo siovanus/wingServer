@@ -27,5 +27,5 @@ func TestDistributed(t *testing.T) {
 		distributed += DailyDistibute[j] * DistributeTime[j]
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index+1]
-	fmt.Println(distributed/100)
+	fmt.Println(distributed / 100)
 }

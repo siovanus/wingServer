@@ -80,6 +80,6 @@ func (this *GovernanceManager) GovBanner() (*common.GovBanner, error) {
 
 	return &common.GovBanner{
 		Daily:       new(big.Int).SetUint64(DailyDistibute[index]).String(),
-		Distributed: new(big.Int).SetUint64(distributed/100).String(),
+		Distributed: new(big.Int).SetUint64(distributed / 100).String(),
 	}, nil
 }
