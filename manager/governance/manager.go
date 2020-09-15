@@ -18,7 +18,7 @@ const (
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
-var DailyDistibute = []uint64{5184, 51840, 25920, 15552, 5184, 4320, 3456, 2592, 1728, 864, 864, 864, 864, 864}
+var DailyDistibute = []uint64{6, 60, 30, 18, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
 var DistributeTime = []uint64{3 * DaySecond, 5 * DaySecond, 5 * DaySecond, 5 * DaySecond, YearSecond - 18*DaySecond, YearSecond, YearSecond,
 	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256000}
 
@@ -57,24 +57,29 @@ func (this *GovernanceManager) GovBannerOverview() (*common.GovBannerOverview, e
 }
 
 func (this *GovernanceManager) GovBanner() (*common.GovBanner, error) {
-	distributed := uint64(time.Now().Unix()) - GenesisTime
+	gap := uint64(time.Now().Unix()) - GenesisTime
 	length := len(DailyDistibute)
 	epoch := []uint64{0}
 	for i := 1; i < length+1; i++ {
 		epoch = append(epoch, epoch[i-1]+DistributeTime[i-1])
 	}
-	if distributed > epoch[length] {
-		distributed = epoch[length]
+	if gap > epoch[length] {
+		gap = epoch[length]
 	}
 	index := 0
 	for i := 0; i < len(epoch); i++ {
-		if distributed >= epoch[i] {
+		if gap >= epoch[i] {
 			index = i
 		}
 	}
+	var distributed uint64 = 0
+	for j := 0; j < index; j++ {
+		distributed += DailyDistibute[j] * DistributeTime[j]
+	}
+	distributed += (gap - epoch[index]) * DailyDistibute[index+1]
 
 	return &common.GovBanner{
 		Daily:       new(big.Int).SetUint64(DailyDistibute[index]).String(),
-		Distributed: new(big.Int).SetUint64(distributed).String(),
+		Distributed: new(big.Int).SetUint64(distributed/100).String(),
 	}, nil
 }
