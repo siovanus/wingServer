@@ -27,7 +27,7 @@ func TestDistributed(t *testing.T) {
 	for j := 0; j < index; j++ {
 		distributed += DailyDistibute[j] * DistributeTime[j]
 	}
-	distributed += (gap - epoch[index]) * DailyDistibute[index+1]
+	distributed += (gap - epoch[index]) * DailyDistibute[index]
 	daily := new(big.Int).SetUint64(DailyDistibute[index] * DaySecond / 100).String()
 	fmt.Println(distributed / 100)
 	fmt.Println(daily)
