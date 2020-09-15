@@ -79,7 +79,7 @@ func (this *GovernanceManager) GovBanner() (*common.GovBanner, error) {
 	distributed += (gap - epoch[index]) * DailyDistibute[index+1]
 
 	return &common.GovBanner{
-		Daily:       new(big.Int).SetUint64(DailyDistibute[index]).String(),
+		Daily:       new(big.Int).SetUint64(DailyDistibute[index] * DaySecond / 100).String(),
 		Distributed: new(big.Int).SetUint64(distributed / 100).String(),
 	}, nil
 }

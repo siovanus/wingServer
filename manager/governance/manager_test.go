@@ -2,6 +2,7 @@ package governance
 
 import (
 	"fmt"
+	"math/big"
 	"testing"
 	"time"
 )
@@ -27,5 +28,7 @@ func TestDistributed(t *testing.T) {
 		distributed += DailyDistibute[j] * DistributeTime[j]
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index+1]
+	daily := new(big.Int).SetUint64(DailyDistibute[index] * DaySecond / 100).String()
 	fmt.Println(distributed / 100)
+	fmt.Println(daily)
 }
