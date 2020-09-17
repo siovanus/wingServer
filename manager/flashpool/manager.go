@@ -161,8 +161,8 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 	if total.Uint64() != 0 {
 		t := new(big.Int).Mul(new(big.Int).Mul(new(big.Int).SetUint64(today),
 			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["WING"]))))),
-			new(big.Int).SetUint64(this.cfg.TokenDecimal["percentage"]))
-		share = new(big.Int).Div(t, total)
+			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"])))))
+		share = new(big.Int).Div(new(big.Int).Div(t, new(big.Int).SetUint64(100)), total)
 	}
 
 	return &common.FlashPoolBanner{
