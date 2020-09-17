@@ -294,7 +294,7 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 		}
 		priceStr, err := this.AssetPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolDetailForStore, this.AssetStoredPrice error: %s", err)
+			return nil, fmt.Errorf("FlashPoolDetailForStore, this.AssetPrice error: %s", err)
 		}
 		price := utils.ToIntByPrecise(priceStr, this.cfg.TokenDecimal["oracle"])
 		// supplyAmount * price
