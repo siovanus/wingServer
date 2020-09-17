@@ -86,7 +86,7 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 			Name: this.cfg.AssetMap[address.ToHexString()],
 			// totalDistribution / distributedDay
 			PerDay: utils.ToStringByPrecise(new(big.Int).Div(totalDistribution,
-				new(big.Int).SetUint64(distributedDay)), this.cfg.TokenDecimal[name]),
+				new(big.Int).SetUint64(distributedDay)), this.cfg.TokenDecimal["WING"]),
 			SupplyAmount:    supplyAmount,
 			BorrowAmount:    borrowAmount,
 			InsuranceAmount: insuranceAmount,
