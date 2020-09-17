@@ -90,7 +90,7 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 			SupplyAmount:    supplyAmount,
 			BorrowAmount:    borrowAmount,
 			InsuranceAmount: insuranceAmount,
-			Total:           utils.ToStringByPrecise(totalDistribution, this.cfg.TokenDecimal[name]),
+			Total:           utils.ToStringByPrecise(totalDistribution, this.cfg.TokenDecimal["WING"]),
 		}
 		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
 	}
@@ -156,7 +156,7 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 		}
 		total = new(big.Int).Add(total, totalDistribution)
 	}
-	today := governance.DailyDistibute[index]
+	today := governance.DailyDistibute[index] * governance.DaySecond
 	share := new(big.Int).SetUint64(0)
 	if total.Uint64() != 0 {
 		t := new(big.Int).Mul(new(big.Int).Mul(new(big.Int).SetUint64(today),
