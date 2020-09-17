@@ -18,8 +18,9 @@ const (
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
-var DailyDistibute = []uint64{6, 60, 30, 18, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
-var DistributeTime = []uint64{3 * DaySecond, 5 * DaySecond, 5 * DaySecond, 5 * DaySecond, YearSecond - 18*DaySecond, YearSecond, YearSecond,
+var DailyDistibute = []uint64{6, 60, 12, 12, 12, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
+var DistributeTime = []uint64{3 * DaySecond, 3*DaySecond - 8*3600 + 5*60, 5*DaySecond - (3*DaySecond - 8*3600 + 5*60),
+	5 * DaySecond, 5 * DaySecond, YearSecond - 18*DaySecond, YearSecond, YearSecond,
 	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256000}
 
 type GovernanceManager struct {

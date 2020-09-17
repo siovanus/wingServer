@@ -9,7 +9,8 @@ import (
 )
 
 func TestDistributed(t *testing.T) {
-	gap := uint64(time.Now().Unix()) - GenesisTime
+	now := uint64(time.Date(2021, time.September, 17, 16, 5, 0, 0, time.UTC).Unix())
+	gap := now - GenesisTime
 	length := len(DailyDistibute)
 	epoch := []uint64{0}
 	for i := 1; i < length+1; i++ {
