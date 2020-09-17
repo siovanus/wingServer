@@ -2,6 +2,7 @@ package governance
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/utils"
 	"math/big"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ func TestDistributed(t *testing.T) {
 		distributed += DailyDistibute[j] * DistributeTime[j]
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index]
-	daily := new(big.Int).SetUint64(DailyDistibute[index] * DaySecond / 100).String()
-	fmt.Println(distributed / 100)
+	daily := utils.ToStringByPrecise(new(big.Int).SetUint64(DailyDistibute[index] * DaySecond), 2)
+	fmt.Println(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed), 2))
 	fmt.Println(daily)
 }
