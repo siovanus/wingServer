@@ -166,7 +166,7 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error)
 	}
 
 	return &common.FlashPoolBanner{
-		Today: utils.ToStringByPrecise(new(big.Int).SetUint64(today), 100),
+		Today: utils.ToStringByPrecise(new(big.Int).SetUint64(today), 2),
 		Share: utils.ToStringByPrecise(share, this.cfg.TokenDecimal["percentage"]),
 		Total: utils.ToStringByPrecise(total, this.cfg.TokenDecimal["WING"]),
 	}, nil
