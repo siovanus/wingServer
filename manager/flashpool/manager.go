@@ -67,7 +67,6 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 	}
 	flashPoolMarketDistribution := make([]*common.Distribution, 0)
 	for _, address := range allMarkets {
-		name := this.cfg.AssetMap[address.ToHexString()]
 		market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadFlashMarket error: %s", err)
