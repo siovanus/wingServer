@@ -20,7 +20,7 @@
     "prenBTC": "https://app.ont.io/wing/prenBTC.svg",
     "pUSDC": "https://app.ont.io/wing/pUSDC.svg",
     "WING": "https://app.ont.io/wing/wing_icon.svg",
-    "Flash": "http://106.75.209.209/icon/flash_icon.svg"
+    "Flash": "https://app.ont.io/wing/flash_icon.svg"
   },
   "oracle_map": {
     "4c9321ed8d3799e74c202191a8816fc1549800ee": "WBTC",
