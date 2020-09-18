@@ -3,7 +3,7 @@
   "port": 10337,
   "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
-  "flash_pool_address": "bd528c732ce50bab2c9ca3bafdc7ff8615d37fef",
+  "flash_pool_address": "791d42c167d19f05a6b1936896d989f442f0ff58",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
@@ -38,6 +38,7 @@
     "pWBTC": 8,
     "prenBTC": 8,
     "WING": 9,
+    "pETH": 12,
     "oracle": 12,
     "flash": 9
   },

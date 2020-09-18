@@ -140,8 +140,21 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 }
 
 func (this *FlashPoolManager) FlashPoolBanner() (*common.FlashPoolBanner, error) {
-	distributed := uint64(time.Now().Unix()) - governance.GenesisTime
-	index := distributed/governance.YearSecond + 1
+	gap := uint64(time.Now().Unix()) - governance.GenesisTime
+	length := len(governance.DailyDistibute)
+	epoch := []uint64{0}
+	for i := 1; i < length+1; i++ {
+		epoch = append(epoch, epoch[i-1]+governance.DistributeTime[i-1])
+	}
+	if gap > epoch[length] {
+		gap = epoch[length]
+	}
+	index := 0
+	for i := 0; i < len(epoch); i++ {
+		if gap >= epoch[i] {
+			index = i
+		}
+	}
 
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
@@ -680,7 +693,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 	if err != nil {
 		return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getAccountLiquidity error: %s", err)
 	}
-	userFlashPoolOverview.BorrowLimit = utils.ToStringByPrecise(accountLiquidity.Liquidity.ToBigInt(), this.cfg.TokenDecimal["flash"])
+	userFlashPoolOverview.BorrowLimit = utils.ToStringByPrecise(accountLiquidity.Liquidity.ToBigInt(), this.cfg.TokenDecimal["oracle"])
 	total := new(big.Int).Add(new(big.Int).Add(s, b), i)
 	if total.Uint64() != 0 {
 		userFlashPoolOverview.NetApy = utils.ToStringByPrecise(new(big.Int).Div(netApy, total), this.cfg.TokenDecimal["flash"])
