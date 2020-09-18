@@ -646,8 +646,7 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			}
 			if b.Uint64() != 0 {
 				borrow.Limit = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(borrowDollar, new(big.Int).SetUint64(
-					uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]+
-						this.cfg.TokenDecimal["percentage"]))))), b), this.cfg.TokenDecimal["percentage"])
+					uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), b), this.cfg.TokenDecimal["percentage"])
 			}
 			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
 		}
