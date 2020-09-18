@@ -13,6 +13,7 @@ import (
 
 const (
 	Total      = 10000000000000000
+	Total80    = 8000000
 	YearSecond = 31536000
 	DaySecond  = 86400
 )
@@ -42,18 +43,44 @@ func NewGovernanceManager(contractAddress ocommon.Address, wingAddress string, s
 }
 
 func (this *GovernanceManager) GovBannerOverview() (*common.GovBannerOverview, error) {
+	gap := uint64(time.Now().Unix()) - GenesisTime
+	length := len(DailyDistibute)
+	epoch := []uint64{0}
+	for i := 1; i < length+1; i++ {
+		epoch = append(epoch, epoch[i-1]+DistributeTime[i-1])
+	}
+	if gap > epoch[length] {
+		gap = epoch[length]
+	}
+	index := 0
+	for i := 0; i < len(epoch); i++ {
+		if gap >= epoch[i] {
+			index = i
+		}
+	}
+	var distributed uint64 = 0
+	for j := 0; j < index; j++ {
+		distributed += DailyDistibute[j] * DistributeTime[j]
+	}
+	distributed += (gap - epoch[index]) * DailyDistibute[index]
+
 	balance, err := this.getBalanceOf("AUKZ3KL1FRRhgcijH6DBdBtswUdtmqL8Wo")
 	if err != nil {
 		return nil, fmt.Errorf("GovBannerOverview, this.getBalanceOf error: %s", err)
 	}
-	totalSupply, err := this.getWingTotalSupply()
-	if err != nil {
-		return nil, fmt.Errorf("GovBannerOverview, this.getWingTotalSupply error: %s", err)
-	}
+	//totalSupply, err := this.getWingTotalSupply()
+	//if err != nil {
+	//	return nil, fmt.Errorf("GovBannerOverview, this.getWingTotalSupply error: %s", err)
+	//}
+	//return &common.GovBannerOverview{
+	//	Remain20: utils.ToStringByPrecise(new(big.Int).SetUint64(balance), this.cfg.TokenDecimal["WING"]),
+	//	Remain80: utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(Total), totalSupply),
+	//		this.cfg.TokenDecimal["WING"]),
+	//}, nil
+	remain80 := Total80*100 - distributed
 	return &common.GovBannerOverview{
 		Remain20: utils.ToStringByPrecise(new(big.Int).SetUint64(balance), this.cfg.TokenDecimal["WING"]),
-		Remain80: utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(Total), totalSupply),
-			this.cfg.TokenDecimal["WING"]),
+		Remain80: utils.ToStringByPrecise(new(big.Int).SetUint64(remain80), 2),
 	}, nil
 }
 
