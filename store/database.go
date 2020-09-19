@@ -156,9 +156,6 @@ func (client Client) SaveTrackHeight(height uint32) error {
 
 type UserFlashPoolOverview struct {
 	UserAddress      string `gorm:"primary_key"`
-	SupplyBalance    string
-	BorrowBalance    string
-	InsuranceBalance string
 	BorrowLimit      string
 	NetApy           string
 	WingAccrued      string
@@ -181,9 +178,6 @@ func (client Client) LoadUserFlashPoolOverview(userAddress string) (*common.User
 	if err != nil {
 		return output, nil
 	}
-	output.SupplyBalance = userFlashPoolOverview.SupplyBalance
-	output.BorrowBalance = userFlashPoolOverview.BorrowBalance
-	output.InsuranceBalance = userFlashPoolOverview.InsuranceBalance
 	output.BorrowLimit = userFlashPoolOverview.BorrowLimit
 	output.NetApy = userFlashPoolOverview.NetApy
 	output.WingAccrued = userFlashPoolOverview.WingAccrued
@@ -195,9 +189,6 @@ func (client Client) SaveUserFlashPoolOverview(userAddress string, input *common
 	input.HalfSerialization(sink)
 	userFlashPoolOverview := &UserFlashPoolOverview{
 		UserAddress:      userAddress,
-		SupplyBalance:    input.SupplyBalance,
-		BorrowBalance:    input.BorrowBalance,
-		InsuranceBalance: input.InsuranceBalance,
 		BorrowLimit:      input.BorrowLimit,
 		NetApy:           input.NetApy,
 		WingAccrued:      input.WingAccrued,

@@ -554,7 +554,6 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 		b = new(big.Int).Add(b, new(big.Int).Mul(utils.ToIntByPrecise(
 			utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]), this.cfg.TokenDecimal["pUSDT"]), price))
 	}
-	userFlashPoolOverview.BorrowBalance = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	netApy := new(big.Int).SetUint64(0)
 
 	s := new(big.Int).SetUint64(0)
@@ -627,7 +626,6 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			supply := &common.Supply{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyDollar:     utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				SupplyBalance:    utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
@@ -639,7 +637,6 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			borrow := &common.Borrow{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				BorrowDollar:     utils.ToStringByPrecise(borrowDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
@@ -654,7 +651,6 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			insurance := &common.Insurance{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				InsuranceDollar:  utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"]),
 				InsuranceBalance: utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[name]),
 				Apy:              utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
@@ -685,8 +681,6 @@ func (this *FlashPoolManager) UserFlashPoolOverviewForStore(accountStr string) (
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
 	}
-	userFlashPoolOverview.SupplyBalance = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	userFlashPoolOverview.InsuranceBalance = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	userFlashPoolOverview.WingAccrued = utils.ToStringByPrecise(w, this.cfg.TokenDecimal["WING"])
 	accountLiquidity, err := this.getAccountLiquidity(account)
 	if err != nil {

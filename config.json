@@ -42,5 +42,5 @@
     "oracle": 12,
     "flash": 9
   },
-  "scan_interval": 1
+  "scan_interval": 2
 }

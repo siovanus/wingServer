@@ -58,6 +58,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 	postMethodMap := map[string]Action{
 		common.USERFLASHPOOLOVERVIEW: {name: common.ACTION_USERFLASHPOOLOVERVIEW, handler: web.UserFlashPoolOverview},
 		common.ASSETPRICE:            {name: common.ACTION_ASSETPRICE, handler: web.AssetPrice},
+		common.ASSETPRICELIST:        {name: common.ACTION_ASSETPRICELIST, handler: web.AssetPriceList},
 		common.CLAIMWING:             {name: common.ACTION_CLAIMWING, handler: web.ClaimWing},
 	}
 	getMethodMap := map[string]Action{

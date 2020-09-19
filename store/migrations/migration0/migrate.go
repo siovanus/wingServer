@@ -34,9 +34,6 @@ type TrackHeight struct {
 
 type UserFlashPoolOverview struct {
 	UserAddress      string `gorm:"primary_key"`
-	SupplyBalance    string
-	BorrowBalance    string
-	InsuranceBalance string
 	BorrowLimit      string
 	NetApy           string
 	WingAccrued      string

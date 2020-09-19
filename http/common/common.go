@@ -16,8 +16,9 @@ const (
 	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
 	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
-	ASSETPRICE = "/api/v1/assetprice"
-	CLAIMWING  = "/api/v1/claimwing"
+	ASSETPRICE     = "/api/v1/assetprice"
+	ASSETPRICELIST = "/api/v1/assetpricelist"
+	CLAIMWING      = "/api/v1/claimwing"
 )
 
 const (
@@ -31,8 +32,9 @@ const (
 	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
 	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
 
-	ACTION_ASSETPRICE = "assetprice"
-	ACTION_CLAIMWING  = "claimwing"
+	ACTION_ASSETPRICE     = "assetprice"
+	ACTION_ASSETPRICELIST = "assetpricelist"
+	ACTION_CLAIMWING      = "claimwing"
 )
 
 type Response struct {
@@ -50,6 +52,16 @@ type AssetPriceRequest struct {
 type AssetPriceResponse struct {
 	Id    string
 	Price string
+}
+
+type AssetPriceListRequest struct {
+	Id        string
+	AssetList []string
+}
+
+type AssetPriceListResponse struct {
+	Id        string
+	PriceList []string
 }
 
 type GovBannerOverview struct {
@@ -121,12 +133,9 @@ type UserFlashPoolOverviewResponse struct {
 }
 
 type UserFlashPoolOverview struct {
-	SupplyBalance    string
-	BorrowBalance    string
-	InsuranceBalance string
-	BorrowLimit      string
-	NetApy           string
-	WingAccrued      string
+	BorrowLimit string
+	NetApy      string
+	WingAccrued string
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow
@@ -224,7 +233,6 @@ func (this *UserFlashPoolOverview) HalfDeserialization(source *common.ZeroCopySo
 type Supply struct {
 	Icon                  string
 	Name                  string
-	SupplyDollar          string
 	SupplyBalance         string
 	Apy                   string
 	CollateralFactor      string
@@ -237,7 +245,6 @@ type Supply struct {
 func (this *Supply) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteString(this.SupplyDollar)
 	sink.WriteString(this.SupplyBalance)
 	sink.WriteString(this.Apy)
 	sink.WriteString(this.CollateralFactor)
@@ -255,10 +262,6 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 	name, _, irregular, eof := source.NextString()
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
-	}
-	supplyDollar, _, irregular, eof := source.NextString()
-	if irregular || eof {
-		return fmt.Errorf("supplyDollar deserialization error eof")
 	}
 	supplyBalance, _, irregular, eof := source.NextString()
 	if irregular || eof {
@@ -290,7 +293,6 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 	}
 	this.Icon = icon
 	this.Name = name
-	this.SupplyDollar = supplyDollar
 	this.SupplyBalance = supplyBalance
 	this.Apy = apy
 	this.CollateralFactor = collateralFactor
@@ -304,7 +306,6 @@ func (this *Supply) Deserialization(source *common.ZeroCopySource) error {
 type Borrow struct {
 	Icon                  string
 	Name                  string
-	BorrowDollar          string
 	BorrowBalance         string
 	Apy                   string
 	Limit                 string
@@ -317,7 +318,6 @@ type Borrow struct {
 func (this *Borrow) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteString(this.BorrowDollar)
 	sink.WriteString(this.BorrowBalance)
 	sink.WriteString(this.Apy)
 	sink.WriteString(this.Limit)
@@ -335,10 +335,6 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 	name, _, irregular, eof := source.NextString()
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
-	}
-	borrowDollar, _, irregular, eof := source.NextString()
-	if irregular || eof {
-		return fmt.Errorf("borrowDollar deserialization error eof")
 	}
 	borrowBalance, _, irregular, eof := source.NextString()
 	if irregular || eof {
@@ -370,7 +366,6 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 	}
 	this.Icon = icon
 	this.Name = name
-	this.BorrowDollar = borrowDollar
 	this.BorrowBalance = borrowBalance
 	this.Apy = apy
 	this.Limit = limit
@@ -384,7 +379,6 @@ func (this *Borrow) Deserialization(source *common.ZeroCopySource) error {
 type Insurance struct {
 	Icon                  string
 	Name                  string
-	InsuranceDollar       string
 	InsuranceBalance      string
 	Apy                   string
 	CollateralFactor      string
@@ -396,7 +390,6 @@ type Insurance struct {
 func (this *Insurance) Serialization(sink *common.ZeroCopySink) {
 	sink.WriteString(this.Icon)
 	sink.WriteString(this.Name)
-	sink.WriteString(this.InsuranceDollar)
 	sink.WriteString(this.InsuranceBalance)
 	sink.WriteString(this.Apy)
 	sink.WriteString(this.CollateralFactor)
@@ -413,10 +406,6 @@ func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
 	name, _, irregular, eof := source.NextString()
 	if irregular || eof {
 		return fmt.Errorf("name deserialization error eof")
-	}
-	insuranceDollar, _, irregular, eof := source.NextString()
-	if irregular || eof {
-		return fmt.Errorf("insuranceDollar deserialization error eof")
 	}
 	insuranceBalance, _, irregular, eof := source.NextString()
 	if irregular || eof {
@@ -444,7 +433,6 @@ func (this *Insurance) Deserialization(source *common.ZeroCopySource) error {
 	}
 	this.Icon = icon
 	this.Name = name
-	this.InsuranceDollar = insuranceDollar
 	this.InsuranceBalance = insuranceBalance
 	this.Apy = apy
 	this.CollateralFactor = collateralFactor

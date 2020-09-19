@@ -128,6 +128,49 @@ func (this *Service) AssetPrice(param map[string]interface{}) map[string]interfa
 	return m
 }
 
+func (this *Service) AssetPriceList(param map[string]interface{}) map[string]interface{} {
+	req := &common.AssetPriceListRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("AssetPriceList: decode params failed, err: %s", err)
+	} else {
+		suc := true
+		var asset string
+		priceList := make([]string, 0)
+		for _, v := range req.AssetList {
+			assetPrice, err := this.fpMgr.AssetPrice(v)
+			if err != nil {
+				suc = false
+				asset = v
+			}
+			priceList = append(priceList, assetPrice)
+		}
+		if !suc {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("AssetPriceList get asset price %s error", asset)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = &common.AssetPriceListResponse{
+				Id:        req.Id,
+				PriceList: priceList,
+			}
+			log.Infof("AssetPriceList success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("AssetPriceList: failed, err: %s", err)
+	} else {
+		log.Debug("AssetPriceList: resp success")
+	}
+	return m
+}
+
 func (this *Service) FlashPoolBanner(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
 	flashPoolBanner, err := this.fpMgr.FlashPoolBanner()
