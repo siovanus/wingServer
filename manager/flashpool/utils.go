@@ -235,6 +235,25 @@ func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big
 	return result, nil
 }
 
+func (this *FlashPoolManager) getBorrowRatePerBlock(contractAddress common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"borrowRatePerBlock", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getBorrowRatePerBlock, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getBorrowRatePerBlock, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	ratePerBlock, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getBorrowRatePerBlock, source.NextI128 error")
+	}
+	result := ratePerBlock.ToBigInt()
+	return result, nil
+}
+
 func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"borrowRatePerBlock", []interface{}{})
@@ -440,8 +459,75 @@ func (this *FlashPoolManager) getClaimWing(holder common.Address) (*big.Int, err
 	source := common.NewZeroCopySource(data)
 	r, eof := source.NextI128()
 	if eof {
-		err = fmt.Errorf("ClaimWing: read distributed eof")
+		err = fmt.Errorf("ClaimWing: read eof")
 		return nil, err
 	}
 	return r.ToBigInt(), nil
+}
+
+func (this *FlashPoolManager) getWingSpeeds(contractAddress common.Address) (*big.Int, error) {
+	method := "wingSpeeds"
+	params := []interface{}{contractAddress}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
+	if err != nil {
+		return nil, fmt.Errorf("getWingSpeeds, this.sdk.WasmVM.PreExecInvokeWasmVMContract: %s", err)
+	}
+	data, err := res.Result.ToByteArray()
+	if err != nil {
+		err = fmt.Errorf("getWingSpeeds: %s", err)
+		return nil, err
+	}
+	source := common.NewZeroCopySource(data)
+	r, eof := source.NextI128()
+	if eof {
+		err = fmt.Errorf("getWingSpeeds: read eof")
+		return nil, err
+	}
+	return r.ToBigInt(), nil
+}
+
+type WingSBIPortion struct {
+	SupplyPortion    common.I128
+	BorrowPortion    common.I128
+	InsurancePortion common.I128
+}
+
+func DeserializeWingSBIPortion(data []byte) (*WingSBIPortion, error) {
+	source := common.NewZeroCopySource(data)
+	supplyPortion, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read supplyPortion eof")
+	}
+	borrowPortion, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read borrowPortion eof")
+	}
+	insurancePortion, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("read insurancePortion eof")
+	}
+	return &WingSBIPortion{
+		SupplyPortion:    supplyPortion,
+		BorrowPortion:    borrowPortion,
+		InsurancePortion: insurancePortion,
+	}, nil
+}
+
+func (this *FlashPoolManager) getWingSBIPortion(contractAddress common.Address) (*WingSBIPortion, error) {
+	method := "wingSBIPortion"
+	params := []interface{}{contractAddress}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
+	if err != nil {
+		return nil, fmt.Errorf("getWingSBIPortion, this.sdk.WasmVM.PreExecInvokeWasmVMContract: %s", err)
+	}
+	data, err := res.Result.ToByteArray()
+	if err != nil {
+		err = fmt.Errorf("getWingSBIPortion: %s", err)
+		return nil, err
+	}
+	wingSBIPortion, err := DeserializeWingSBIPortion(data)
+	if err != nil {
+		return nil, err
+	}
+	return wingSBIPortion, nil
 }

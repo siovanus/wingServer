@@ -161,10 +161,8 @@ func (this *Service) TrackEvent() {
 
 func (this *Service) SnapshotMinute() {
 	for {
-		err := this.StoreFlashPoolAllMarket()
-		if err != nil {
-			log.Errorf("SnapshotMinute, this.StoreFlashPoolAllMarket error:", err)
-		}
+		go this.StoreFlashPoolAllMarket()
+		go this.StoreWingApy()
 		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
 }

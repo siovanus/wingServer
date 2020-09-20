@@ -70,9 +70,9 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadFlashMarket error: %s", err)
 		}
-		supplyAmount := market.TotalSupply
-		borrowAmount := market.TotalBorrow
-		insuranceAmount := market.TotalInsurance
+		supplyAmount := market.TotalSupplyDollar
+		borrowAmount := market.TotalBorrowDollar
+		insuranceAmount := market.TotalInsuranceDollar
 
 		totalDistribution, err := this.getTotalDistribution(address)
 		if err != nil {
@@ -110,9 +110,9 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 		if err != nil {
 			return nil, fmt.Errorf("PoolDistribution, this.store.LoadFlashMarket error: %s", err)
 		}
-		supplyAmount := market.TotalSupply
-		borrowAmount := market.TotalBorrow
-		insuranceAmount := market.TotalInsurance
+		supplyAmount := market.TotalSupplyDollar
+		borrowAmount := market.TotalBorrowDollar
+		insuranceAmount := market.TotalInsuranceDollar
 
 		totalDistribution, err := this.getTotalDistribution(address)
 		if err != nil {
@@ -197,9 +197,9 @@ func (this *FlashPoolManager) FlashPoolDetail() (*common.FlashPoolDetail, error)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadFlashMarket error: %s", err)
 		}
-		supplyAmount := market.TotalSupply
-		borrowAmount := market.TotalBorrow
-		insuranceAmount := market.TotalInsurance
+		supplyAmount := market.TotalSupplyDollar
+		borrowAmount := market.TotalBorrowDollar
+		insuranceAmount := market.TotalInsuranceDollar
 
 		// supplyAmount * price
 		// borrowAmount * price
@@ -380,14 +380,17 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		market.Name = this.cfg.AssetMap[address.ToHexString()]
 		market.Icon = this.cfg.IconMap[market.Name]
 
+		market.TotalSupplyAmount = utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[name])
+		market.TotalBorrowAmount = utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name])
+		market.TotalInsuranceAmount = utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[name])
 		// supplyAmount * price
 		// borrowAmount * price
 		// insuranceAmount * price
-		market.TotalSupply = utils.ToStringByPrecise(new(big.Int).Mul(supplyAmount, price),
+		market.TotalSupplyDollar = utils.ToStringByPrecise(new(big.Int).Mul(supplyAmount, price),
 			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
-		market.TotalBorrow = utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
+		market.TotalBorrowDollar = utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
 			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
-		market.TotalInsurance = utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
+		market.TotalInsuranceDollar = utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
 			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
 		market.CollateralFactor = utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"])
 		market.SupplyApy = utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"])
@@ -522,9 +525,12 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
 		}
 
-		cash := utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal[assetName])
-		borrowRatePerBlock := new(big.Int).Div(utils.ToIntByPrecise(market.BorrowApy, this.cfg.TokenDecimal["flash"]),
-			new(big.Int).SetUint64(BlockPerYear))
+		//TODO
+		cash := utils.ToIntByPrecise(market.TotalSupplyAmount, this.cfg.TokenDecimal[assetName])
+		borrowRatePerBlock, err := this.getBorrowRatePerBlock(address)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowRatePerBlock error: %s", err)
+		}
 		borrowLiquidity := new(big.Int).Mul(cash, new(big.Int).Mul(new(big.Int).Sub(new(big.Int).SetUint64(500),
 			borrowRatePerBlock), new(big.Int).SetUint64(BlockPerYear)))
 		if supplyAmount.Uint64() == 0 && borrowAmount.Uint64() == 0 && insuranceAmount.Uint64() == 0 {
@@ -536,7 +542,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 				BorrowLiquidity: utils.ToStringByPrecise(borrowLiquidity, this.cfg.TokenDecimal["flash"]+
 					this.cfg.TokenDecimal[assetName]),
 				InsuranceApy:     utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
-				InsuranceAmount:  market.TotalInsurance,
+				InsuranceAmount:  market.TotalInsuranceAmount,
 				CollateralFactor: market.CollateralFactor,
 				IfCollateral:     userAssetBalance.IfCollateral,
 			}
@@ -680,4 +686,65 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		}
 	}
 	return liquidationList, nil
+}
+
+func (this *FlashPoolManager) WingApyForStore() error {
+	allMarkets, err := this.GetAllMarkets()
+	if err != nil {
+		return fmt.Errorf("WingApy, this.GetAllMarkets error: %s", err)
+	}
+	for _, address := range allMarkets {
+		wingSpeeds, err := this.getWingSpeeds(address)
+		if err != nil {
+			return fmt.Errorf("WingApy, this.getWingSpeeds error: %s", err)
+		}
+		wingSBIPortion, err := this.getWingSBIPortion(address)
+		if err != nil {
+			return fmt.Errorf("WingApy, this.getWingSBIPortion error: %s", err)
+		}
+		totalPortion := new(big.Int).Add(wingSBIPortion.InsurancePortion.ToBigInt(),
+			new(big.Int).Add(wingSBIPortion.SupplyPortion.ToBigInt(), wingSBIPortion.BorrowPortion.ToBigInt()))
+		price, err := this.AssetStoredPrice("WING")
+		if err != nil {
+			return fmt.Errorf("WingApy, this.AssetStoredPrice error: %s", err)
+		}
+		market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
+		if err != nil {
+			return fmt.Errorf("WingApy, this.store.LoadFlashMarket error: %s", err)
+		}
+		totalSupplyDollar := utils.ToIntByPrecise(market.TotalSupplyDollar, this.cfg.TokenDecimal["pUSDT"])
+		totalBorrowDollar := utils.ToIntByPrecise(market.TotalBorrowDollar, this.cfg.TokenDecimal["pUSDT"])
+		totalInsuranceDollar := utils.ToIntByPrecise(market.TotalInsuranceDollar, this.cfg.TokenDecimal["pUSDT"])
+		supplyApy := utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
+			wingSBIPortion.SupplyPortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
+			totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+		borrowApy := utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
+			wingSBIPortion.BorrowPortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
+			totalBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+		insuranceApy := utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
+			wingSBIPortion.InsurancePortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
+			totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+		wingApy := &store.WingApy{
+			AssetName:    this.cfg.AssetMap[address.ToHexString()],
+			SupplyApy:    supplyApy,
+			BorrowApy:    borrowApy,
+			InsuranceApy: insuranceApy,
+		}
+		err = this.store.SaveWingApy(wingApy)
+		if err != nil {
+			return fmt.Errorf("WingApy, this.store.SaveWingApy error: %s", err)
+		}
+	}
+	return nil
+}
+
+func (this *FlashPoolManager) WingApy(asset string) (store.WingApy, error) {
+	wingApy, err := this.store.LoadWingApy(asset)
+	if err != nil {
+		return store.WingApy{}, fmt.Errorf("WingApy, this.store.LoadWingApy error: %s", err)
+	}
+	return wingApy, nil
 }

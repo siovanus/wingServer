@@ -102,6 +102,13 @@ func (this *Service) StoreFlashPoolAllMarket() error {
 	return nil
 }
 
+func (this *Service) StoreWingApy() {
+	err := this.fpMgr.WingApyForStore()
+	if err != nil {
+		log.Errorf("StoreUserBalance, this.fpMgr.WingApyForStore error: %s", err)
+	}
+}
+
 func listContains(list []string, arg string) bool {
 	for _, v := range list {
 		if arg == v {

@@ -359,3 +359,38 @@ func (this *Service) LiquidationList(param map[string]interface{}) map[string]in
 	}
 	return m
 }
+
+func (this *Service) WingApy(param map[string]interface{}) map[string]interface{} {
+	req := &common.WingApyRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("WingApy: decode params failed, err: %s", err)
+	} else {
+		wingApy, err := this.fpMgr.WingApy(req.Asset)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("WingApy error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = &common.WingApyResponse{
+				Id:           req.Id,
+				SupplyApy:    wingApy.SupplyApy,
+				BorrowApy:    wingApy.BorrowApy,
+				InsuranceApy: wingApy.InsuranceApy,
+			}
+			log.Infof("WingApy success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("WingApy: failed, err: %s", err)
+	} else {
+		log.Debug("WingApy: resp success")
+	}
+	return m
+}

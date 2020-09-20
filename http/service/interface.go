@@ -13,6 +13,7 @@ type GovernanceManager interface {
 
 type FlashPoolManager interface {
 	AssetPrice(asset string) (string, error)
+	WingApy(asset string) (store.WingApy, error)
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
 	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*common.FlashPoolBanner, error)
@@ -28,4 +29,5 @@ type FlashPoolManager interface {
 	ClaimWing(account string) (string, error)
 	BorrowAddressList() ([]store.UserAssetBalance, error)
 	LiquidationList(account string) ([]*common.Liquidation, error)
+	WingApyForStore() error
 }

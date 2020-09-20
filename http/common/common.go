@@ -17,6 +17,7 @@ const (
 	ASSETPRICELIST  = "/api/v1/assetpricelist"
 	CLAIMWING       = "/api/v1/claimwing"
 	LIQUIDATIONLIST = "/api/v1/liquidationlist"
+	WINGAPY         = "api/v1/wingapy"
 )
 
 const (
@@ -36,6 +37,7 @@ const (
 	ACTION_ASSETPRICELIST  = "assetpricelist"
 	ACTION_CLAIMWING       = "claimwing"
 	ACTION_LIQUIDATIONLIST = "liquidationlist"
+	ACTION_WINGAPY         = "wingapy"
 )
 
 type Response struct {
@@ -184,11 +186,14 @@ type FlashPoolAllMarket struct {
 type Market struct {
 	Icon                  string
 	Name                  string `gorm:"primary_key"`
-	TotalSupply           string
+	TotalSupplyDollar     string
+	TotalSupplyAmount     string
 	SupplyApy             string
-	TotalBorrow           string
+	TotalBorrowDollar     string
+	TotalBorrowAmount     string
 	BorrowApy             string
-	TotalInsurance        string
+	TotalInsuranceDollar  string
+	TotalInsuranceAmount  string
 	InsuranceApy          string
 	CollateralFactor      string
 	SupplyDistribution    string
@@ -232,4 +237,16 @@ type LiquidationListRequest struct {
 type LiquidationListResponse struct {
 	Id              string
 	LiquidationList []*Liquidation
+}
+
+type WingApyRequest struct {
+	Id    string
+	Asset string
+}
+
+type WingApyResponse struct {
+	Id           string
+	SupplyApy    string
+	BorrowApy    string
+	InsuranceApy string
 }

@@ -61,6 +61,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.ASSETPRICELIST:        {name: common.ACTION_ASSETPRICELIST, handler: web.AssetPriceList},
 		common.CLAIMWING:             {name: common.ACTION_CLAIMWING, handler: web.ClaimWing},
 		common.LIQUIDATIONLIST:       {name: common.ACTION_LIQUIDATIONLIST, handler: web.LiquidationList},
+		common.WINGAPY:               {name: common.ACTION_WINGAPY, handler: web.WingApy},
 	}
 	getMethodMap := map[string]Action{
 		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},

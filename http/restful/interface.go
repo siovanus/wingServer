@@ -16,4 +16,5 @@ type Web interface {
 	AssetPriceList(map[string]interface{}) map[string]interface{}
 	ClaimWing(map[string]interface{}) map[string]interface{}
 	LiquidationList(map[string]interface{}) map[string]interface{}
+	WingApy(map[string]interface{}) map[string]interface{}
 }

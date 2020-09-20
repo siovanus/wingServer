@@ -43,6 +43,13 @@ type UserAssetBalance struct {
 	IfCollateral     bool
 }
 
+type WingApy struct {
+	AssetName    string `gorm:"primary_key"`
+	SupplyApy    string
+	BorrowApy    string
+	InsuranceApy string
+}
+
 // Migrate runs the initial migration
 func Migrate(tx *gorm.DB) error {
 	err := tx.AutoMigrate(&FlashPoolDetail{}).Error
@@ -73,6 +80,11 @@ func Migrate(tx *gorm.DB) error {
 	err = tx.AutoMigrate(common.Market{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate Market")
+	}
+
+	err = tx.AutoMigrate(WingApy{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate WingApy")
 	}
 
 	return nil
