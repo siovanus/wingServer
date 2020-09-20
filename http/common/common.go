@@ -11,9 +11,12 @@ const (
 	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
 	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
-	ASSETPRICE     = "/api/v1/assetprice"
-	ASSETPRICELIST = "/api/v1/assetpricelist"
-	CLAIMWING      = "/api/v1/claimwing"
+	BORROWADDRESSLIST = "/api/v1/borrowaddresslist"
+
+	ASSETPRICE      = "/api/v1/assetprice"
+	ASSETPRICELIST  = "/api/v1/assetpricelist"
+	CLAIMWING       = "/api/v1/claimwing"
+	LIQUIDATIONLIST = "/api/v1/liquidationlist"
 )
 
 const (
@@ -27,9 +30,12 @@ const (
 	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
 	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
 
-	ACTION_ASSETPRICE     = "assetprice"
-	ACTION_ASSETPRICELIST = "assetpricelist"
-	ACTION_CLAIMWING      = "claimwing"
+	ACTION_BORROWADDRESSLIST = "borrowaddresslist"
+
+	ACTION_ASSETPRICE      = "assetprice"
+	ACTION_ASSETPRICELIST  = "assetpricelist"
+	ACTION_CLAIMWING       = "claimwing"
+	ACTION_LIQUIDATIONLIST = "liquidationlist"
 )
 
 type Response struct {
@@ -201,21 +207,14 @@ type ClaimWingResponse struct {
 	Amount  string
 }
 
-type BorrowAddress struct {
-	AddressList []string
-}
-
 type Liquidation struct {
-	Address          string
+	Icon             string
+	Name             string
 	BorrowLimitUsed  string
 	BorrowBalance    string
 	BorrowDollar     string
 	CollateralDollar string
-	CollateralAsset  []*CollateralAsset
-}
-
-type LiquidationList struct {
-	Liquidation *Liquidation
+	CollateralAssets []*CollateralAsset
 }
 
 type CollateralAsset struct {
@@ -223,4 +222,14 @@ type CollateralAsset struct {
 	Name    string
 	Balance string
 	Dollar  string
+}
+
+type LiquidationListRequest struct {
+	Id      string
+	Address string
+}
+
+type LiquidationListResponse struct {
+	Id              string
+	LiquidationList []*Liquidation
 }

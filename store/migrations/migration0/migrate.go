@@ -34,7 +34,8 @@ type TrackHeight struct {
 
 type UserAssetBalance struct {
 	UserAddress      string `gorm:"primary_key"`
-	AssetName        string `gorm:"primary_key"`
+	AssetAddress     string `gorm:"primary_key"`
+	AssetName        string
 	Icon             string
 	SupplyBalance    string
 	BorrowBalance    string
@@ -74,7 +75,7 @@ func Migrate(tx *gorm.DB) error {
 
 	err = tx.AutoMigrate(UserAssetBalance{}).Error
 	if err != nil {
-		return errors.Wrap(err, "failed to auto migrate UserBalance")
+		return errors.Wrap(err, "failed to auto migrate UserAssetBalance")
 	}
 
 	err = tx.AutoMigrate(common.Market{}).Error

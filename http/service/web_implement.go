@@ -304,3 +304,58 @@ func (this *Service) ClaimWing(param map[string]interface{}) map[string]interfac
 	}
 	return m
 }
+
+func (this *Service) BorrowAddressList(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	borrowAddressList, err := this.fpMgr.BorrowAddressList()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("BorrowAddressList error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = borrowAddressList
+		log.Infof("BorrowAddressList success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("BorrowAddressList: failed, err: %s", err)
+	} else {
+		log.Debug("BorrowAddressList: resp success")
+	}
+	return m
+}
+
+func (this *Service) LiquidationList(param map[string]interface{}) map[string]interface{} {
+	req := &common.LiquidationListRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("LiquidationList: decode params failed, err: %s", err)
+	} else {
+		liquidationList, err := this.fpMgr.LiquidationList(req.Address)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("LiquidationList error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = &common.LiquidationListResponse{
+				Id:              req.Id,
+				LiquidationList: liquidationList,
+			}
+			log.Infof("LiquidationList success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("LiquidationList: failed, err: %s", err)
+	} else {
+		log.Debug("LiquidationList: resp success")
+	}
+	return m
+}

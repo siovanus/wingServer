@@ -60,6 +60,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.ASSETPRICE:            {name: common.ACTION_ASSETPRICE, handler: web.AssetPrice},
 		common.ASSETPRICELIST:        {name: common.ACTION_ASSETPRICELIST, handler: web.AssetPriceList},
 		common.CLAIMWING:             {name: common.ACTION_CLAIMWING, handler: web.ClaimWing},
+		common.LIQUIDATIONLIST:       {name: common.ACTION_LIQUIDATIONLIST, handler: web.LiquidationList},
 	}
 	getMethodMap := map[string]Action{
 		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},
@@ -69,6 +70,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
 		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
 		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
+		common.BORROWADDRESSLIST:           {name: common.ACTION_BORROWADDRESSLIST, handler: web.BorrowAddressList},
 	}
 	this.postMap = postMethodMap
 	this.getMap = getMethodMap

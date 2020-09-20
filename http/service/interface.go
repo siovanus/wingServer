@@ -27,4 +27,6 @@ type FlashPoolManager interface {
 	GetAllMarkets() ([]ocommon.Address, error)
 	GetInsuranceAddress(ocommon.Address) (ocommon.Address, error)
 	ClaimWing(account string) (string, error)
+	BorrowAddressList() ([]store.UserAssetBalance, error)
+	LiquidationList(account string) ([]*common.Liquidation, error)
 }

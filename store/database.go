@@ -153,7 +153,8 @@ func (client Client) SaveTrackHeight(height uint32) error {
 
 type UserAssetBalance struct {
 	UserAddress      string `gorm:"primary_key"`
-	AssetName        string `gorm:"primary_key"`
+	AssetAddress     string `gorm:"primary_key"`
+	AssetName        string
 	Icon             string
 	SupplyBalance    string
 	BorrowBalance    string
@@ -164,6 +165,15 @@ type UserAssetBalance struct {
 func (client Client) LoadUserBalance(userAddress string) ([]UserAssetBalance, error) {
 	userBalance := make([]UserAssetBalance, 0)
 	err := client.db.Where("user_address = ?", userAddress).Find(&userBalance).Error
+	if err != nil {
+		return userBalance, err
+	}
+	return userBalance, err
+}
+
+func (client Client) LoadBorrowUsers() ([]UserAssetBalance, error) {
+	userBalance := make([]UserAssetBalance, 0)
+	err := client.db.Select("user_address").Where("borrow_balance <> ?", "0").Find(&userBalance).Error
 	if err != nil {
 		return userBalance, err
 	}
