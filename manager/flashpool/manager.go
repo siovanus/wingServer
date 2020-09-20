@@ -429,6 +429,23 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 	i := new(big.Int).SetUint64(0)
 	for _, address := range allMarkets {
 		assetName := this.cfg.AssetMap[address.ToHexString()]
+		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.AssetStoredPrice error: %s", err)
+		}
+		userAssetBalance := store.UserAssetBalance{}
+		for _, v := range userBalance {
+			if v.AssetName == assetName {
+				userAssetBalance = v
+			}
+		}
+		borrowAmount := utils.ToIntByPrecise(userAssetBalance.BorrowBalance, this.cfg.TokenDecimal[assetName])
+		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowAmount, price),
+			this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["pUSDT"])
+		b = new(big.Int).Add(s, borrowDollar)
+	}
+	for _, address := range allMarkets {
+		assetName := this.cfg.AssetMap[address.ToHexString()]
 		assetApy, err := this.store.LoadAssetApy(assetName)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadAssetApy error: %s", err)
@@ -456,7 +473,6 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
 			this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["pUSDT"])
 		s = new(big.Int).Add(s, supplyDollar)
-		b = new(big.Int).Add(s, borrowDollar)
 		i = new(big.Int).Add(i, insuranceDollar)
 		supplyApy := utils.ToIntByPrecise(assetApy.SupplyApy, this.cfg.TokenDecimal["flash"])
 		borrowApy := utils.ToIntByPrecise(assetApy.BorrowApy, this.cfg.TokenDecimal["flash"])
@@ -485,9 +501,13 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: assetApy.CollateralFactor,
 			}
-			if b.Uint64() != 0 {
+			if accountLiquidity.Liquidity.ToBigInt().Uint64() != 0 {
+				borrowLimit := utils.ToIntByPrecise(utils.ToStringByPrecise(accountLiquidity.Liquidity.ToBigInt(),
+					this.cfg.TokenDecimal["oracle"]), this.cfg.TokenDecimal["pUSDT"])
+				totalLimit := new(big.Int).Add(borrowLimit, b)
 				borrow.Limit = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(borrowDollar, new(big.Int).SetUint64(
-					uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), b), this.cfg.TokenDecimal["percentage"])
+					uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), totalLimit),
+					this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["percentage"])
 			}
 			userFlashPoolOverview.CurrentBorrow = append(userFlashPoolOverview.CurrentBorrow, borrow)
 		}
