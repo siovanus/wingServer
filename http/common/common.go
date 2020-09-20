@@ -7,6 +7,7 @@ const (
 	GOVBANNER                   = "/api/v1/govbanner"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
+	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
 	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
 	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
@@ -22,6 +23,7 @@ const (
 	ACTION_GOVBANNER                   = "govbanner"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
+	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
 	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
 	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
 
@@ -91,10 +93,10 @@ type FlashPoolBanner struct {
 	Total string
 }
 
-type MarketFund struct {
-	Icon string
-	Name string
-	Fund string
+type FlashPoolDetail struct {
+	TotalSupply    string
+	TotalBorrow    string
+	TotalInsurance string
 }
 
 type UserFlashPoolOverviewRequest struct {
@@ -109,10 +111,6 @@ type UserFlashPoolOverviewResponse struct {
 }
 
 type UserFlashPoolOverview struct {
-	TotalSupply    string
-	TotalBorrow    string
-	TotalInsurance string
-
 	BorrowLimit string
 	NetApy      string
 
