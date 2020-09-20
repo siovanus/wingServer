@@ -67,7 +67,6 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.GOVBANNEROVERVIEW:           {name: common.ACTION_GOVBANNEROVERVIEW, handler: web.GovBannerOverview},
 		common.GOVBANNER:                   {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
 		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
-		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
 		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
 	}
 	this.postMap = postMethodMap

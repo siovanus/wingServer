@@ -3,16 +3,16 @@
   "port": 10337,
   "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
-  "flash_pool_address": "791d42c167d19f05a6b1936896d989f442f0ff58",
+  "flash_pool_address": "a06fc611b84d59aade5355cc56d4f0c1b5f6e011",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "4c9321ed8d3799e74c202191a8816fc1549800ee": "pWBTC",
-    "4c6bc50aa374c55c876fb01199f70f49eae4113e": "prenBTC",
-    "2f15c08e062b05185f57a22923ca6c3e3f1f11b2": "pUSDC",
-    "056b514db5f2b8c04b6ef22febbbae3e85ca1b01": "ONTd",
-    "2ae6e628c18b6ba8ea977ba3b489ae97cedefbb9": "WING",
-    "8307da3380ed27b60c0d724af7ebc3f722996425": "pETH"
+    "caed9d007394db446b7beb16dca28be38a485141": "pWBTC",
+    "ad0b74c0b2d51e75b56b79574cbf5cb8f06644f5": "prenBTC",
+    "b1a43839a334b32a696118316826c2b580ce50c9": "pUSDC",
+    "a5e9699bc57802fa062244d7d9c8c505ca0d55fb": "ONTd",
+    "5ac00fa9fcfebd9cb5536b9500e8c76a50d74cac": "WING",
+    "72ca218905c2e30180d8a29f570477d2bc15c168": "pETH"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -23,12 +23,12 @@
     "Flash": "https://app.ont.io/wing/flash_icon.svg"
   },
   "oracle_map": {
-    "4c9321ed8d3799e74c202191a8816fc1549800ee": "WBTC",
-    "4c6bc50aa374c55c876fb01199f70f49eae4113e": "renBTC",
-    "2f15c08e062b05185f57a22923ca6c3e3f1f11b2": "USDT",
-    "056b514db5f2b8c04b6ef22febbbae3e85ca1b01": "ONTd",
-    "2ae6e628c18b6ba8ea977ba3b489ae97cedefbb9": "WING",
-    "8307da3380ed27b60c0d724af7ebc3f722996425": "ETH"
+    "caed9d007394db446b7beb16dca28be38a485141": "WBTC",
+    "ad0b74c0b2d51e75b56b79574cbf5cb8f06644f5": "renBTC",
+    "b1a43839a334b32a696118316826c2b580ce50c9": "USDT",
+    "a5e9699bc57802fa062244d7d9c8c505ca0d55fb": "ONTd",
+    "5ac00fa9fcfebd9cb5536b9500e8c76a50d74cac": "WING",
+    "72ca218905c2e30180d8a29f570477d2bc15c168": "ETH"
   },
   "token_decimal":{
     "percentage": 4,
@@ -38,9 +38,10 @@
     "pWBTC": 8,
     "prenBTC": 8,
     "WING": 9,
-    "pETH": 12,
+    "pETH": 18,
     "oracle": 12,
     "flash": 9
   },
-  "scan_interval": 2
+  "scan_interval": 2,
+  "snapshot_interval": 60
 }

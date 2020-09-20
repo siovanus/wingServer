@@ -7,7 +7,6 @@ type Web interface {
 	GovBanner(map[string]interface{}) map[string]interface{}
 	FlashPoolBanner(map[string]interface{}) map[string]interface{}
 
-	FlashPoolDetail(map[string]interface{}) map[string]interface{}
 	FlashPoolAllMarket(map[string]interface{}) map[string]interface{}
 	UserFlashPoolOverview(map[string]interface{}) map[string]interface{}
 

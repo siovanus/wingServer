@@ -18,9 +18,8 @@ type Service struct {
 	store                *store.Client
 	trackHeight          uint32
 	listeningAddressList []string
+	assetList            []string
 }
-
-var ASSET = []string{"ONTd", "WBTC", "renBTC", "USDC", "WING", "ETH"}
 
 func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client, cfg *config.Config) *Service {
 	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, store: store}
@@ -33,6 +32,7 @@ func (this *Service) AddListeningAddressList() {
 		os.Exit(1)
 	}
 	for _, v := range allMarkets {
+		this.assetList = append(this.assetList, this.cfg.OracleMap[v.ToHexString()])
 		this.listeningAddressList = append(this.listeningAddressList, v.ToHexString())
 		addr, err := this.fpMgr.GetInsuranceAddress(v)
 		if err != nil {
@@ -56,7 +56,7 @@ func (this *Service) Close() {
 	log.Info("All connections closed. Bye!")
 }
 
-func (this *Service) Snapshot() {
+func (this *Service) SnapshotDaily() {
 	flashPoolDetail, err := this.fpMgr.FlashPoolDetailForStore()
 	if err != nil {
 		log.Errorf("Snapshot, this.fpMgr.FlashPoolDetailForStore error: %s", err)
@@ -144,8 +144,7 @@ func (this *Service) TrackEvent() {
 			if len(accounts) != 0 {
 				for _, v := range accounts {
 					log.Infof("TrackEvent, account: %s", v)
-					go this.StoreFlashPoolOverview(v)
-					go this.StoreFlashPoolAllMarket()
+					go this.StoreUserBalance(v)
 				}
 			}
 
@@ -157,5 +156,20 @@ func (this *Service) TrackEvent() {
 			}
 		}
 		time.Sleep(time.Second * time.Duration(this.cfg.ScanInterval))
+	}
+}
+
+func (this *Service) SnapshotMinute() {
+	for {
+		err := this.StoreFlashPoolAllMarket()
+		if err != nil {
+			log.Errorf("SnapshotMinute, this.StoreFlashPoolAllMarket error:", err)
+		}
+
+		err = this.StoreAssetApy()
+		if err != nil {
+			log.Errorf("SnapshotMinute, this.StoreAssetApy error:", err)
+		}
+		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
 }

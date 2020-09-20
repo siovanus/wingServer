@@ -60,7 +60,7 @@ func (this *Service) trackSnapshotEvent(height uint32) (bool, []string, error) {
 }
 
 func (this *Service) PriceFeed() error {
-	for _, v := range ASSET {
+	for _, v := range this.assetList {
 		data, err := this.fpMgr.AssetPrice(v)
 		if err != nil {
 			log.Errorf("PriceFeed, this.fpMgr.AssetPrice error: %s", err)
@@ -79,14 +79,10 @@ func (this *Service) PriceFeed() error {
 	return nil
 }
 
-func (this *Service) StoreFlashPoolOverview(account string) {
-	userFlashPoolOverview, err := this.fpMgr.UserFlashPoolOverviewForStore(account)
+func (this *Service) StoreUserBalance(account string) {
+	err := this.fpMgr.UserBalanceForStore(account)
 	if err != nil {
-		log.Errorf("StoreFlashPoolOverview, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
-	}
-	err = this.store.SaveUserFlashPoolOverview(account, userFlashPoolOverview)
-	if err != nil {
-		log.Errorf("StoreFlashPoolOverview, this.store.SaveUserFlashPoolOverview error: %s", err)
+		log.Errorf("StoreUserBalance, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
 	}
 }
 
@@ -102,6 +98,15 @@ func (this *Service) StoreFlashPoolAllMarket() error {
 			log.Errorf("StoreFlashPoolOverview, this.store.SaveFlashMarket error: %s", err)
 			return err
 		}
+	}
+	return nil
+}
+
+func (this *Service) StoreAssetApy() error {
+	err := this.fpMgr.AssetApyForStore()
+	if err != nil {
+		log.Errorf("StoreAssetApy, this.fpMgr.AssetApyForStore error: %s", err)
+		return err
 	}
 	return nil
 }

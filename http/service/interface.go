@@ -16,13 +16,13 @@ type FlashPoolManager interface {
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
 	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*common.FlashPoolBanner, error)
-	FlashPoolDetail() (*common.FlashPoolDetail, error)
 	FlashPoolDetailForStore() (*store.FlashPoolDetail, error)
 	FlashPoolMarketStore() error
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
 	FlashPoolAllMarketForStore() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
-	UserFlashPoolOverviewForStore(account string) (*common.UserFlashPoolOverview, error)
+	UserBalanceForStore(account string) error
+	AssetApyForStore() error
 	GetAllMarkets() ([]ocommon.Address, error)
 	GetInsuranceAddress(ocommon.Address) (ocommon.Address, error)
 	ClaimWing(account string) (string, error)

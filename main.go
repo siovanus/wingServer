@@ -116,7 +116,8 @@ func startServer(ctx *cli.Context) {
 	serv.AddListeningAddressList()
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 
-	go serv.Snapshot()
+	go serv.SnapshotDaily()
+	go serv.SnapshotMinute()
 	go serv.TrackEvent()
 	go restServer.Start()
 	go checkLogFile(logLevel)

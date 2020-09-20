@@ -27,6 +27,7 @@ type Config struct {
 	SystemContract     []string          `json:"system_contract"`
 	TokenDecimal       map[string]uint64 `json:"token_decimal"`
 	ScanInterval       uint64            `json:"scan_interval"`
+	SnapshotInterval   uint64            `json:"snapshot_interval"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

@@ -5,12 +5,10 @@ import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/csv"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/store/migrations"
 )
@@ -154,47 +152,27 @@ func (client Client) SaveTrackHeight(height uint32) error {
 	return client.db.Save(trackHeight).Error
 }
 
-type UserFlashPoolOverview struct {
+type UserAssetBalance struct {
 	UserAddress      string `gorm:"primary_key"`
-	BorrowLimit      string
-	NetApy           string
-	WingAccrued      string
-	Info             string
+	AssetName        string `gorm:"primary_key"`
+	Icon             string
+	SupplyBalance    string
+	BorrowBalance    string
+	InsuranceBalance string
+	IfCollateral     bool
 }
 
-func (client Client) LoadUserFlashPoolOverview(userAddress string) (*common.UserFlashPoolOverview, error) {
-	var userFlashPoolOverview UserFlashPoolOverview
-	output := new(common.UserFlashPoolOverview)
-	err := client.db.Where(UserFlashPoolOverview{UserAddress: userAddress}).Last(&userFlashPoolOverview).Error
+func (client Client) LoadUserBalance(userAddress string) ([]UserAssetBalance, error) {
+	var userBalance []UserAssetBalance
+	err := client.db.Where(UserAssetBalance{UserAddress: userAddress}).Find(&userBalance).Error
 	if err != nil {
-		return output, err
+		return userBalance, err
 	}
-	info, err := hex.DecodeString(userFlashPoolOverview.Info)
-	if err != nil {
-		return output, nil
-	}
-	source := ocommon.NewZeroCopySource(info)
-	err = output.HalfDeserialization(source)
-	if err != nil {
-		return output, nil
-	}
-	output.BorrowLimit = userFlashPoolOverview.BorrowLimit
-	output.NetApy = userFlashPoolOverview.NetApy
-	output.WingAccrued = userFlashPoolOverview.WingAccrued
-	return output, err
+	return userBalance, err
 }
 
-func (client Client) SaveUserFlashPoolOverview(userAddress string, input *common.UserFlashPoolOverview) error {
-	sink := ocommon.NewZeroCopySink(nil)
-	input.HalfSerialization(sink)
-	userFlashPoolOverview := &UserFlashPoolOverview{
-		UserAddress:      userAddress,
-		BorrowLimit:      input.BorrowLimit,
-		NetApy:           input.NetApy,
-		WingAccrued:      input.WingAccrued,
-		Info:             hex.EncodeToString(sink.Bytes()),
-	}
-	return client.db.Save(userFlashPoolOverview).Error
+func (client Client) SaveUserAssetBalance(input *UserAssetBalance) error {
+	return client.db.Save(input).Error
 }
 
 func (client Client) LoadFlashMarket(name string) (common.Market, error) {
@@ -205,4 +183,22 @@ func (client Client) LoadFlashMarket(name string) (common.Market, error) {
 
 func (client Client) SaveFlashMarket(market *common.Market) error {
 	return client.db.Save(market).Error
+}
+
+type AssetApy struct {
+	AssetName        string `gorm:"primary_key"`
+	SupplyApy        string
+	BorrowApy        string
+	InsuranceApy     string
+	CollateralFactor string
+}
+
+func (client Client) LoadAssetApy(assetName string) (AssetApy, error) {
+	var assetApy AssetApy
+	err := client.db.Where(AssetApy{AssetName: assetName}).Last(&assetApy).Error
+	return assetApy, err
+}
+
+func (client Client) SaveAssetApy(assetApy *AssetApy) error {
+	return client.db.Save(assetApy).Error
 }

@@ -32,12 +32,22 @@ type TrackHeight struct {
 	Height uint32
 }
 
-type UserFlashPoolOverview struct {
+type UserAssetBalance struct {
 	UserAddress      string `gorm:"primary_key"`
-	BorrowLimit      string
-	NetApy           string
-	WingAccrued      string
-	Info             string
+	AssetName        string `gorm:"primary_key"`
+	Icon             string
+	SupplyBalance    string
+	BorrowBalance    string
+	InsuranceBalance string
+	IfCollateral     bool
+}
+
+type AssetApy struct {
+	AssetName        string `gorm:"primary_key"`
+	SupplyApy        string
+	BorrowApy        string
+	InsuranceApy     string
+	CollateralFactor string
 }
 
 // Migrate runs the initial migration
@@ -62,14 +72,19 @@ func Migrate(tx *gorm.DB) error {
 		return errors.Wrap(err, "failed to auto migrate TrackHeight")
 	}
 
-	err = tx.AutoMigrate(UserFlashPoolOverview{}).Error
+	err = tx.AutoMigrate(UserAssetBalance{}).Error
 	if err != nil {
-		return errors.Wrap(err, "failed to auto migrate UserFlashPoolOverview")
+		return errors.Wrap(err, "failed to auto migrate UserBalance")
 	}
 
 	err = tx.AutoMigrate(common.Market{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate UserFlashPoolOverview")
+	}
+
+	err = tx.AutoMigrate(AssetApy{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate AssetApy")
 	}
 
 	return nil
