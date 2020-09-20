@@ -437,10 +437,10 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.AssetStoredPrice error: %s", err)
 		}
-		userAssetBalance := new(store.UserAssetBalance)
+		userAssetBalance := store.UserAssetBalance{}
 		for _, v := range userBalance {
 			if v.AssetName == assetName {
-				userAssetBalance = &v
+				userAssetBalance = v
 			}
 		}
 		supplyAmount := utils.ToIntByPrecise(userAssetBalance.SupplyBalance, this.cfg.TokenDecimal[assetName])

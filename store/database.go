@@ -6,7 +6,6 @@ import (
 	"database/sql/driver"
 	"encoding/csv"
 	"fmt"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/siovanus/wingServer/http/common"
@@ -163,8 +162,8 @@ type UserAssetBalance struct {
 }
 
 func (client Client) LoadUserBalance(userAddress string) ([]UserAssetBalance, error) {
-	var userBalance []UserAssetBalance
-	err := client.db.Where(UserAssetBalance{UserAddress: userAddress}).Find(&userBalance).Error
+	userBalance := make([]UserAssetBalance, 0)
+	err := client.db.Where("user_address = ?", userAddress).Find(&userBalance).Error
 	if err != nil {
 		return userBalance, err
 	}
