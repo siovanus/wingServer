@@ -194,19 +194,18 @@ func (client Client) SaveFlashMarket(market *common.Market) error {
 	return client.db.Save(market).Error
 }
 
-type WingApy struct {
-	AssetName    string `gorm:"primary_key"`
-	SupplyApy    string
-	BorrowApy    string
-	InsuranceApy string
+func (client Client) LoadWingApys() ([]common.WingApy, error) {
+	wingApys := make([]common.WingApy, 0)
+	err := client.db.Find(&wingApys).Error
+	return wingApys, err
 }
 
-func (client Client) LoadWingApy(assetName string) (WingApy, error) {
-	var wingApy WingApy
-	err := client.db.Where(WingApy{AssetName: assetName}).Last(&wingApy).Error
+func (client Client) LoadWingApy(assetName string) (common.WingApy, error) {
+	var wingApy common.WingApy
+	err := client.db.Where(common.WingApy{AssetName: assetName}).Last(&wingApy).Error
 	return wingApy, err
 }
 
-func (client Client) SaveWingApy(wingApy *WingApy) error {
+func (client Client) SaveWingApy(wingApy *common.WingApy) error {
 	return client.db.Save(wingApy).Error
 }

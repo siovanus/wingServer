@@ -17,7 +17,7 @@ const (
 	ASSETPRICELIST  = "/api/v1/assetpricelist"
 	CLAIMWING       = "/api/v1/claimwing"
 	LIQUIDATIONLIST = "/api/v1/liquidationlist"
-	WINGAPY         = "api/v1/wingapy"
+	WINGAPYS        = "/api/v1/wingapys"
 )
 
 const (
@@ -37,7 +37,7 @@ const (
 	ACTION_ASSETPRICELIST  = "assetpricelist"
 	ACTION_CLAIMWING       = "claimwing"
 	ACTION_LIQUIDATIONLIST = "liquidationlist"
-	ACTION_WINGAPY         = "wingapy"
+	ACTION_WINGAPYS        = "wingapys"
 )
 
 type Response struct {
@@ -239,13 +239,8 @@ type LiquidationListResponse struct {
 	LiquidationList []*Liquidation
 }
 
-type WingApyRequest struct {
-	Id    string
-	Asset string
-}
-
-type WingApyResponse struct {
-	Id           string
+type WingApy struct {
+	AssetName    string `gorm:"primary_key"`
 	SupplyApy    string
 	BorrowApy    string
 	InsuranceApy string

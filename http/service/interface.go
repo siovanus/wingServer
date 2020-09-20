@@ -13,7 +13,7 @@ type GovernanceManager interface {
 
 type FlashPoolManager interface {
 	AssetPrice(asset string) (string, error)
-	WingApy(asset string) (store.WingApy, error)
+	WingApys() ([]common.WingApy, error)
 	FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error)
 	PoolDistribution() (*common.Distribution, error)
 	FlashPoolBanner() (*common.FlashPoolBanner, error)

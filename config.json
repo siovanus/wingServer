@@ -3,16 +3,16 @@
   "port": 10337,
   "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
-  "flash_pool_address": "a06fc611b84d59aade5355cc56d4f0c1b5f6e011",
+  "flash_pool_address": "3cf8669e0fa5eed790d4a0c155690bc1e9d42cdc",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "caed9d007394db446b7beb16dca28be38a485141": "pWBTC",
-    "ad0b74c0b2d51e75b56b79574cbf5cb8f06644f5": "prenBTC",
-    "b1a43839a334b32a696118316826c2b580ce50c9": "pUSDC",
-    "a5e9699bc57802fa062244d7d9c8c505ca0d55fb": "ONTd",
-    "5ac00fa9fcfebd9cb5536b9500e8c76a50d74cac": "WING",
-    "72ca218905c2e30180d8a29f570477d2bc15c168": "pETH"
+    "c8338acf4ec2690262a251af889ac9bd0c063314": "pWBTC",
+    "5aeff357d0cf637e790ade2ac816038352a67861": "prenBTC",
+    "ccded472234930157f207c5b83129b2afdd72c47": "pUSDC",
+    "ddf2fc11c92d6b69f638b2f40bc6a3aa503e2f27": "ONTd",
+    "5fed860c17edbe9ea034e36c935e5e817fad8c71": "WING",
+    "8e2df8ef5d9c860470d5e55192690cafdee6f3a3": "pETH"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -25,12 +25,12 @@
     "pUSDT": "https://app.ont.io/wing/pusdt.svg"
   },
   "oracle_map": {
-    "caed9d007394db446b7beb16dca28be38a485141": "WBTC",
-    "ad0b74c0b2d51e75b56b79574cbf5cb8f06644f5": "renBTC",
-    "b1a43839a334b32a696118316826c2b580ce50c9": "USDT",
-    "a5e9699bc57802fa062244d7d9c8c505ca0d55fb": "ONTd",
-    "5ac00fa9fcfebd9cb5536b9500e8c76a50d74cac": "WING",
-    "72ca218905c2e30180d8a29f570477d2bc15c168": "ETH"
+    "c8338acf4ec2690262a251af889ac9bd0c063314": "WBTC",
+    "5aeff357d0cf637e790ade2ac816038352a67861": "renBTC",
+    "ccded472234930157f207c5b83129b2afdd72c47": "USDT",
+    "ddf2fc11c92d6b69f638b2f40bc6a3aa503e2f27": "ONTd",
+    "5fed860c17edbe9ea034e36c935e5e817fad8c71": "WING",
+    "8e2df8ef5d9c860470d5e55192690cafdee6f3a3": "ETH"
   },
   "token_decimal":{
     "percentage": 4,
