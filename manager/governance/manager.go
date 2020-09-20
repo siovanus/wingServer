@@ -68,15 +68,6 @@ func (this *GovernanceManager) GovBannerOverview() (*common.GovBannerOverview, e
 	if err != nil {
 		return nil, fmt.Errorf("GovBannerOverview, this.getBalanceOf error: %s", err)
 	}
-	//totalSupply, err := this.getWingTotalSupply()
-	//if err != nil {
-	//	return nil, fmt.Errorf("GovBannerOverview, this.getWingTotalSupply error: %s", err)
-	//}
-	//return &common.GovBannerOverview{
-	//	Remain20: utils.ToStringByPrecise(new(big.Int).SetUint64(balance), this.cfg.TokenDecimal["WING"]),
-	//	Remain80: utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(Total), totalSupply),
-	//		this.cfg.TokenDecimal["WING"]),
-	//}, nil
 	remain80 := Total80*100 - distributed
 	return &common.GovBannerOverview{
 		Remain20: utils.ToStringByPrecise(new(big.Int).SetUint64(balance), this.cfg.TokenDecimal["WING"]),

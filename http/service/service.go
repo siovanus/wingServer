@@ -165,11 +165,6 @@ func (this *Service) SnapshotMinute() {
 		if err != nil {
 			log.Errorf("SnapshotMinute, this.StoreFlashPoolAllMarket error:", err)
 		}
-
-		err = this.StoreAssetApy()
-		if err != nil {
-			log.Errorf("SnapshotMinute, this.StoreAssetApy error:", err)
-		}
 		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
 }

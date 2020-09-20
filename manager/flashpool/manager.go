@@ -447,7 +447,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 	}
 	for _, address := range allMarkets {
 		assetName := this.cfg.AssetMap[address.ToHexString()]
-		assetApy, err := this.store.LoadAssetApy(assetName)
+		market, err := this.store.LoadFlashMarket(assetName)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadAssetApy error: %s", err)
 		}
@@ -475,9 +475,9 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 			this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["pUSDT"])
 		s = new(big.Int).Add(s, supplyDollar)
 		i = new(big.Int).Add(i, insuranceDollar)
-		supplyApy := utils.ToIntByPrecise(assetApy.SupplyApy, this.cfg.TokenDecimal["flash"])
-		borrowApy := utils.ToIntByPrecise(assetApy.BorrowApy, this.cfg.TokenDecimal["flash"])
-		insuranceApy := utils.ToIntByPrecise(assetApy.InsuranceApy, this.cfg.TokenDecimal["flash"])
+		supplyApy := utils.ToIntByPrecise(market.SupplyApy, this.cfg.TokenDecimal["flash"])
+		borrowApy := utils.ToIntByPrecise(market.BorrowApy, this.cfg.TokenDecimal["flash"])
+		insuranceApy := utils.ToIntByPrecise(market.InsuranceApy, this.cfg.TokenDecimal["flash"])
 		sa := new(big.Int).Mul(supplyDollar, supplyApy)
 		ia := new(big.Int).Mul(insuranceDollar, insuranceApy)
 		ba := new(big.Int).Mul(borrowDollar, borrowApy)
@@ -489,7 +489,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyBalance:    utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[assetName]),
 				Apy:              utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
-				CollateralFactor: assetApy.CollateralFactor,
+				CollateralFactor: market.CollateralFactor,
 				IfCollateral:     userAssetBalance.IfCollateral,
 			}
 			userFlashPoolOverview.CurrentSupply = append(userFlashPoolOverview.CurrentSupply, supply)
@@ -500,7 +500,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
-				CollateralFactor: assetApy.CollateralFactor,
+				CollateralFactor: market.CollateralFactor,
 			}
 			if accountLiquidity.Liquidity.ToBigInt().Uint64() != 0 {
 				borrowLimit := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Sub(accountLiquidity.Liquidity.ToBigInt(),
@@ -517,29 +517,27 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				InsuranceBalance: utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[assetName]),
 				Apy:              utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
-				CollateralFactor: assetApy.CollateralFactor,
+				CollateralFactor: market.CollateralFactor,
 			}
 			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
 		}
 
-		totalBorrowAmount, err := this.getBorrowAmount(address)
-		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getSupplyAmount error: %s", err)
-		}
-		totalInsuranceAmount, err := this.getInsuranceAmount(address)
-		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverviewForStore, this.getInsuranceAmount error: %s", err)
-		}
+		cash := utils.ToIntByPrecise(market.TotalSupply, this.cfg.TokenDecimal[assetName])
+		borrowRatePerBlock := new(big.Int).Div(utils.ToIntByPrecise(market.BorrowApy, this.cfg.TokenDecimal["flash"]),
+			new(big.Int).SetUint64(BlockPerYear))
+		borrowLiquidity := new(big.Int).Mul(cash, new(big.Int).Mul(new(big.Int).Sub(new(big.Int).SetUint64(500),
+			borrowRatePerBlock), new(big.Int).SetUint64(BlockPerYear)))
 		if supplyAmount.Uint64() == 0 && borrowAmount.Uint64() == 0 && insuranceAmount.Uint64() == 0 {
 			userMarket := &common.UserMarket{
-				Name:             this.cfg.AssetMap[address.ToHexString()],
-				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyApy:        utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
-				BorrowApy:        utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
-				BorrowLiquidity:  utils.ToStringByPrecise(totalBorrowAmount, this.cfg.TokenDecimal[assetName]),
+				Name:      this.cfg.AssetMap[address.ToHexString()],
+				Icon:      this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
+				SupplyApy: utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
+				BorrowApy: utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
+				BorrowLiquidity: utils.ToStringByPrecise(borrowLiquidity, this.cfg.TokenDecimal["flash"]+
+					this.cfg.TokenDecimal[assetName]),
 				InsuranceApy:     utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
-				InsuranceAmount:  utils.ToStringByPrecise(totalInsuranceAmount, this.cfg.TokenDecimal[assetName]),
-				CollateralFactor: assetApy.CollateralFactor,
+				InsuranceAmount:  market.TotalInsurance,
+				CollateralFactor: market.CollateralFactor,
 				IfCollateral:     userAssetBalance.IfCollateral,
 			}
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
@@ -596,44 +594,6 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr string) error {
 		err = this.store.SaveUserAssetBalance(userBalance)
 		if err != nil {
 			return fmt.Errorf("UserBalanceForStore, this.store.SaveUserAssetBalance error: %s", err)
-		}
-	}
-	return nil
-}
-
-func (this *FlashPoolManager) AssetApyForStore() error {
-	allMarkets, err := this.GetAllMarkets()
-	if err != nil {
-		return fmt.Errorf("AssetApyForStore, this.GetAllMarkets error: %s", err)
-	}
-	for _, address := range allMarkets {
-		name := this.cfg.AssetMap[address.ToHexString()]
-		marketMeta, err := this.getMarketMeta(address)
-		if err != nil {
-			return fmt.Errorf("AssetApyForStore, this.getMarketMeta error: %s", err)
-		}
-		supplyApy, err := this.getSupplyApy(address)
-		if err != nil {
-			return fmt.Errorf("AssetApyForStore, this.getSupplyApy error: %s", err)
-		}
-		borrowApy, err := this.getBorrowApy(address)
-		if err != nil {
-			return fmt.Errorf("AssetApyForStore, this.getBorrowApy error: %s", err)
-		}
-		insuranceApy, err := this.getInsuranceApy(address)
-		if err != nil {
-			return fmt.Errorf("AssetApyForStore, this.getInsuranceApy error: %s", err)
-		}
-		assetApy := &store.AssetApy{
-			AssetName:        name,
-			SupplyApy:        utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
-			BorrowApy:        utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
-			InsuranceApy:     utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
-			CollateralFactor: utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"]),
-		}
-		err = this.store.SaveAssetApy(assetApy)
-		if err != nil {
-			return fmt.Errorf("AssetApyForStore, this.store.SaveAssetApy error: %s", err)
 		}
 	}
 	return nil

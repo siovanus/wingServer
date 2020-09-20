@@ -43,14 +43,6 @@ type UserAssetBalance struct {
 	IfCollateral     bool
 }
 
-type AssetApy struct {
-	AssetName        string `gorm:"primary_key"`
-	SupplyApy        string
-	BorrowApy        string
-	InsuranceApy     string
-	CollateralFactor string
-}
-
 // Migrate runs the initial migration
 func Migrate(tx *gorm.DB) error {
 	err := tx.AutoMigrate(&FlashPoolDetail{}).Error
@@ -80,12 +72,7 @@ func Migrate(tx *gorm.DB) error {
 
 	err = tx.AutoMigrate(common.Market{}).Error
 	if err != nil {
-		return errors.Wrap(err, "failed to auto migrate UserFlashPoolOverview")
-	}
-
-	err = tx.AutoMigrate(AssetApy{}).Error
-	if err != nil {
-		return errors.Wrap(err, "failed to auto migrate AssetApy")
+		return errors.Wrap(err, "failed to auto migrate Market")
 	}
 
 	return nil

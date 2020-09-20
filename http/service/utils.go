@@ -102,15 +102,6 @@ func (this *Service) StoreFlashPoolAllMarket() error {
 	return nil
 }
 
-func (this *Service) StoreAssetApy() error {
-	err := this.fpMgr.AssetApyForStore()
-	if err != nil {
-		log.Errorf("StoreAssetApy, this.fpMgr.AssetApyForStore error: %s", err)
-		return err
-	}
-	return nil
-}
-
 func listContains(list []string, arg string) bool {
 	for _, v := range list {
 		if arg == v {
