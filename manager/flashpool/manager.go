@@ -68,7 +68,7 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 	for _, address := range allMarkets {
 		market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolDetail, this.store.LoadFlashMarket error: %s", err)
+			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.store.LoadFlashMarket error: %s", err)
 		}
 		supplyAmount := market.TotalSupplyDollar
 		borrowAmount := market.TotalBorrowDollar
@@ -525,22 +525,15 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 			userFlashPoolOverview.CurrentInsurance = append(userFlashPoolOverview.CurrentInsurance, insurance)
 		}
 
-		//TODO
-		cash := utils.ToIntByPrecise(market.TotalSupplyAmount, this.cfg.TokenDecimal[assetName])
-		borrowRatePerBlock, err := this.getBorrowRatePerBlock(address)
-		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverview, this.getBorrowRatePerBlock error: %s", err)
-		}
-		borrowLiquidity := new(big.Int).Mul(cash, new(big.Int).Mul(new(big.Int).Sub(new(big.Int).SetUint64(500),
-			borrowRatePerBlock), new(big.Int).SetUint64(BlockPerYear)))
 		if supplyAmount.Uint64() == 0 && borrowAmount.Uint64() == 0 && insuranceAmount.Uint64() == 0 {
 			userMarket := &common.UserMarket{
 				Name:      this.cfg.AssetMap[address.ToHexString()],
 				Icon:      this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				SupplyApy: utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
 				BorrowApy: utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
-				BorrowLiquidity: utils.ToStringByPrecise(borrowLiquidity, this.cfg.TokenDecimal["flash"]+
-					this.cfg.TokenDecimal[assetName]),
+				BorrowLiquidity: utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(market.TotalSupplyAmount,
+					this.cfg.TokenDecimal[assetName]), utils.ToIntByPrecise(market.TotalBorrowAmount,
+					this.cfg.TokenDecimal[assetName])), this.cfg.TokenDecimal[assetName]),
 				InsuranceApy:     utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
 				InsuranceAmount:  market.TotalInsuranceAmount,
 				CollateralFactor: market.CollateralFactor,
@@ -549,7 +542,7 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 			userFlashPoolOverview.AllMarket = append(userFlashPoolOverview.AllMarket, userMarket)
 		}
 	}
-	total := new(big.Int).Add(new(big.Int).Add(s, b), i)
+	total := new(big.Int).Add(s, i)
 	if total.Uint64() != 0 {
 		userFlashPoolOverview.NetApy = utils.ToStringByPrecise(new(big.Int).Div(netApy, total), this.cfg.TokenDecimal["flash"])
 	}

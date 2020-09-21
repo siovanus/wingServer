@@ -140,19 +140,37 @@ func (this *FlashPoolManager) getInsuranceAmountByAccount(contractAddress, accou
 }
 
 func (this *FlashPoolManager) getSupplyAmount(contractAddress common.Address) (*big.Int, error) {
+	totalCash, err := this.getCash(contractAddress)
+	if err != nil {
+		return nil, fmt.Errorf("getSupplyAmount, this.getCash error: %s", err)
+	}
+	totalBorrows, err := this.getBorrowAmount(contractAddress)
+	if err != nil {
+		return nil, fmt.Errorf("getSupplyAmount, this.getBorrowAmount error: %s", err)
+	}
+	totalReserves, err := this.getTotalReserves(contractAddress)
+	if err != nil {
+		return nil, fmt.Errorf("getSupplyAmount, this.getBorrowAmount error: %s", err)
+	}
+	amount := new(big.Int).Sub(new(big.Int).Add(totalCash, totalBorrows), totalReserves)
+
+	return amount, nil
+}
+
+func (this *FlashPoolManager) getCash(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"getCash", []interface{}{})
 	if err != nil {
-		return nil, fmt.Errorf("getSupplyAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("getCash, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
 	if err != nil {
-		return nil, fmt.Errorf("getSupplyAmount, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("getCash, preExecResult.Result.ToByteArray error: %s", err)
 	}
 	source := common.NewZeroCopySource(r)
 	amount, eof := source.NextI128()
 	if eof {
-		return nil, fmt.Errorf("getSupplyAmount, source.NextI128 error")
+		return nil, fmt.Errorf("getCash, source.NextI128 error")
 	}
 	return amount.ToBigInt(), nil
 }
@@ -171,6 +189,24 @@ func (this *FlashPoolManager) getBorrowAmount(contractAddress common.Address) (*
 	amount, eof := source.NextI128()
 	if eof {
 		return nil, fmt.Errorf("getBorrowAmount, source.NextI128 error")
+	}
+	return amount.ToBigInt(), nil
+}
+
+func (this *FlashPoolManager) getTotalReserves(contractAddress common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"totalReserves", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getTotalReserves, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getTotalReserves, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	amount, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getTotalReserves, source.NextI128 error")
 	}
 	return amount.ToBigInt(), nil
 }
