@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/http/restful"
 	"github.com/siovanus/wingServer/log"
@@ -150,7 +151,7 @@ func (this *Service) AssetPriceList(param map[string]interface{}) map[string]int
 		}
 		if !suc {
 			resp.Error = restful.INTERNAL_ERROR
-			resp.Desc = err.Error()
+			resp.Desc = fmt.Errorf("AssetPriceList get asset price %s error", asset).Error()
 			log.Errorf("AssetPriceList get asset price %s error", asset)
 		} else {
 			resp.Error = restful.SUCCESS

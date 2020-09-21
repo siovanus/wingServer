@@ -669,11 +669,15 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 				return nil, fmt.Errorf("UserFlashPoolOverview, this.getAccountLiquidity error: %s", err)
 			}
 			liquidity := new(big.Int).Sub(accountLiquidity.Liquidity.ToBigInt(), accountLiquidity.Shortfall.ToBigInt())
-			liquidation.BorrowLimitUsed = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalBorrowDollar,
-				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))),
-				new(big.Int).Add(utils.ToIntByPrecise(utils.ToStringByPrecise(liquidity, this.cfg.TokenDecimal["oracle"]),
-					this.cfg.TokenDecimal["pETH"]+this.cfg.TokenDecimal["oracle"]), totalBorrowDollar)),
-				this.cfg.TokenDecimal["percentage"])
+			limit := new(big.Int).Add(utils.ToIntByPrecise(utils.ToStringByPrecise(liquidity, this.cfg.TokenDecimal["oracle"]),
+				this.cfg.TokenDecimal["pETH"]+this.cfg.TokenDecimal["oracle"]), totalBorrowDollar)
+			if limit.Uint64() != 0 {
+				liquidation.BorrowLimitUsed = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalBorrowDollar,
+					new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), limit),
+					this.cfg.TokenDecimal["percentage"])
+			} else {
+				liquidation.BorrowLimitUsed = "10"
+			}
 			liquidation.CollateralDollar = utils.ToStringByPrecise(totalCollateralDollar, this.cfg.TokenDecimal["pETH"]+this.cfg.TokenDecimal["oracle"])
 			liquidationList = append(liquidationList, liquidation)
 		}
