@@ -3,6 +3,8 @@ package governance
 import (
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/utils"
+	"math/big"
 	"time"
 )
 
@@ -53,8 +55,13 @@ func (this *GovernanceManager) Wing() (*common.Wing, error) {
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index]
 
+	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total*100), 2))
+	t, _ := total.Float64()
+	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Circulating*100), 2))
+	c, _ := circulating.Float64()
+
 	return &common.Wing{
-		Total:       float64(distributed)/100 +Total,
-		Circulating: float64(distributed)/100 +Circulating,
+		Total:       t,
+		Circulating: c,
 	}, nil
 }
