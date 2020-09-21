@@ -20,19 +20,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/siovanus/wingServer/store"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
 
-	sdk "github.com/ontio/ontology-go-sdk"
-	"github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/restful"
 	"github.com/siovanus/wingServer/http/service"
 	"github.com/siovanus/wingServer/log"
-	"github.com/siovanus/wingServer/manager/flashpool"
 	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/urfave/cli"
 )
@@ -76,49 +72,15 @@ func startServer(ctx *cli.Context) {
 		return
 	}
 
-	store, err := store.ConnectToDb(servConfig.DatabaseURL)
-	if err != nil {
-		log.Errorf("store.ConnectToDb error: %s", err)
-		return
-	}
-	defer store.Close()
-
-	sdk := sdk.NewOntologySdk()
-	sdk.NewRpcClient().SetAddress(servConfig.JsonRpcAddress)
-
-	govAddress, err := common.AddressFromHexString(servConfig.GovernanceAddress)
-	if err != nil {
-		log.Errorf("govAddress common.AddressFromHexString error: %s", err)
-		return
-	}
-	fpAddress, err := common.AddressFromHexString(servConfig.FlashPoolAddress)
-	if err != nil {
-		log.Errorf("fpAddress common.AddressFromHexString error: %s", err)
-		return
-	}
-	oracleAddress, err := common.AddressFromHexString(servConfig.OracleAddress)
-	if err != nil {
-		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
-		return
-	}
-	govMgr := governance.NewGovernanceManager(govAddress, servConfig.WingAddress, sdk, servConfig)
+	govMgr := governance.NewGovernanceManager(servConfig)
 	if govMgr == nil {
 		log.Errorf("governance manager is nil")
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk, store, servConfig)
-	if fpMgr == nil {
-		log.Errorf("flashpool manager is nil")
-		return
-	}
 	log.Infof("init svr success")
-	serv := service.NewService(sdk, govMgr, fpMgr, store, servConfig)
-	serv.AddListeningAddressList()
+	serv := service.NewService(govMgr, servConfig)
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 
-	go serv.SnapshotDaily()
-	go serv.SnapshotMinute()
-	go serv.TrackEvent()
 	go restServer.Start()
 	go checkLogFile(logLevel)
 

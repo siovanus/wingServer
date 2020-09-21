@@ -20,7 +20,7 @@ type ApiServer interface {
 	Stop()
 }
 
-type handler func(map[string]interface{}) map[string]interface{}
+type handler func(map[string]interface{}) interface{}
 
 type Action struct {
 	sync.RWMutex
@@ -54,26 +54,10 @@ func InitRestServer(web Web, port uint64) ApiServer {
 
 //resigtry handler method
 func (this *restServer) registryRestServerAction(web Web) {
-
-	postMethodMap := map[string]Action{
-		common.USERFLASHPOOLOVERVIEW: {name: common.ACTION_USERFLASHPOOLOVERVIEW, handler: web.UserFlashPoolOverview},
-		common.ASSETPRICE:            {name: common.ACTION_ASSETPRICE, handler: web.AssetPrice},
-		common.ASSETPRICELIST:        {name: common.ACTION_ASSETPRICELIST, handler: web.AssetPriceList},
-		common.CLAIMWING:             {name: common.ACTION_CLAIMWING, handler: web.ClaimWing},
-		common.LIQUIDATIONLIST:       {name: common.ACTION_LIQUIDATIONLIST, handler: web.LiquidationList},
-	}
 	getMethodMap := map[string]Action{
-		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},
-		common.POOLDISTRIBUTION:            {name: common.ACTION_POOLDISTRIBUTION, handler: web.PoolDistribution},
-		common.GOVBANNEROVERVIEW:           {name: common.ACTION_GOVBANNEROVERVIEW, handler: web.GovBannerOverview},
-		common.GOVBANNER:                   {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
-		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
-		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
-		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
-		common.BORROWADDRESSLIST:           {name: common.ACTION_BORROWADDRESSLIST, handler: web.BorrowAddressList},
-		common.WINGAPYS:                    {name: common.ACTION_WINGAPYS, handler: web.WingApys},
+		common.CIRCULATINGSUPPLY: {name: common.ACTION_CIRCULATINGSUPPLY, handler: web.CirculatingSupply},
+		common.TOTALSUPPLY:       {name: common.ACTION_TOTALSUPPLY, handler: web.TotalSupply},
 	}
-	this.postMap = postMethodMap
 	this.getMap = getMethodMap
 }
 
@@ -120,15 +104,13 @@ func (this *restServer) getUrlParams(r *http.Request) map[string]interface{} {
 func (this *restServer) initGetHandler() {
 	for k := range this.getMap {
 		this.router.Get(k, func(w http.ResponseWriter, r *http.Request) {
-			var resp map[string]interface{}
+			var resp interface{}
 			url := this.getPath(r.URL.Path)
 			if h, ok := this.getMap[url]; ok {
 				req := this.getUrlParams(r)
 				resp = h.handler(req)
-				resp["action"] = h.name
 			} else {
 				resp = PackResponse(INVALID_METHOD)
-				resp["action"] = h.name
 			}
 			this.response(w, resp)
 		})
@@ -144,7 +126,7 @@ func (this *restServer) initPostHandler() {
 			defer r.Body.Close()
 
 			var req = make(map[string]interface{})
-			var resp map[string]interface{}
+			var resp interface{}
 
 			url := this.getPath(r.URL.Path)
 			if h, ok := this.postMap[url]; ok {
@@ -154,10 +136,8 @@ func (this *restServer) initPostHandler() {
 					log.Error("unmarshal body error:", err)
 					resp = PackResponse(ILLEGAL_DATAFORMAT)
 				}
-				resp["action"] = h.name
 			} else {
 				resp = PackResponse(INVALID_METHOD)
-				resp["action"] = h.name
 			}
 			this.response(w, resp)
 		})
@@ -178,8 +158,7 @@ func (this *restServer) write(w http.ResponseWriter, data []byte) {
 }
 
 //response
-func (this *restServer) response(w http.ResponseWriter, resp map[string]interface{}) {
-	resp["desc"] = ErrMap[resp["error"].(uint32)]
+func (this *restServer) response(w http.ResponseWriter, resp interface{}) {
 	data, err := json.Marshal(resp)
 	if err != nil {
 		log.Fatalf("HTTP Handle - json.Marshal: %v", err)
