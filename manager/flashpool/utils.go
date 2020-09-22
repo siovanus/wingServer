@@ -567,3 +567,24 @@ func (this *FlashPoolManager) getWingSBIPortion(contractAddress common.Address) 
 	}
 	return wingSBIPortion, nil
 }
+
+func (this *FlashPoolManager) getClaimWingAtMarket(account common.Address, contractAddresses []interface{}) (*big.Int, error) {
+	method := "claimWingAtMarkets"
+	params := []interface{}{account, contractAddresses}
+	res, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(this.contractAddress, method, params)
+	if err != nil {
+		return nil, fmt.Errorf("getClaimWingAtMarket, this.sdk.WasmVM.PreExecInvokeWasmVMContract: %s", err)
+	}
+	data, err := res.Result.ToByteArray()
+	if err != nil {
+		err = fmt.Errorf("getClaimWingAtMarket error: %s", err)
+		return nil, err
+	}
+	source := common.NewZeroCopySource(data)
+	r, eof := source.NextI128()
+	if eof {
+		err = fmt.Errorf("getClaimWingAtMarket: read eof")
+		return nil, err
+	}
+	return r.ToBigInt(), nil
+}

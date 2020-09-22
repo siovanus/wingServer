@@ -138,6 +138,7 @@ type Supply struct {
 	SupplyDistribution    string
 	BorrowDistribution    string
 	InsuranceDistribution string
+	WingEarned            string
 	IfCollateral          bool
 }
 
@@ -151,6 +152,7 @@ type Borrow struct {
 	SupplyDistribution    string
 	BorrowDistribution    string
 	InsuranceDistribution string
+	WingEarned            string
 }
 
 type Insurance struct {
@@ -162,6 +164,7 @@ type Insurance struct {
 	SupplyDistribution    string
 	BorrowDistribution    string
 	InsuranceDistribution string
+	WingEarned            string
 }
 
 type UserMarket struct {
