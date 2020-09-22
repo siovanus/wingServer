@@ -488,7 +488,8 @@ func (this *FlashPoolManager) UserFlashPoolOverview(accountStr string) (*common.
 
 		claimWingAtMarket, err := this.getClaimWingAtMarket(account, []interface{}{address})
 		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverview, this.getClaimWingAtMarket error: %s", err)
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.getClaimWingAtMarket account %s asset %s error: %s",
+				account.ToBase58(), address.ToHexString(), err)
 		}
 
 		if supplyAmount.Uint64() != 0 {
