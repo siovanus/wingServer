@@ -153,8 +153,8 @@ func (client Client) SaveTrackHeight(height uint32) error {
 
 type UserAssetBalance struct {
 	UserAddress      string `gorm:"primary_key"`
-	AssetAddress     string `gorm:"primary_key"`
-	AssetName        string
+	AssetName        string `gorm:"primary_key"`
+	AssetAddress     string
 	Icon             string
 	SupplyBalance    string
 	BorrowBalance    string
