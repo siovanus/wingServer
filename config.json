@@ -1,18 +1,18 @@
 {
-  "json_rpc_address": "http://polaris4.ont.io:20336",
+  "json_rpc_address": "http://dappnode2.ont.io:20336",
   "port": 10337,
-  "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
-  "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
-  "flash_pool_address": "ea7660cb741caf5e311dfce1e57aa849c4b03069",
-  "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
+  "governance_address": "6b9271d8d853ae7a50a03c33a21ef2ce6761a3d8",
+  "wing_address": "00c59fcd27a562d6397883eab1f2fff56e58ef80",
+  "flash_pool_address": "a7af1dfc7539db719fc2215577c6c33474016820",
+  "oracle_address": "653e46a76ffdd3639364ff0d0a7d63cb327d65a8",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "9dadeceb5a70726bebec31b0593dcf14defaeb32": "pWBTC",
-    "04e3136e8a985406c5941908b0c8b6be287b0000": "prenBTC",
-    "895037cc90b71136adf48b591012e19ce2d79708": "pUSDC",
-    "7e4e37b2b15e4f3122bffdead73cc93c4b5382f8": "ONTd",
-    "870b5fc680b72af1d89f97f5d567f55fa5fd8275": "WING",
-    "e499645fbf9e6bb12d51fbbf8ed785c9d2dd27bb": "pETH"
+    "5018fbd6733cbbc3125f9f8afd967329bcf2d912": "pWBTC",
+    "8ae74af15b0c168c736f9955816232e2cfdcad1d": "prenBTC",
+    "00d98332521788a152131010a50765dc1c78b2a6": "pUSDC",
+    "0567fd3619bb0a3d35f13ca9bf25dedc70dabc0a": "ONTd",
+    "9800ab054db022fd1557d5bb7b3230127bb4c0e8": "WING",
+    "d7a41d8f2ae1d751cb923288aafd010983271c24": "pETH"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -25,12 +25,12 @@
     "pUSDT": "https://app.ont.io/wing/pusdt.svg"
   },
   "oracle_map": {
-    "9dadeceb5a70726bebec31b0593dcf14defaeb32": "WBTC",
-    "04e3136e8a985406c5941908b0c8b6be287b0000": "renBTC",
-    "895037cc90b71136adf48b591012e19ce2d79708": "USDT",
-    "7e4e37b2b15e4f3122bffdead73cc93c4b5382f8": "ONTd",
-    "870b5fc680b72af1d89f97f5d567f55fa5fd8275": "WING",
-    "e499645fbf9e6bb12d51fbbf8ed785c9d2dd27bb": "ETH"
+    "5018fbd6733cbbc3125f9f8afd967329bcf2d912": "WBTC",
+    "8ae74af15b0c168c736f9955816232e2cfdcad1d": "renBTC",
+    "00d98332521788a152131010a50765dc1c78b2a6": "USDC",
+    "0567fd3619bb0a3d35f13ca9bf25dedc70dabc0a": "ONTd",
+    "9800ab054db022fd1557d5bb7b3230127bb4c0e8": "WING",
+    "d7a41d8f2ae1d751cb923288aafd010983271c24": "ETH"
   },
   "token_decimal":{
     "percentage": 4,
