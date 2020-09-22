@@ -3,16 +3,16 @@
   "port": 10337,
   "governance_address": "6b9271d8d853ae7a50a03c33a21ef2ce6761a3d8",
   "wing_address": "00c59fcd27a562d6397883eab1f2fff56e58ef80",
-  "flash_pool_address": "a7af1dfc7539db719fc2215577c6c33474016820",
+  "flash_pool_address": "f36e4560ec088c860b7c8c9bdbeff6322e1c6580",
   "oracle_address": "653e46a76ffdd3639364ff0d0a7d63cb327d65a8",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
-    "5018fbd6733cbbc3125f9f8afd967329bcf2d912": "pWBTC",
-    "8ae74af15b0c168c736f9955816232e2cfdcad1d": "prenBTC",
-    "00d98332521788a152131010a50765dc1c78b2a6": "pUSDC",
-    "0567fd3619bb0a3d35f13ca9bf25dedc70dabc0a": "ONTd",
-    "9800ab054db022fd1557d5bb7b3230127bb4c0e8": "WING",
-    "d7a41d8f2ae1d751cb923288aafd010983271c24": "pETH"
+    "426106a4243c1dc17ce497b84c840765157b2e38": "pWBTC",
+    "15e84e180a6f6c2de306e6b3f2ed1c681a78dbe4": "prenBTC",
+    "a9627f953c1765baa61673bf22e3038b62ed66b0": "pUSDC",
+    "6043e531c3016400b87e8dd4ca8f07f1a8bbb58a": "ONTd",
+    "a93a4379a47e7ebd98793a3afffb31d8855a3dc1": "WING",
+    "aba1e3f68fe45260a98bb707144d391a1f81d323": "pETH"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -25,15 +25,15 @@
     "pUSDT": "https://app.ont.io/wing/pusdt.svg"
   },
   "oracle_map": {
-    "5018fbd6733cbbc3125f9f8afd967329bcf2d912": "WBTC",
-    "8ae74af15b0c168c736f9955816232e2cfdcad1d": "renBTC",
-    "00d98332521788a152131010a50765dc1c78b2a6": "USDC",
-    "0567fd3619bb0a3d35f13ca9bf25dedc70dabc0a": "ONTd",
-    "9800ab054db022fd1557d5bb7b3230127bb4c0e8": "WING",
-    "d7a41d8f2ae1d751cb923288aafd010983271c24": "ETH"
+    "426106a4243c1dc17ce497b84c840765157b2e38": "WBTC",
+    "15e84e180a6f6c2de306e6b3f2ed1c681a78dbe4": "renBTC",
+    "a9627f953c1765baa61673bf22e3038b62ed66b0": "USDC",
+    "6043e531c3016400b87e8dd4ca8f07f1a8bbb58a": "ONTd",
+    "a93a4379a47e7ebd98793a3afffb31d8855a3dc1": "WING",
+    "aba1e3f68fe45260a98bb707144d391a1f81d323": "ETH"
   },
   "token_decimal":{
-    "percentage": 4,
+    "percentage": 12,
     "ONTd": 9,
     "pUSDC": 6,
     "pUSDT": 6,
@@ -45,5 +45,5 @@
     "flash": 9
   },
   "scan_interval": 2,
-  "snapshot_interval": 60
+  "snapshot_interval": 30
 }
