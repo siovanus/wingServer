@@ -249,7 +249,11 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 	if eof {
 		return nil, fmt.Errorf("getTotalDistribution, source.NextI128 error")
 	}
-	return amount.ToBigInt(), nil
+	if this.cfg.AssetMap[assetAddress.ToHexString()] == "pWBTC" {
+		return new(big.Int).Sub(amount.ToBigInt(), GAP), nil
+	} else {
+		return amount.ToBigInt(), nil
+	}
 }
 
 func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big.Int, error) {
