@@ -1,10 +1,10 @@
 {
-  "json_rpc_address": "http://dappnode2.ont.io:20336",
+  "json_rpc_address": "http://polaris2.ont.io:20336",
   "port": 10337,
-  "governance_address": "6b9271d8d853ae7a50a03c33a21ef2ce6761a3d8",
-  "wing_address": "00c59fcd27a562d6397883eab1f2fff56e58ef80",
+  "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
+  "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "f36e4560ec088c860b7c8c9bdbeff6322e1c6580",
-  "oracle_address": "653e46a76ffdd3639364ff0d0a7d63cb327d65a8",
+  "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
     "426106a4243c1dc17ce497b84c840765157b2e38": "pWBTC",
@@ -12,7 +12,11 @@
     "a9627f953c1765baa61673bf22e3038b62ed66b0": "pUSDC",
     "6043e531c3016400b87e8dd4ca8f07f1a8bbb58a": "ONTd",
     "a93a4379a47e7ebd98793a3afffb31d8855a3dc1": "WING",
-    "aba1e3f68fe45260a98bb707144d391a1f81d323": "pETH"
+    "aba1e3f68fe45260a98bb707144d391a1f81d323": "pETH",
+    "321e884a5038af74952c828c01beb9d0a7f48027": "pDAI",
+    "fefc05dff53c0e8056a0ffbbba6d567fe3e6b783": "pUSDT",
+    "bfab93b994f4d233f57ad54954b83d031a62fbc0": "pSUSD"
+
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -22,7 +26,9 @@
     "WING": "https://app.ont.io/wing/wing_icon.svg",
     "Flash": "https://app.ont.io/wing/flash_icon.svg",
     "pETH": "https://app.ont.io/wing/peth.svg",
-    "pUSDT": "https://app.ont.io/wing/pusdt.svg"
+    "pUSDT": "https://app.ont.io/wing/pusdt.svg",
+    "pDAI": "https://app.ont.io/wing/oDAI.svg",
+    "pSUSD": "https://app.ont.io/wing/psusd.svg"
   },
   "oracle_map": {
     "426106a4243c1dc17ce497b84c840765157b2e38": "WBTC",
@@ -30,7 +36,10 @@
     "a9627f953c1765baa61673bf22e3038b62ed66b0": "USDC",
     "6043e531c3016400b87e8dd4ca8f07f1a8bbb58a": "ONTd",
     "a93a4379a47e7ebd98793a3afffb31d8855a3dc1": "WING",
-    "aba1e3f68fe45260a98bb707144d391a1f81d323": "ETH"
+    "aba1e3f68fe45260a98bb707144d391a1f81d323": "ETH",
+    "321e884a5038af74952c828c01beb9d0a7f48027": "DAI",
+    "fefc05dff53c0e8056a0ffbbba6d567fe3e6b783": "USDT",
+    "bfab93b994f4d233f57ad54954b83d031a62fbc0": "SUSD"
   },
   "token_decimal":{
     "percentage": 12,
@@ -42,7 +51,10 @@
     "WING": 9,
     "pETH": 18,
     "oracle": 12,
-    "flash": 9
+    "flash": 9,
+    "pDAI": 18,
+    "pSUSD": 6,
+    "pUSDT": 6
   },
   "scan_interval": 2,
   "snapshot_interval": 30
