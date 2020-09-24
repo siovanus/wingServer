@@ -148,11 +148,7 @@ func (this *FlashPoolManager) getSupplyAmount(contractAddress common.Address) (*
 	if err != nil {
 		return nil, fmt.Errorf("getSupplyAmount, this.getBorrowAmount error: %s", err)
 	}
-	totalReserves, err := this.getTotalReserves(contractAddress)
-	if err != nil {
-		return nil, fmt.Errorf("getSupplyAmount, this.getBorrowAmount error: %s", err)
-	}
-	amount := new(big.Int).Sub(new(big.Int).Add(totalCash, totalBorrows), totalReserves)
+	amount := new(big.Int).Add(totalCash, totalBorrows)
 
 	return amount, nil
 }
