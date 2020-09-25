@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	BlockPerYear = 60 * 60 * 24 * 365 * 2 / 3
+	BlockPerYear = 60 * 60 * 24 * 365 * 2 / 5
 )
 
 var GAP = new(big.Int).SetUint64(133119809809839 + 4372988350976 + 5076507782025)
