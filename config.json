@@ -1,10 +1,10 @@
 {
   "json_rpc_address": "http://polaris2.ont.io:20336",
   "port": 10337,
-  "governance_address": "6b9271d8d853ae7a50a03c33a21ef2ce6761a3d8",
-  "wing_address": "00c59fcd27a562d6397883eab1f2fff56e58ef80",
+  "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
+  "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "03d3d6e5fc1aa8fc2dac4a2d78ad96126cbf84c4",
-  "oracle_address": "653e46a76ffdd3639364ff0d0a7d63cb327d65a8",
+  "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@localhost:5432/wing?sslmode=disable",
   "asset_map": {
     "f2a0a4ea9a6c6ba6e23be0f58c75a5e984f9a712": "pWBTC",
@@ -14,8 +14,11 @@
     "c2edda6cde43dd4e00d3e5053306f8fb4ee52ce3": "WING",
     "2a8f0267c38eecffd1c0823fae777e0237265ee9": "pETH",
     "803a0fed1fe42befc30f3ffca46923fafd276f0d": "pDAI",
-    "771e4d3a9ca2d1135a88ee3f37fe65e602e72f45": "pUSDT"
-
+    "771e4d3a9ca2d1135a88ee3f37fe65e602e72f45": "pUSDT",
+    "5daf48bd1aac8bc24e2b98ba426578e76f9abfcc": "pSUSD",
+    "d74c24121a2fab40dfb50369a3f0c933965a2a14": "pNEO",
+    "13d95823da086c1bc6e5dd365a3f459c421eda77": "pOKB",
+    "c1faf0767fadeea5720ca743ab80113a3355e69c": "pUNI"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -27,7 +30,10 @@
     "pETH": "https://app.ont.io/wing/peth.svg",
     "pUSDT": "https://app.ont.io/wing/pusdt.svg",
     "pDAI": "https://app.ont.io/wing/oDAI.svg",
-    "pSUSD": "https://app.ont.io/wing/psusd.svg"
+    "pSUSD": "https://app.ont.io/wing/psusd.svg",
+    "pNEO": "https://app.ont.io/wing/neo-ont.svg",
+    "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
+    "pUNI": "https://app.ont.io/wing/UNI-ONT.svg"
   },
   "oracle_map": {
     "f2a0a4ea9a6c6ba6e23be0f58c75a5e984f9a712": "WBTC",
@@ -37,7 +43,11 @@
     "c2edda6cde43dd4e00d3e5053306f8fb4ee52ce3": "WING",
     "2a8f0267c38eecffd1c0823fae777e0237265ee9": "ETH",
     "803a0fed1fe42befc30f3ffca46923fafd276f0d": "DAI",
-    "771e4d3a9ca2d1135a88ee3f37fe65e602e72f45": "USDT"
+    "771e4d3a9ca2d1135a88ee3f37fe65e602e72f45": "USDT",
+    "5daf48bd1aac8bc24e2b98ba426578e76f9abfcc": "SUSD",
+    "d74c24121a2fab40dfb50369a3f0c933965a2a14": "NEO",
+    "13d95823da086c1bc6e5dd365a3f459c421eda77": "OKB",
+    "c1faf0767fadeea5720ca743ab80113a3355e69c": "UNI"
   },
   "token_decimal":{
     "percentage": 4,
@@ -51,7 +61,11 @@
     "oracle": 12,
     "flash": 9,
     "pDAI": 18,
-    "pSUSD": 6
+    "pSUSD": 18,
+    "pUSDT": 6,
+    "pNEO": 8,
+    "pOKB": 18,
+    "pUNI": 18
   },
   "scan_interval": 2,
   "snapshot_interval": 30
