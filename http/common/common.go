@@ -5,6 +5,7 @@ const (
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
 	GOVBANNEROVERVIEW           = "/api/v1/govbanneroverview"
 	GOVBANNER                   = "/api/v1/govbanner"
+	TOTALRESERVE                = "/api/v1/totalreserve"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
 	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
@@ -25,6 +26,7 @@ const (
 	ACTION_POOLDISTRIBUTION            = "pooldistribution"
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
+	ACTION_TOTALRESERVE                = "totalreserve"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"

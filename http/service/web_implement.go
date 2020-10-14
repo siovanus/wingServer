@@ -382,3 +382,25 @@ func (this *Service) WingApys(param map[string]interface{}) map[string]interface
 	}
 	return m
 }
+
+func (this *Service) TotalReserve(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	totalReserve, err := this.fpMgr.TotalReserve()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("TotalReserve error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = totalReserve
+		log.Infof("TotalReserve success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("TotalReserve: failed, err: %s", err)
+	} else {
+		log.Debug("TotalReserve: resp success")
+	}
+	return m
+}
