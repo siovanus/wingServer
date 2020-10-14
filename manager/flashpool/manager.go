@@ -810,3 +810,27 @@ func (this *FlashPoolManager) WingApys() ([]common.WingApy, error) {
 	}
 	return wingApys, nil
 }
+
+func (this *FlashPoolManager) TotalReserve() (string, error) {
+	allMarkets, err := this.GetAllMarkets()
+	if err != nil {
+		return "", fmt.Errorf("TotalReserve, this.GetAllMarkets error: %s", err)
+	}
+	totalReserve := new(big.Int)
+	for _, address := range allMarkets {
+		name := this.cfg.AssetMap[address.ToHexString()]
+		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
+		if err != nil {
+			return "", fmt.Errorf("LiquidationList, this.AssetStoredPrice error: %s", err)
+		}
+		reserveBalance, err := this.getTotalReserves(address)
+		if err != nil {
+			return "", fmt.Errorf("TotalReserve, this.getTotalReserves error: %s", err)
+		}
+
+		delta := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(price, reserveBalance),
+			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"]), this.cfg.TokenDecimal["pUSDT"])
+		totalReserve = new(big.Int).Add(totalReserve, delta)
+	}
+	return utils.ToStringByPrecise(totalReserve, this.cfg.TokenDecimal["pUSDT"]), nil
+}
