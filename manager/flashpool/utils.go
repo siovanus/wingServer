@@ -326,29 +326,29 @@ func (this *FlashPoolManager) GetInsuranceAddress(contractAddress common.Address
 	return insuranceAddress, nil
 }
 
-func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (*big.Int, error) {
-	insuranceAddress, err := this.GetInsuranceAddress(contractAddress)
-	if err != nil {
-		return nil, fmt.Errorf("getInsuranceApy, this.getInsuranceAddress error: %s", err)
-	}
-
-	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
-		"supplyRatePerBlock", []interface{}{})
-	if err != nil {
-		return nil, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
-	}
-	r, err := preExecResult.Result.ToByteArray()
-	if err != nil {
-		return nil, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
-	}
-	source := common.NewZeroCopySource(r)
-	ratePerBlock, eof := source.NextI128()
-	if eof {
-		return nil, fmt.Errorf("getInsuranceApy, source.NextI128 error")
-	}
-	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear))
-	return result, nil
-}
+//func (this *FlashPoolManager) getInsuranceApy(contractAddress common.Address) (*big.Int, error) {
+//	insuranceAddress, err := this.GetInsuranceAddress(contractAddress)
+//	if err != nil {
+//		return nil, fmt.Errorf("getInsuranceApy, this.getInsuranceAddress error: %s", err)
+//	}
+//
+//	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
+//		"supplyRatePerBlock", []interface{}{})
+//	if err != nil {
+//		return nil, fmt.Errorf("getInsuranceApy, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+//	}
+//	r, err := preExecResult.Result.ToByteArray()
+//	if err != nil {
+//		return nil, fmt.Errorf("getInsuranceApy, preExecResult.Result.ToByteArray error: %s", err)
+//	}
+//	source := common.NewZeroCopySource(r)
+//	ratePerBlock, eof := source.NextI128()
+//	if eof {
+//		return nil, fmt.Errorf("getInsuranceApy, source.NextI128 error")
+//	}
+//	result := new(big.Int).Mul(ratePerBlock.ToBigInt(), new(big.Int).SetUint64(BlockPerYear))
+//	return result, nil
+//}
 
 type MarketMeta struct {
 	Addr          common.Address
