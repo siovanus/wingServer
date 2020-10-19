@@ -252,6 +252,24 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 	}
 }
 
+func (this *FlashPoolManager) getReserveFactor(contractAddress common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"reserveFactorMantissa", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getReserveFactor, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getReserveFactor, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	reserveFactor, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getReserveFactor, source.NextI128 error")
+	}
+	return reserveFactor.ToBigInt(), nil
+}
+
 func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"supplyRatePerBlock", []interface{}{})

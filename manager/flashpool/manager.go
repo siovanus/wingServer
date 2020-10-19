@@ -430,14 +430,22 @@ func (this *FlashPoolManager) allMarket() (*common.UserFlashPoolOverview, error)
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadAssetApy error: %s", err)
 		}
 
-		supplyApy := utils.ToIntByPrecise(market.SupplyApy, this.cfg.TokenDecimal["flash"])
 		borrowApy := utils.ToIntByPrecise(market.BorrowApy, this.cfg.TokenDecimal["flash"])
 		insuranceApy := utils.ToIntByPrecise(market.InsuranceApy, this.cfg.TokenDecimal["flash"])
+		borrowAmount := utils.ToIntByPrecise(market.TotalBorrowAmount, this.cfg.TokenDecimal[assetName])
+		supplyAmount := utils.ToIntByPrecise(market.TotalSupplyAmount, this.cfg.TokenDecimal[assetName])
+		supplyApy := new(big.Int)
+		if borrowAmount.Uint64() != 0 {
+			ratio := new(big.Int).Div(new(big.Int).Mul(borrowAmount,
+				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["flash"]))))), supplyAmount)
+			supplyApy = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(borrowApy, ratio),
+				new(big.Int).SetUint64(85)), new(big.Int).SetUint64(100))
+		}
 
 		userMarket := &common.UserMarket{
 			Name:      this.cfg.AssetMap[address.ToHexString()],
 			Icon:      this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-			SupplyApy: utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
+			SupplyApy: utils.ToStringByPrecise(supplyApy, 2*this.cfg.TokenDecimal["flash"]),
 			BorrowApy: utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 			BorrowLiquidity: utils.ToStringByPrecise(new(big.Int).Sub(utils.ToIntByPrecise(market.TotalSupplyAmount,
 				this.cfg.TokenDecimal[assetName]), utils.ToIntByPrecise(market.TotalBorrowAmount,
