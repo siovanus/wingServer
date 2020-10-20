@@ -9,17 +9,16 @@ import (
 )
 
 const (
-	Total       = 2000000
-	Circulating = 250000
-	YearSecond  = 31536000
-	DaySecond   = 86400
+	Total      = 2000000
+	YearSecond = 31536000
+	DaySecond  = 86400
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
-var DailyDistibute = []uint64{6, 60, 12, 12, 12, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
-var DistributeTime = []uint64{3 * DaySecond, 3*DaySecond - 8*3600 + 5*60, 5*DaySecond - (3*DaySecond - 8*3600 + 5*60),
-	5 * DaySecond, 5 * DaySecond, YearSecond - 18*DaySecond, YearSecond, YearSecond,
-	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256000}
+var DailyDistibute = []uint64{6, 60, 30, 18, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
+var DistributeTime = []uint64{3 * DaySecond, 5 * DaySecond, 5 * DaySecond, 5 * DaySecond,
+	YearSecond - 18*DaySecond, YearSecond, YearSecond, YearSecond,
+	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256064}
 
 type GovernanceManager struct {
 	cfg *config.Config
@@ -57,7 +56,7 @@ func (this *GovernanceManager) Wing() (*common.Wing, error) {
 
 	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total*100), 2))
 	t, _ := total.Float64()
-	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Circulating*100), 2))
+	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed), 2))
 	c, _ := circulating.Float64()
 
 	return &common.Wing{

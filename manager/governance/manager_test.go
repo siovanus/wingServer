@@ -9,8 +9,6 @@ import (
 )
 
 func TestDistributed(t *testing.T) {
-	//now := uint64(time.Date(2021, time.September, 17, 16, 5, 0, 0, time.UTC).Unix())
-	//gap := now - GenesisTime
 	gap := uint64(time.Now().Unix()) - GenesisTime
 	length := len(DailyDistibute)
 	epoch := []uint64{0}
@@ -31,7 +29,12 @@ func TestDistributed(t *testing.T) {
 		distributed += DailyDistibute[j] * DistributeTime[j]
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index]
-	daily := utils.ToStringByPrecise(new(big.Int).SetUint64(DailyDistibute[index]*DaySecond), 2)
-	fmt.Println(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed), 2))
-	fmt.Println(daily)
+
+	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total*100), 2))
+	tt, _ := total.Float64()
+	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed), 2))
+	c, _ := circulating.Float64()
+
+	fmt.Println(tt)
+	fmt.Println(c)
 }
