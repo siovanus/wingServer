@@ -30,5 +30,5 @@ type FlashPoolManager interface {
 	BorrowAddressList() ([]store.UserAssetBalance, error)
 	LiquidationList(account string) ([]*common.Liquidation, error)
 	WingApyForStore() error
-	TotalReserve() (string, error)
+	Reserves() (*common.Reserves, error)
 }

@@ -819,26 +819,40 @@ func (this *FlashPoolManager) WingApys() ([]common.WingApy, error) {
 	return wingApys, nil
 }
 
-func (this *FlashPoolManager) TotalReserve() (string, error) {
+func (this *FlashPoolManager) Reserves() (*common.Reserves, error) {
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return "", fmt.Errorf("TotalReserve, this.GetAllMarkets error: %s", err)
+		return nil, fmt.Errorf("TotalReserve, this.GetAllMarkets error: %s", err)
 	}
 	totalReserve := new(big.Int)
+	reserves := &common.Reserves{
+		AssetReserve: make([]*common.Reserve, 0),
+	}
 	for _, address := range allMarkets {
 		name := this.cfg.AssetMap[address.ToHexString()]
 		price, err := this.AssetStoredPrice(this.cfg.OracleMap[address.ToHexString()])
 		if err != nil {
-			return "", fmt.Errorf("LiquidationList, this.AssetStoredPrice error: %s", err)
+			return nil, fmt.Errorf("TotalReserve, this.AssetStoredPrice error: %s", err)
 		}
 		reserveBalance, err := this.getTotalReserves(address)
 		if err != nil {
-			return "", fmt.Errorf("TotalReserve, this.getTotalReserves error: %s", err)
+			return nil, fmt.Errorf("TotalReserve, this.getTotalReserves error: %s", err)
 		}
+		reserveBalanceStr := utils.ToStringByPrecise(reserveBalance, this.cfg.TokenDecimal[name])
+		reserveDollarStr := utils.ToStringByPrecise(new(big.Int).Mul(price, reserveBalance),
+			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
+		assetReserve := &common.Reserve{
+			Name:           name,
+			Icon:           this.cfg.IconMap[name],
+			ReserveFactor:  "0.15",
+			ReserveBalance: reserveBalanceStr,
+			ReserveDollar:  reserveDollarStr,
+		}
+		reserves.AssetReserve = append(reserves.AssetReserve, assetReserve)
 
-		delta := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(price, reserveBalance),
-			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"]), this.cfg.TokenDecimal["pUSDT"])
+		delta := utils.ToIntByPrecise(reserveDollarStr, this.cfg.TokenDecimal["pUSDT"])
 		totalReserve = new(big.Int).Add(totalReserve, delta)
 	}
-	return utils.ToStringByPrecise(totalReserve, this.cfg.TokenDecimal["pUSDT"]), nil
+	reserves.TotalReserve = utils.ToStringByPrecise(totalReserve, this.cfg.TokenDecimal["pUSDT"])
+	return reserves, nil
 }

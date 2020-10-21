@@ -5,7 +5,7 @@ type Web interface {
 	PoolDistribution(map[string]interface{}) map[string]interface{}
 	GovBannerOverview(map[string]interface{}) map[string]interface{}
 	GovBanner(map[string]interface{}) map[string]interface{}
-	TotalReserve(map[string]interface{}) map[string]interface{}
+	Reserves(map[string]interface{}) map[string]interface{}
 	FlashPoolBanner(map[string]interface{}) map[string]interface{}
 
 	FlashPoolDetail(map[string]interface{}) map[string]interface{}

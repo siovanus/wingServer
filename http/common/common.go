@@ -5,7 +5,7 @@ const (
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
 	GOVBANNEROVERVIEW           = "/api/v1/govbanneroverview"
 	GOVBANNER                   = "/api/v1/govbanner"
-	TOTALRESERVE                = "/api/v1/totalreserve"
+	RESERVES                    = "/api/v1/reserves"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
 	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
@@ -26,7 +26,7 @@ const (
 	ACTION_POOLDISTRIBUTION            = "pooldistribution"
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
-	ACTION_TOTALRESERVE                = "totalreserve"
+	ACTION_RESERVES                    = "reserves"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
@@ -249,4 +249,17 @@ type WingApy struct {
 	SupplyApy    string
 	BorrowApy    string
 	InsuranceApy string
+}
+
+type Reserves struct {
+	AssetReserve []*Reserve
+	TotalReserve string
+}
+
+type Reserve struct {
+	Name           string
+	Icon           string
+	ReserveFactor  string
+	ReserveBalance string
+	ReserveDollar  string
 }
