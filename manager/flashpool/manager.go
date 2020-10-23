@@ -383,7 +383,7 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		}
 		borrowIndex, err := this.getBorrowIndex(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getExchangeRate error: %s", err)
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowIndex error: %s", err)
 		}
 
 		market := new(common.Market)
@@ -491,6 +491,10 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 	}
 	userFlashPoolOverview.BorrowLimit = utils.ToStringByPrecise(new(big.Int).Sub(accountLiquidity.Liquidity.ToBigInt(),
 		accountLiquidity.Shortfall.ToBigInt()), this.cfg.TokenDecimal["oracle"])
+	userBalance, err := this.store.LoadUserBalance(accountStr)
+	if err != nil {
+		return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadUserBalance error: %s", err)
+	}
 
 	netApy := new(big.Int).SetUint64(0)
 	s := new(big.Int).SetUint64(0)
@@ -502,18 +506,23 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.AssetStoredPrice error: %s", err)
 		}
-		userAssetBalance, err := this.store.LoadUserAssetBalance(accountStr, assetName)
-		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadUserBalance error: %s", err)
+		userAssetBalance := store.UserAssetBalance{}
+		for _, v := range userBalance {
+			if v.AssetName == assetName {
+				userAssetBalance = v
+			}
 		}
 		flashMarket, err := this.store.LoadFlashMarket(assetName)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadFlashMarket error: %s", err)
 		}
 
-		borrowBalance := new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.BorrowAmount, 0),
-			utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
-			utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0))
+		borrowBalance := new(big.Int)
+		if utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0).Uint64() != 0 {
+			borrowBalance = new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.BorrowAmount, 0),
+				utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
+				utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0))
+		}
 		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowBalance, price),
 			this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["pUSDT"])
 		b = new(big.Int).Add(b, borrowDollar)
@@ -528,9 +537,11 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.AssetStoredPrice error: %s", err)
 		}
-		userAssetBalance, err := this.store.LoadUserAssetBalance(accountStr, assetName)
-		if err != nil {
-			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadUserBalance error: %s", err)
+		userAssetBalance := store.UserAssetBalance{}
+		for _, v := range userBalance {
+			if v.AssetName == assetName {
+				userAssetBalance = v
+			}
 		}
 		flashMarket, err := this.store.LoadFlashMarket(assetName)
 		if err != nil {
@@ -539,9 +550,12 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 
 		supplyAmount := new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.FToken, 0),
 			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
-		borrowAmount := new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.BorrowAmount, 0),
-			utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
-			utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0))
+		borrowAmount := new(big.Int)
+		if utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0).Uint64() != 0 {
+			borrowAmount = new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.BorrowAmount, 0),
+				utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
+				utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0))
+		}
 		insuranceAmount := new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.FToken, 0),
 			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
 		// supplyAmount * price
