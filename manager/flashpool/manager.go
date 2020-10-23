@@ -19,7 +19,7 @@ const (
 	BlockPerYear = 60 * 60 * 24 * 365 * 2 / 5
 )
 
-var GAP = new(big.Int).SetUint64(201315534126786)
+var GAP = new(big.Int).SetUint64(198684465873214)
 
 type FlashPoolManager struct {
 	cfg             *config.Config
