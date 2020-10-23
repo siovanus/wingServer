@@ -204,6 +204,8 @@ type Market struct {
 	SupplyDistribution    string
 	BorrowDistribution    string
 	InsuranceDistribution string
+	ExchangeRate          string
+	BorrowIndex           string
 }
 
 type ClaimWingRequest struct {

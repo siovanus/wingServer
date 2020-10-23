@@ -71,6 +71,24 @@ func (this *FlashPoolManager) getAssetsIn(account common.Address) ([]common.Addr
 	return assetsIn, nil
 }
 
+func (this *FlashPoolManager) getFTokenAmount(contractAddress, account common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"balanceOf", []interface{}{account})
+	if err != nil {
+		return nil, fmt.Errorf("getFTokenAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getFTokenAmount, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	amount, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getFTokenAmount, source.NextI128 error")
+	}
+	return amount.ToBigInt(), nil
+}
+
 func (this *FlashPoolManager) getSupplyAmountByAccount(contractAddress, account common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
 		"balanceOfUnderlying", []interface{}{account})
@@ -89,20 +107,34 @@ func (this *FlashPoolManager) getSupplyAmountByAccount(contractAddress, account 
 	return amount.ToBigInt(), nil
 }
 
-func (this *FlashPoolManager) getBorrowAmountByAccount(contractAddress, account common.Address) (*big.Int, error) {
+func (this *FlashPoolManager) getITokenAmount(contractAddress, account common.Address) (*big.Int, error) {
 	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
-		"borrowBalanceStored", []interface{}{account})
+		"insuranceAddr", []interface{}{})
 	if err != nil {
-		return nil, fmt.Errorf("getBorrowAmountByAccount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+		return nil, fmt.Errorf("getITokenAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
 	}
 	r, err := preExecResult.Result.ToByteArray()
 	if err != nil {
-		return nil, fmt.Errorf("getBorrowAmountByAccount, preExecResult.Result.ToByteArray error: %s", err)
+		return nil, fmt.Errorf("getITokenAmount, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	insuranceAddress, err := common.AddressParseFromBytes(r)
+	if err != nil {
+		return nil, fmt.Errorf("getITokenAmount, common.AddressParseFromBytes error: %s", err)
+	}
+
+	preExecResult, err = this.sdk.WasmVM.PreExecInvokeWasmVMContract(insuranceAddress,
+		"balanceOf", []interface{}{account})
+	if err != nil {
+		return nil, fmt.Errorf("getITokenAmount, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err = preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getITokenAmount, preExecResult.Result.ToByteArray error: %s", err)
 	}
 	source := common.NewZeroCopySource(r)
 	amount, eof := source.NextI128()
 	if eof {
-		return nil, fmt.Errorf("getBorrowAmountByAccount, source.NextI128 error")
+		return nil, fmt.Errorf("getITokenAmount, source.NextI128 error")
 	}
 	return amount.ToBigInt(), nil
 }
@@ -250,6 +282,42 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 	} else {
 		return amount.ToBigInt(), nil
 	}
+}
+
+func (this *FlashPoolManager) getExchangeRate(contractAddress common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"exchangeRateCurrent", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getExchangeRate, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getExchangeRate, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	exchangeRate, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getExchangeRate, source.NextI128 error")
+	}
+	return exchangeRate.ToBigInt(), nil
+}
+
+func (this *FlashPoolManager) getBorrowIndex(contractAddress common.Address) (*big.Int, error) {
+	preExecResult, err := this.sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress,
+		"borrowIndex", []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("getBorrowIndex, this.sdk.WasmVM.PreExecInvokeWasmVMContract error: %s", err)
+	}
+	r, err := preExecResult.Result.ToByteArray()
+	if err != nil {
+		return nil, fmt.Errorf("getBorrowIndex, preExecResult.Result.ToByteArray error: %s", err)
+	}
+	source := common.NewZeroCopySource(r)
+	borrowIndex, eof := source.NextI128()
+	if eof {
+		return nil, fmt.Errorf("getBorrowIndex, source.NextI128 error")
+	}
+	return borrowIndex.ToBigInt(), nil
 }
 
 func (this *FlashPoolManager) getReserveFactor(contractAddress common.Address) (*big.Int, error) {

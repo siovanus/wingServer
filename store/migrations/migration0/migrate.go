@@ -33,14 +33,15 @@ type TrackHeight struct {
 }
 
 type UserAssetBalance struct {
-	UserAddress      string `gorm:"primary_key"`
-	AssetName        string `gorm:"primary_key"`
-	AssetAddress     string
-	Icon             string
-	SupplyBalance    string
-	BorrowBalance    string
-	InsuranceBalance string
-	IfCollateral     bool
+	UserAddress  string `gorm:"primary_key"`
+	AssetName    string `gorm:"primary_key"`
+	AssetAddress string
+	Icon         string
+	FToken       string
+	BorrowAmount string
+	BorrowIndex  string
+	Itoken       string
+	IfCollateral bool
 }
 
 type WingApy struct {
