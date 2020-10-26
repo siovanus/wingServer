@@ -751,7 +751,7 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		totalBorrowDollar = new(big.Int).Add(totalBorrowDollar, borrowDollar)
 		supplyBalance := new(big.Int).Mul(utils.ToIntByPrecise(v.FToken, 0),
 			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
-		if v.AssetName != "WING" && v.IfCollateral && supplyBalance.Uint64() != 0 {
+		if v.IfCollateral && supplyBalance.Uint64() != 0 {
 			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
 				this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]), this.cfg.TokenDecimal["pETH"])
 		if v.IfCollateral && v.SupplyBalance != "0" {
