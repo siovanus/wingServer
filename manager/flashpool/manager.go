@@ -556,7 +556,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 				utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
 				utils.ToIntByPrecise(userAssetBalance.BorrowIndex, 0))
 		}
-		insuranceAmount := new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.FToken, 0),
+		insuranceAmount := new(big.Int).Mul(utils.ToIntByPrecise(userAssetBalance.Itoken, 0),
 			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
 		// supplyAmount * price
 		// borrowAmount * price
@@ -587,7 +587,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 			supply := &common.Supply{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				SupplyBalance:    utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[assetName]),
+				SupplyBalance:    utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[assetName]+this.cfg.TokenDecimal["flash"]),
 				Apy:              utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"]),
 				CollateralFactor: market.CollateralFactor,
 				WingEarned:       utils.ToStringByPrecise(claimWingAtMarket, this.cfg.TokenDecimal["WING"]),
@@ -599,7 +599,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 			borrow := &common.Borrow{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]),
+				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]+this.cfg.TokenDecimal["flash"]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				WingEarned:       utils.ToStringByPrecise(claimWingAtMarket, this.cfg.TokenDecimal["WING"]),
 				CollateralFactor: market.CollateralFactor,
@@ -617,7 +617,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 			insurance := &common.Insurance{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				InsuranceBalance: utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[assetName]),
+				InsuranceBalance: utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[assetName]+this.cfg.TokenDecimal["flash"]),
 				Apy:              utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"]),
 				WingEarned:       utils.ToStringByPrecise(claimWingAtMarket, this.cfg.TokenDecimal["WING"]),
 				CollateralFactor: market.CollateralFactor,
@@ -656,6 +656,10 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borr
 	if err != nil {
 		return fmt.Errorf("UserBalanceForStore, this.GetAllMarkets error: %s", err)
 	}
+	userBalance, err := this.store.LoadUserBalance(accountStr)
+	if err != nil {
+		return fmt.Errorf("UserBalanceForStore, this.store.LoadUserBalance error: %s", err)
+	}
 	assetsIn, _ := this.getAssetsIn(account)
 	for _, address := range allMarkets {
 		fToken, err := this.getFTokenAmount(address, account)
@@ -675,9 +679,11 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borr
 			}
 		}
 		if borrowAmount == "" && borrowIndex == "" {
-			userAssetBalance, err := this.store.LoadUserAssetBalance(accountStr, address.ToHexString())
-			if err != nil {
-				return fmt.Errorf("UserBalanceForStore, this.store.LoadUserAssetBalance error: %s", err)
+			userAssetBalance := store.UserAssetBalance{}
+			for _, v := range userBalance {
+				if v.AssetName == name {
+					userAssetBalance = v
+				}
 			}
 			borrowAmount = userAssetBalance.BorrowAmount
 			borrowIndex = userAssetBalance.BorrowIndex

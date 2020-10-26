@@ -163,15 +163,6 @@ type UserAssetBalance struct {
 	IfCollateral bool
 }
 
-func (client Client) LoadUserAssetBalance(userAddress, assetName string) (UserAssetBalance, error) {
-	var userAssetBalance UserAssetBalance
-	err := client.db.Where("user_address = ? AND asset_name = ?", userAddress, assetName).Find(&userAssetBalance).Error
-	if err != nil {
-		return userAssetBalance, err
-	}
-	return userAssetBalance, err
-}
-
 func (client Client) LoadUserBalance(userAddress string) ([]UserAssetBalance, error) {
 	userBalance := make([]UserAssetBalance, 0)
 	err := client.db.Where("user_address = ?", userAddress).Find(&userBalance).Error
