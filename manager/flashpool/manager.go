@@ -760,8 +760,6 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		if v.IfCollateral && supplyBalance.Uint64() != 0 {
 			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
 				this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]), this.cfg.TokenDecimal["pETH"])
-		if v.IfCollateral && v.SupplyBalance != "0" {
-			supplyDollar := new(big.Int).Mul(utils.ToIntByPrecise(v.SupplyBalance, this.cfg.TokenDecimal["pETH"]), price)
 			totalCollateralDollar = new(big.Int).Add(totalCollateralDollar, supplyDollar)
 			collateralAsset := &common.CollateralAsset{
 				Icon:    v.Icon,
