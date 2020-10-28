@@ -1,6 +1,9 @@
 package service
 
 import (
+	"github.com/siovanus/wingServer/manager/flashpool"
+	"github.com/siovanus/wingServer/manager/governance"
+	"github.com/siovanus/wingServer/manager/ifpool"
 	"os"
 	"time"
 
@@ -13,16 +16,18 @@ import (
 type Service struct {
 	sdk                  *sdk.OntologySdk
 	cfg                  *config.Config
-	govMgr               GovernanceManager
-	fpMgr                FlashPoolManager
+	govMgr               *governance.GovernanceManager
+	fpMgr                *flashpool.FlashPoolManager
+	ifMgr                *ifpool.IFPoolManager
 	store                *store.Client
 	trackHeight          uint32
 	listeningAddressList []string
 	assetList            []string
 }
 
-func NewService(sdk *sdk.OntologySdk, govMgr GovernanceManager, fpMgr FlashPoolManager, store *store.Client, cfg *config.Config) *Service {
-	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, store: store}
+func NewService(sdk *sdk.OntologySdk, govMgr *governance.GovernanceManager, fpMgr *flashpool.FlashPoolManager,
+	ifMgr *ifpool.IFPoolManager, store *store.Client, cfg *config.Config) *Service {
+	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, ifMgr: ifMgr, store: store}
 }
 
 func (this *Service) AddListeningAddressList() {

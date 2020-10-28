@@ -19,6 +19,11 @@ const (
 	CLAIMWING       = "/api/v1/claimwing"
 	LIQUIDATIONLIST = "/api/v1/liquidationlist"
 	WINGAPYS        = "/api/v1/wingapys"
+
+	IFPOOLOVERVIEW   = "/api/v1/if/ifpooloverview"
+	IFMARKETDETAIL   = "/api/v1/if/ifmarketdetail"
+	USERIFINFO       = "/api/v1/if/userifinfo"
+	USERIFMARKETINFO = "/api/v1/if/userifmarketinfo"
 )
 
 const (
@@ -40,6 +45,11 @@ const (
 	ACTION_CLAIMWING       = "claimwing"
 	ACTION_LIQUIDATIONLIST = "liquidationlist"
 	ACTION_WINGAPYS        = "wingapys"
+
+	ACTION_IFPOOLOVERVIEW   = "ifpooloverview"
+	ACTION_IFMARKETDETAIL   = "ifmarketdetail"
+	ACTION_USERIFINFO       = "userifinfo"
+	ACTION_USERIFMARKETINFO = "userifmarketinfo"
 )
 
 type Response struct {
@@ -236,14 +246,27 @@ type CollateralAsset struct {
 	Dollar  string
 }
 
-type LiquidationListRequest struct {
-	Id      string
+type IFMarketDetailRequest struct {
+	Market string
+}
+
+type UserIFInfoRequest struct {
 	Address string
+}
+
+type UserIFMarketInfoRequest struct {
+	Address string
+	Market  string
 }
 
 type LiquidationListResponse struct {
 	Id              string
 	LiquidationList []*Liquidation
+}
+
+type LiquidationListRequest struct {
+	Id      string
+	Address string
 }
 
 type WingApy struct {
@@ -264,4 +287,63 @@ type Reserve struct {
 	ReserveFactor  string
 	ReserveBalance string
 	ReserveDollar  string
+}
+
+type IFPoolOverview struct {
+	Total       string
+	Cap         string
+	IFAssetList []*IFAssetList
+}
+
+type IFAssetList struct {
+	Name                 string
+	Icon                 string
+	SupplyBalance        string
+	BorrowInterestPerDay string
+	Liquidity            string
+}
+
+type IFMarketDetail struct {
+	Name                 string
+	Icon                 string
+	TotalSupply          string
+	SupplyWingAPY        string
+	UtilizationRate      string
+	MaximumLTV           string
+	TotalBorrowed        string
+	BorrowInterestPerDay string
+	BorrowWingAPY        string
+	Liquidity            string
+	BorrowCap            string
+	TotalInsurance       string
+	InsuranceWingAPY     string
+}
+
+type UserIFInfo struct {
+	TotalSupplyDollar    string
+	SupplyWingEarned     string
+	TotalBorrowDollar    string
+	BorrowWingEarned     string
+	BorrowInterestPerDay string
+	TotalInsuranceDollar string
+	InsuranceWingEarned  string
+	Composition          []*Composition
+}
+
+type Composition struct {
+	Operation string
+	Name      string
+	Icon      string
+	Balance   string
+	IfCanOp   bool
+}
+
+type UserIFMarketInfo struct {
+	SupplyBalance       string
+	SupplyWingEarned    string
+	BorrowBalance       string
+	Limit               string
+	BorrowWingEarned    string
+	InsuranceBalance    string
+	InsuranceWingEarned string
 }

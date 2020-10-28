@@ -404,3 +404,115 @@ func (this *Service) Reserves(param map[string]interface{}) map[string]interface
 	}
 	return m
 }
+
+func (this *Service) IFPoolOverview(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	IFPoolOverview, err := this.ifMgr.IFPoolOverview()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("IFPoolOverview error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = IFPoolOverview
+		log.Infof("IFPoolOverview success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IFPoolOverview: failed, err: %s", err)
+	} else {
+		log.Debug("IFPoolOverview: resp success")
+	}
+	return m
+}
+
+func (this *Service) IFMarketDetail(param map[string]interface{}) map[string]interface{} {
+	req := &common.IFMarketDetailRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("IFMarketDetail: decode params failed, err: %s", err)
+	} else {
+		IFMarketDetail, err := this.ifMgr.IFMarketDetail(req.Market)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("IFMarketDetail error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = IFMarketDetail
+			log.Infof("IFMarketDetail success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IFMarketDetail: failed, err: %s", err)
+	} else {
+		log.Debug("IFMarketDetail: resp success")
+	}
+	return m
+}
+
+func (this *Service) UserIFInfo(param map[string]interface{}) map[string]interface{} {
+	req := &common.UserIFInfoRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("UserIFInfo: decode params failed, err: %s", err)
+	} else {
+		userIFInfo, err := this.ifMgr.UserIFInfo(req.Address)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("UserIFInfo error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = userIFInfo
+			log.Infof("UserIFInfo success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("UserIFInfo: failed, err: %s", err)
+	} else {
+		log.Debug("UserIFInfo: resp success")
+	}
+	return m
+}
+
+func (this *Service) UserIFMarketInfo(param map[string]interface{}) map[string]interface{} {
+	req := &common.UserIFMarketInfoRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("UserIFMarketInfo: decode params failed, err: %s", err)
+	} else {
+		userIFMarketInfo, err := this.ifMgr.UserIFMarketInfo(req.Address, req.Market)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("UserIFMarketInfo error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = userIFMarketInfo
+			log.Infof("UserIFMarketInfo success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("UserIFMarketInfo: failed, err: %s", err)
+	} else {
+		log.Debug("UserIFMarketInfo: resp success")
+	}
+	return m
+}

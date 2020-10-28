@@ -18,6 +18,7 @@ type Config struct {
 	GovernanceAddress  string            `json:"governance_address"`
 	WingAddress        string            `json:"wing_address"`
 	FlashPoolAddress   string            `json:"flash_pool_address"`
+	IFPoolAddress      string            `json:"if_pool_address"`
 	OracleAddress      string            `json:"oracle_address"`
 	DatabaseURL        string            `json:"database_url"`
 	AssetMap           map[string]string `json:"asset_map"`

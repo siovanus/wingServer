@@ -20,6 +20,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/manager/ifpool"
 	"github.com/siovanus/wingServer/store"
 	"os"
 	"os/signal"
@@ -96,6 +97,11 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("fpAddress common.AddressFromHexString error: %s", err)
 		return
 	}
+	ifAddress, err := common.AddressFromHexString(servConfig.IFPoolAddress)
+	if err != nil {
+		log.Errorf("ifAddress common.AddressFromHexString error: %s", err)
+		return
+	}
 	oracleAddress, err := common.AddressFromHexString(servConfig.OracleAddress)
 	if err != nil {
 		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
@@ -111,8 +117,13 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
+	ifMgr := ifpool.NewIFPoolManager(ifAddress, oracleAddress, sdk, store, servConfig)
+	if ifMgr == nil {
+		log.Errorf("ifpool manager is nil")
+		return
+	}
 	log.Infof("init svr success")
-	serv := service.NewService(sdk, govMgr, fpMgr, store, servConfig)
+	serv := service.NewService(sdk, govMgr, fpMgr, ifMgr, store, servConfig)
 	serv.AddListeningAddressList()
 	restServer := restful.InitRestServer(serv, servConfig.Port)
 
