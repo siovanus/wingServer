@@ -32,6 +32,7 @@ func (this *Service) AddListeningAddressList() {
 		os.Exit(1)
 	}
 	for _, v := range allMarkets {
+		log.Infof("ftoken address: %s", v.ToHexString())
 		this.assetList = append(this.assetList, this.cfg.OracleMap[v.ToHexString()])
 		this.listeningAddressList = append(this.listeningAddressList, v.ToHexString())
 		addr, err := this.fpMgr.GetInsuranceAddress(v)
