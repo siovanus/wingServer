@@ -20,10 +20,7 @@ const (
 	LIQUIDATIONLIST = "/api/v1/liquidationlist"
 	WINGAPYS        = "/api/v1/wingapys"
 
-	IFPOOLOVERVIEW   = "/api/v1/if/ifpooloverview"
-	IFMARKETDETAIL   = "/api/v1/if/ifmarketdetail"
-	USERIFINFO       = "/api/v1/if/userifinfo"
-	USERIFMARKETINFO = "/api/v1/if/userifmarketinfo"
+	IFPOOLINFO = "/api/v1/if/ifpoolinfo"
 )
 
 const (
@@ -46,10 +43,7 @@ const (
 	ACTION_LIQUIDATIONLIST = "liquidationlist"
 	ACTION_WINGAPYS        = "wingapys"
 
-	ACTION_IFPOOLOVERVIEW   = "ifpooloverview"
-	ACTION_IFMARKETDETAIL   = "ifmarketdetail"
-	ACTION_USERIFINFO       = "userifinfo"
-	ACTION_USERIFMARKETINFO = "userifmarketinfo"
+	ACTION_IFPOOLINFO = "ifpoolinfo"
 )
 
 type Response struct {
@@ -246,17 +240,8 @@ type CollateralAsset struct {
 	Dollar  string
 }
 
-type IFMarketDetailRequest struct {
-	Market string
-}
-
-type UserIFInfoRequest struct {
+type IFPoolInfoRequest struct {
 	Address string
-}
-
-type UserIFMarketInfoRequest struct {
-	Address string
-	Market  string
 }
 
 type LiquidationListResponse struct {
@@ -289,24 +274,18 @@ type Reserve struct {
 	ReserveDollar  string
 }
 
-type IFPoolOverview struct {
+type IFPoolInfo struct {
 	Total       string
 	Cap         string
 	IFAssetList []*IFAssetList
+	UserIFInfo  *UserIFInfo
 }
 
 type IFAssetList struct {
 	Name                 string
 	Icon                 string
-	SupplyBalance        string
-	BorrowInterestPerDay string
-	Liquidity            string
-}
-
-type IFMarketDetail struct {
-	Name                 string
-	Icon                 string
 	TotalSupply          string
+	SupplyInterestPerDay string
 	SupplyWingAPY        string
 	UtilizationRate      string
 	MaximumLTV           string
@@ -331,14 +310,9 @@ type UserIFInfo struct {
 }
 
 type Composition struct {
-	Operation string
-	Name      string
-	Icon      string
-	Balance   string
-	IfCanOp   bool
-}
-
-type UserIFMarketInfo struct {
+	Name                string
+	Icon                string
+	IfCanBorrow         bool
 	SupplyBalance       string
 	SupplyWingEarned    string
 	BorrowBalance       string

@@ -44,62 +44,109 @@ func (this *IFPoolManager) AssetStoredPrice(asset string) (*big.Int, error) {
 	return utils.ToIntByPrecise(price.Price, this.cfg.TokenDecimal["oracle"]), nil
 }
 
-func (this *IFPoolManager) IFPoolOverview() (*common.IFPoolOverview, error) {
-	return &common.IFPoolOverview{
+func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error) {
+	IFPoolInfo := &common.IFPoolInfo{
 		Total: "462000.13241",
 		Cap:   "500000",
 		IFAssetList: []*common.IFAssetList{
-			{Name: "pSUSD", Icon: "https://app.ont.io/wing/psusd.svg", SupplyBalance: "400000.13241", BorrowInterestPerDay: "0.0005", Liquidity: "2325.67"},
-			{Name: "pUSDT", Icon: "https://app.ont.io/wing/pusdt.svg", SupplyBalance: "61000", BorrowInterestPerDay: "0.0005", Liquidity: "23525.456"},
-			{Name: "pDAI", Icon: "https://app.ont.io/wing/oDAI.svg", SupplyBalance: "1000", BorrowInterestPerDay: "0.0005", Liquidity: "47474.67"},
+			{
+				Name:                 "pSUSD",
+				Icon:                 "https://app.ont.io/wing/psusd.svg",
+				TotalSupply:          "121435.4564747",
+				SupplyInterestPerDay: "0.0253463",
+				SupplyWingAPY:        "0.242536",
+				UtilizationRate:      "0.786714",
+				MaximumLTV:           "0.1425",
+				TotalBorrowed:        "965256.25225",
+				BorrowInterestPerDay: "0.000224",
+				BorrowWingAPY:        "235267",
+				Liquidity:            "2536.4564",
+				BorrowCap:            "500",
+				TotalInsurance:       "1876969.34536",
+				InsuranceWingAPY:     "25.34649",
+			},
+			{
+				Name:                 "pUSDT",
+				Icon:                 "https://app.ont.io/wing/pusdt.svg",
+				TotalSupply:          "1435.456747",
+				SupplyInterestPerDay: "0.252536",
+				SupplyWingAPY:        "0.2436",
+				UtilizationRate:      "0.7714",
+				MaximumLTV:           "0.125",
+				TotalBorrowed:        "9656.25225",
+				BorrowInterestPerDay: "0.00024",
+				BorrowWingAPY:        "2367",
+				Liquidity:            "256.4564",
+				BorrowCap:            "30",
+				TotalInsurance:       "1769.3536",
+				InsuranceWingAPY:     "2.349",
+			},
+			{
+				Name:                 "pDAI",
+				Icon:                 "https://app.ont.io/wing/oDAI.svg",
+				TotalSupply:          "252.3636",
+				SupplyInterestPerDay: "0.0035636",
+				SupplyWingAPY:        "0.24236536536",
+				UtilizationRate:      "0.3536",
+				MaximumLTV:           "0.3536",
+				TotalBorrowed:        "35252.647",
+				BorrowInterestPerDay: "0.0002724",
+				BorrowWingAPY:        "79707",
+				Liquidity:            "890.3242",
+				BorrowCap:            "242",
+				TotalInsurance:       "34535.34575536",
+				InsuranceWingAPY:     "575.686",
+			},
 		},
-	}, nil
-}
-
-func (this *IFPoolManager) IFMarketDetail(market string) (*common.IFMarketDetail, error) {
-	return &common.IFMarketDetail{
-		Name:                 market,
-		Icon:                 "https://app.ont.io/wing/pusdt.svg",
-		TotalSupply:          "121435.4564747",
-		SupplyWingAPY:        "0.242536",
-		UtilizationRate:      "0.786714",
-		MaximumLTV:           "0.1425",
-		TotalBorrowed:        "965256.25225",
-		BorrowInterestPerDay: "0.000224",
-		BorrowWingAPY:        "235267",
-		Liquidity:            "2536.4564",
-		BorrowCap:            "500",
-		TotalInsurance:       "1876969.34536",
-		InsuranceWingAPY:     "25.34649",
-	}, nil
-}
-
-func (this *IFPoolManager) UserIFInfo(account string) (*common.UserIFInfo, error) {
-	return &common.UserIFInfo{
-		TotalSupplyDollar:    "23526.3647",
-		SupplyWingEarned:     "25.3647",
-		TotalBorrowDollar:    "25364.485",
-		BorrowWingEarned:     "789.36536",
-		BorrowInterestPerDay: "0.837636",
-		TotalInsuranceDollar: "96747.474747",
-		InsuranceWingEarned:  "36796.366",
-		Composition: []*common.Composition{
-			{Operation: "supply", Name: "pSUSD", Icon: "https://app.ont.io/wing/psusd.svg", Balance: "2536.367", IfCanOp: true},
-			{Operation: "supply", Name: "pUSDT", Icon: "https://app.ont.io/wing/pusdt.svg", Balance: "42526.3636", IfCanOp: true},
-			{Operation: "borrow", Name: "pSUSD", Icon: "https://app.ont.io/wing/psusd.svg", Balance: "235546.4647", IfCanOp: false},
-			{Operation: "insurance", Name: "pDAI", Icon: "https://app.ont.io/wing/oDAI.svg", Balance: "4756.252", IfCanOp: true},
-		},
-	}, nil
-}
-
-func (this *IFPoolManager) UserIFMarketInfo(account, market string) (*common.UserIFMarketInfo, error) {
-	return &common.UserIFMarketInfo{
-		SupplyBalance:       "583525.256",
-		SupplyWingEarned:    "376.4373",
-		BorrowBalance:       "4727.45747",
-		Limit:               "0.276525",
-		BorrowWingEarned:    "12.3637",
-		InsuranceBalance:    "4225.3637",
-		InsuranceWingEarned: "12.637",
-	}, nil
+	}
+	if account != "" {
+		IFPoolInfo.UserIFInfo = &common.UserIFInfo{
+			TotalSupplyDollar:    "23526.3647",
+			SupplyWingEarned:     "25.3647",
+			TotalBorrowDollar:    "25364.485",
+			BorrowWingEarned:     "789.36536",
+			BorrowInterestPerDay: "0.837636",
+			TotalInsuranceDollar: "96747.474747",
+			InsuranceWingEarned:  "36796.366",
+			Composition: []*common.Composition{
+				{
+					Name:                "pUSDT",
+					Icon:                "https://app.ont.io/wing/pusdt.svg",
+					IfCanBorrow:         true,
+					SupplyBalance:       "42526.3636",
+					SupplyWingEarned:    "242.2525",
+					BorrowBalance:       "252.4578",
+					Limit:               "0.25265",
+					BorrowWingEarned:    "235.3677",
+					InsuranceBalance:    "141536.47",
+					InsuranceWingEarned: "14.25265",
+				},
+				{
+					Name:                "pSUSD",
+					Icon:                "https://app.ont.io/wing/psusd.svg",
+					IfCanBorrow:         true,
+					SupplyBalance:       "235546.4647",
+					SupplyWingEarned:    "22.225",
+					BorrowBalance:       "52.4578",
+					Limit:               "0.265",
+					BorrowWingEarned:    "25.377",
+					InsuranceBalance:    "14136.47",
+					InsuranceWingEarned: "1.2265",
+				},
+				{
+					Name:                "pDAI",
+					Icon:                "https://app.ont.io/wing/psusd.svg",
+					IfCanBorrow:         true,
+					SupplyBalance:       "235544566.464467",
+					SupplyWingEarned:    "224.225",
+					BorrowBalance:       "524.4578",
+					Limit:               "0.765",
+					BorrowWingEarned:    "265.37697",
+					InsuranceBalance:    "696.47",
+					InsuranceWingEarned: "1141.2265",
+				},
+			},
+		}
+	}
+	return IFPoolInfo, nil
 }

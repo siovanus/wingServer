@@ -19,8 +19,5 @@ type Web interface {
 	LiquidationList(map[string]interface{}) map[string]interface{}
 	WingApys(map[string]interface{}) map[string]interface{}
 
-	IFPoolOverview(map[string]interface{}) map[string]interface{}
-	IFMarketDetail(map[string]interface{}) map[string]interface{}
-	UserIFInfo(map[string]interface{}) map[string]interface{}
-	UserIFMarketInfo(map[string]interface{}) map[string]interface{}
+	IFPoolInfo(map[string]interface{}) map[string]interface{}
 }
