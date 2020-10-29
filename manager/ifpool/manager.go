@@ -52,6 +52,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			{
 				Name:                 "pSUSD",
 				Icon:                 "https://app.ont.io/wing/psusd.svg",
+				Price:                "1.001",
 				TotalSupply:          "121435.4564747",
 				SupplyInterestPerDay: "0.0253463",
 				SupplyWingAPY:        "0.242536",
@@ -68,6 +69,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			{
 				Name:                 "pUSDT",
 				Icon:                 "https://app.ont.io/wing/pusdt.svg",
+				Price:                "1",
 				TotalSupply:          "1435.456747",
 				SupplyInterestPerDay: "0.252536",
 				SupplyWingAPY:        "0.2436",
@@ -84,6 +86,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			{
 				Name:                 "pDAI",
 				Icon:                 "https://app.ont.io/wing/oDAI.svg",
+				Price:                "1.02",
 				TotalSupply:          "252.3636",
 				SupplyInterestPerDay: "0.0035636",
 				SupplyWingAPY:        "0.24236536536",

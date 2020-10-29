@@ -284,6 +284,7 @@ type IFPoolInfo struct {
 type IFAssetList struct {
 	Name                 string
 	Icon                 string
+	Price                string
 	TotalSupply          string
 	SupplyInterestPerDay string
 	SupplyWingAPY        string
