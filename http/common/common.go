@@ -311,14 +311,17 @@ type UserIFInfo struct {
 }
 
 type Composition struct {
-	Name                string
-	Icon                string
-	IfCanBorrow         bool
-	SupplyBalance       string
-	SupplyWingEarned    string
-	BorrowBalance       string
-	Limit               string
-	BorrowWingEarned    string
-	InsuranceBalance    string
-	InsuranceWingEarned string
+	Name                  string
+	Icon                  string
+	IfCanBorrow           bool
+	SupplyBalance         string
+	SupplyWingEarned      string
+	BorrowWingEarned      string
+	InsuranceBalance      string
+	InsuranceWingEarned   string
+	CollateralBalance     string
+	CollateralName        string
+	CollateralIcon        string
+	BorrowUnpaidPrincipal string
+	BorrowInterestBalance string
 }
