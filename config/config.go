@@ -13,7 +13,9 @@ const (
 
 //Config object used by ontology-instance
 type Config struct {
-	Port uint64 `json:"port"`
+	RPCAddress  string `json:"rpc_address"`
+	WingAddress string `json:"wing_address"`
+	Port        uint64 `json:"port"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

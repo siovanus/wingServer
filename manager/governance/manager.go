@@ -1,38 +1,62 @@
 package governance
 
 import (
+	"math/big"
+	"time"
+
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/utils"
-	"math/big"
-	"time"
 )
 
 const (
-	Total      = 2000000
-	YearSecond = 31536000
-	DaySecond  = 86400
+	Total       = 2000000000000000
+	YearSecond  = 31536000
+	DaySecond   = 86400
+	ZeroAddress = "AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM"
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
-var DailyDistibute = []uint64{6, 60, 30, 18, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1}
+var DailyDistibute = []uint64{60000000, 600000000, 300000000, 180000000, 60000000, 50000000, 40000000, 30000000,
+	20000000, 10000000, 10000000, 10000000, 10000000, 10000000}
 var DistributeTime = []uint64{3 * DaySecond, 5 * DaySecond, 5 * DaySecond, 5 * DaySecond,
 	YearSecond - 18*DaySecond, YearSecond, YearSecond, YearSecond,
 	YearSecond, YearSecond, YearSecond, YearSecond, YearSecond, 4256064}
 
 type GovernanceManager struct {
 	cfg *config.Config
+	sdk *ontology_go_sdk.OntologySdk
 }
 
-func NewGovernanceManager(cfg *config.Config) *GovernanceManager {
+func NewGovernanceManager(cfg *config.Config, sdk *ontology_go_sdk.OntologySdk) *GovernanceManager {
 	manager := &GovernanceManager{
 		cfg: cfg,
+		sdk: sdk,
 	}
 
 	return manager
 }
 
 func (this *GovernanceManager) Wing() (*common.Wing, error) {
+	wingAddress, err := ocommon.AddressFromHexString(this.cfg.WingAddress)
+	if err != nil {
+		return nil, err
+	}
+	address, err := ocommon.AddressFromBase58(ZeroAddress)
+	if err != nil {
+		return nil, err
+	}
+	result, err := this.sdk.NeoVM.PreExecInvokeNeoVMContract(wingAddress, []interface{}{"balanceOf", []interface{}{address}})
+	if err != nil {
+		return nil, err
+	}
+	burned, err := result.Result.ToInteger()
+	if err != nil {
+		return nil, err
+	}
+
 	gap := uint64(time.Now().Unix()) - GenesisTime
 	length := len(DailyDistibute)
 	epoch := []uint64{0}
@@ -54,9 +78,10 @@ func (this *GovernanceManager) Wing() (*common.Wing, error) {
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index]
 
-	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total*100), 2))
+	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total), 9))
 	t, _ := total.Float64()
-	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed), 2))
+	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(distributed),
+		burned), 9))
 	c, _ := circulating.Float64()
 
 	return &common.Wing{

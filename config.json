@@ -1,3 +1,5 @@
 {
+  "rpc_address": "http://dappnode1.ont.io:20336",
+  "wing_address": "00c59fcd27a562d6397883eab1f2fff56e58ef80",
   "port": 10337
 }

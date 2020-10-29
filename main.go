@@ -20,6 +20,7 @@ package main
 
 import (
 	"fmt"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"os"
 	"os/signal"
 	"runtime"
@@ -71,8 +72,10 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("parse config failed, err: %s", err)
 		return
 	}
+	sdk := ontology_go_sdk.NewOntologySdk()
+	sdk.NewRpcClient().SetAddress(servConfig.RPCAddress)
 
-	govMgr := governance.NewGovernanceManager(servConfig)
+	govMgr := governance.NewGovernanceManager(servConfig, sdk)
 	if govMgr == nil {
 		log.Errorf("governance manager is nil")
 		return
