@@ -20,4 +20,5 @@ type Web interface {
 	WingApys(map[string]interface{}) map[string]interface{}
 
 	IFPoolInfo(map[string]interface{}) map[string]interface{}
+	IFHistory(map[string]interface{}) map[string]interface{}
 }

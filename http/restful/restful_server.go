@@ -63,6 +63,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.LIQUIDATIONLIST:       {name: common.ACTION_LIQUIDATIONLIST, handler: web.LiquidationList},
 
 		common.IFPOOLINFO: {name: common.ACTION_IFPOOLINFO, handler: web.IFPoolInfo},
+		common.IFHOSTORY:  {name: common.ACTION_IFHISTORY, handler: web.IFHistory},
 	}
 	getMethodMap := map[string]Action{
 		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},

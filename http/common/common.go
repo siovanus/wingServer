@@ -21,6 +21,7 @@ const (
 	WINGAPYS        = "/api/v1/wingapys"
 
 	IFPOOLINFO = "/api/v1/if/ifpoolinfo"
+	IFHOSTORY  = "/api/v1/if/ifhistory"
 )
 
 const (
@@ -44,6 +45,7 @@ const (
 	ACTION_WINGAPYS        = "wingapys"
 
 	ACTION_IFPOOLINFO = "ifpoolinfo"
+	ACTION_IFHISTORY  = "ifhistory"
 )
 
 type Response struct {
@@ -324,4 +326,28 @@ type Composition struct {
 	CollateralIcon        string
 	BorrowUnpaidPrincipal string
 	BorrowInterestBalance string
+}
+
+type IFHistoryRequest struct {
+	Asset          string
+	Operation      string
+	StartTimestamp uint64
+	EndTimestamp   uint64
+	PageNo         uint64
+	PageSize       uint64
+}
+
+type IFHistoryResponse struct {
+	MaxPageNum uint64
+	PageItems  []*IFHistory
+}
+
+type IFHistory struct {
+	Name      string
+	Icon      string
+	Operation string
+	Timestamp uint64
+	Balance   string
+	Dollar    string
+	Address   string
 }

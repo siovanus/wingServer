@@ -434,3 +434,34 @@ func (this *Service) IFPoolInfo(param map[string]interface{}) map[string]interfa
 	}
 	return m
 }
+
+func (this *Service) IFHistory(param map[string]interface{}) map[string]interface{} {
+	req := &common.IFHistoryRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("IFHistory: decode params failed, err: %s", err)
+	} else {
+		IFHistory, err := this.ifMgr.IFHistory(req.Asset, req.Operation, req.StartTimestamp, req.EndTimestamp,
+			req.PageNo, req.PageSize)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("IFHistory error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = IFHistory
+			log.Infof("IFHistory success")
+		}
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IFHistory: failed, err: %s", err)
+	} else {
+		log.Debug("IFHistory: resp success")
+	}
+	return m
+}

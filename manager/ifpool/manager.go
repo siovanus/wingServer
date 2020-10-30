@@ -162,3 +162,29 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	}
 	return IFPoolInfo, nil
 }
+
+func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo, pageSize uint64) (*common.IFHistoryResponse, error) {
+	return &common.IFHistoryResponse{
+		MaxPageNum: 1,
+		PageItems: []*common.IFHistory{
+			{
+				Name:      "pUSDT",
+				Icon:      "https://app.ont.io/wing/pusdt.svg",
+				Operation: "Supply",
+				Timestamp: 1604026092000,
+				Balance:   "32532.58",
+				Dollar:    "23526.464",
+				Address:   "Af3Etnp5ffrXR3swrCx9f7KuvChYLgqsTZ",
+			},
+			{
+				Name:      "pDAI",
+				Icon:      "https://app.ont.io/wing/oDAI.svg",
+				Operation: "Borrow",
+				Timestamp: 1604026092000,
+				Balance:   "6968.58",
+				Dollar:    "797.464",
+				Address:   "AR36E5jLdWDKW3Yg51qDFWPGKSLvfPhbqS",
+			},
+		},
+	}, nil
+}
