@@ -1,47 +1,30 @@
 package ifpool
 
 import (
-	"fmt"
 	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/store"
-	"github.com/siovanus/wingServer/utils"
-	"math"
-	"math/big"
 )
 
 type IFPoolManager struct {
 	cfg             *config.Config
 	contractAddress ocommon.Address
-	oracleAddress   ocommon.Address
 	sdk             *sdk.OntologySdk
 	store           *store.Client
 }
 
-func NewIFPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk,
-	store *store.Client, cfg *config.Config) *IFPoolManager {
+func NewIFPoolManager(contractAddress ocommon.Address, sdk *sdk.OntologySdk, store *store.Client,
+	cfg *config.Config) *IFPoolManager {
 	manager := &IFPoolManager{
 		cfg:             cfg,
 		contractAddress: contractAddress,
-		oracleAddress:   oracleAddress,
 		sdk:             sdk,
 		store:           store,
 	}
 
 	return manager
-}
-
-func (this *IFPoolManager) AssetStoredPrice(asset string) (*big.Int, error) {
-	if asset == "USDT" {
-		return new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["oracle"])))), nil
-	}
-	price, err := this.store.LoadPrice(asset)
-	if err != nil {
-		return nil, fmt.Errorf("AssetStoredPrice, this.store.LoadPrice error: %s", err)
-	}
-	return utils.ToIntByPrecise(price.Price, this.cfg.TokenDecimal["oracle"]), nil
 }
 
 func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error) {
@@ -115,10 +98,10 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 				{
 					Name:                  "pUSDT",
 					Icon:                  "https://app.ont.io/wing/pusdt.svg",
-					IfCanBorrow:           true,
 					SupplyBalance:         "42526.3636",
 					SupplyWingEarned:      "242.2525",
 					BorrowWingEarned:      "235.3677",
+					LastBorrowTimestamp:   "1604026092000",
 					InsuranceBalance:      "141536.47",
 					InsuranceWingEarned:   "14.25265",
 					CollateralName:        "pSUSD",
@@ -130,32 +113,32 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 				{
 					Name:                  "pSUSD",
 					Icon:                  "https://app.ont.io/wing/psusd.svg",
-					IfCanBorrow:           true,
 					SupplyBalance:         "235546.4647",
 					SupplyWingEarned:      "22.225",
 					BorrowWingEarned:      "25.377",
+					LastBorrowTimestamp:   "1604026082000",
 					InsuranceBalance:      "14136.47",
 					InsuranceWingEarned:   "1.2265",
 					CollateralName:        "pDAI",
 					CollateralIcon:        "https://app.ont.io/wing/oDAI.svg",
 					CollateralBalance:     "24.6868",
-					BorrowUnpaidPrincipal: "707.808",
-					BorrowInterestBalance: "4646.707",
+					BorrowUnpaidPrincipal: "0",
+					BorrowInterestBalance: "0",
 				},
 				{
 					Name:                  "pDAI",
 					Icon:                  "https://app.ont.io/wing/oDAI.svg",
-					IfCanBorrow:           true,
 					SupplyBalance:         "235544566.464467",
 					SupplyWingEarned:      "224.225",
 					BorrowWingEarned:      "265.37697",
+					LastBorrowTimestamp:   "1604026082000",
 					InsuranceBalance:      "696.47",
 					InsuranceWingEarned:   "1141.2265",
 					CollateralName:        "pUSDT",
 					CollateralIcon:        "https://app.ont.io/wing/pusdt.svg",
 					CollateralBalance:     "2242.57578",
-					BorrowUnpaidPrincipal: "3636.57",
-					BorrowInterestBalance: "2352.57",
+					BorrowUnpaidPrincipal: "0",
+					BorrowInterestBalance: "0",
 				},
 			},
 		}

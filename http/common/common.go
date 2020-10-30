@@ -315,10 +315,10 @@ type UserIFInfo struct {
 type Composition struct {
 	Name                  string
 	Icon                  string
-	IfCanBorrow           bool
 	SupplyBalance         string
 	SupplyWingEarned      string
 	BorrowWingEarned      string
+	LastBorrowTimestamp   string
 	InsuranceBalance      string
 	InsuranceWingEarned   string
 	CollateralBalance     string
