@@ -145,7 +145,7 @@ func (this *Service) TrackEvent() {
 			if len(accounts) != 0 {
 				for _, v := range accounts {
 					log.Infof("TrackEvent, account: %s", v)
-					go this.StoreUserBalance(v, "", "")
+					go this.StoreUserBalance(v)
 				}
 			}
 

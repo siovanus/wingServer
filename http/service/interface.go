@@ -23,7 +23,7 @@ type FlashPoolManager interface {
 	FlashPoolAllMarket() (*common.FlashPoolAllMarket, error)
 	FlashPoolAllMarketForStore() (*common.FlashPoolAllMarket, error)
 	UserFlashPoolOverview(account string) (*common.UserFlashPoolOverview, error)
-	UserBalanceForStore(accountStr, borrowAmount, borrowIndex string) error
+	UserBalanceForStore(accountStr string) error
 	GetAllMarkets() ([]ocommon.Address, error)
 	GetInsuranceAddress(ocommon.Address) (ocommon.Address, error)
 	ClaimWing(account string) (string, error)

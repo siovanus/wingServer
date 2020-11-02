@@ -2,17 +2,19 @@ package flashpool
 
 import (
 	"fmt"
-	"github.com/siovanus/wingServer/utils"
+	flash_ctrl "github.com/wing-groups/wing-contract-tools/contracts/flash-ctrl"
+	price_oracle "github.com/wing-groups/wing-contract-tools/contracts/price-oracle"
 	"math"
 	"math/big"
 	"time"
 
-	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/siovanus/wingServer/store"
+	"github.com/siovanus/wingServer/utils"
+	flash_token "github.com/wing-groups/wing-contract-tools/contracts/flash-token"
 )
 
 const (
@@ -22,21 +24,27 @@ const (
 var GAP = new(big.Int).SetUint64(198684465873214)
 
 type FlashPoolManager struct {
-	cfg             *config.Config
-	contractAddress ocommon.Address
-	oracleAddress   ocommon.Address
-	sdk             *sdk.OntologySdk
-	store           *store.Client
+	cfg         *config.Config
+	store       *store.Client
+	Comptroller *flash_ctrl.Comptroller
+	FlashToken  *flash_token.FlashToken
+	Oracle      *price_oracle.Oracle
 }
 
-func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, sdk *sdk.OntologySdk,
-	store *store.Client, cfg *config.Config) *FlashPoolManager {
+func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *store.Client,
+	cfg *config.Config) *FlashPoolManager {
+	flashToken, _ := flash_token.NewFlashToken(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
+		2500, 20000)
+	comptroller, _ := flash_ctrl.NewComptroller(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
+		2500, 20000)
+	oracle, _ := price_oracle.NewOracle(cfg.JsonRpcAddress, oracleAddress.ToHexString(), nil,
+		2500, 20000)
 	manager := &FlashPoolManager{
-		cfg:             cfg,
-		contractAddress: contractAddress,
-		oracleAddress:   oracleAddress,
-		sdk:             sdk,
-		store:           store,
+		cfg:         cfg,
+		store:       store,
+		FlashToken:  flashToken,
+		Comptroller: comptroller,
+		Oracle:      oracle,
 	}
 
 	return manager
@@ -232,15 +240,15 @@ func (this *FlashPoolManager) FlashPoolDetailForStore() (*store.FlashPoolDetail,
 	i := new(big.Int).SetUint64(0)
 	for _, address := range allMarkets {
 		name := this.cfg.AssetMap[address.ToHexString()]
-		supplyAmount, err := this.getSupplyAmount(address)
+		supplyAmount, err := this.getTotalSupply(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
 		}
-		borrowAmount, err := this.getBorrowAmount(address)
+		borrowAmount, err := this.getTotalBorrows(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
 		}
-		insuranceAmount, err := this.getInsuranceAmount(address)
+		insuranceAmount, err := this.getTotalInsurance(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolDetailForStore, this.getSupplyAmount error: %s", err)
 		}
@@ -277,15 +285,15 @@ func (this *FlashPoolManager) FlashPoolMarketStore() error {
 	timestamp := uint64(time.Now().Unix())
 	for _, address := range allMarkets {
 		flashPoolMarket := new(store.FlashPoolMarket)
-		supplyAmount, err := this.getSupplyAmount(address)
+		supplyAmount, err := this.getTotalSupply(address)
 		if err != nil {
 			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
 		}
-		borrowAmount, err := this.getBorrowAmount(address)
+		borrowAmount, err := this.getTotalBorrows(address)
 		if err != nil {
 			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
 		}
-		insuranceAmount, err := this.getInsuranceAmount(address)
+		insuranceAmount, err := this.getTotalInsurance(address)
 		if err != nil {
 			return fmt.Errorf("FlashPoolMarketStore, this.getSupplyAmount error: %s", err)
 		}
@@ -344,15 +352,15 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 	}
 	for _, address := range allMarkets {
 		name := this.cfg.AssetMap[address.ToHexString()]
-		supplyAmount, err := this.getSupplyAmount(address)
+		supplyAmount, err := this.getTotalSupply(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getSupplyAmount error: %s", err)
 		}
-		borrowAmount, err := this.getBorrowAmount(address)
+		borrowAmount, err := this.getTotalBorrows(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowAmount error: %s", err)
 		}
-		insuranceAmount, err := this.getInsuranceAmount(address)
+		insuranceAmount, err := this.getTotalInsurance(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getInsuranceAmount error: %s", err)
 		}
@@ -381,10 +389,6 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getExchangeRate error: %s", err)
 		}
-		borrowIndex, err := this.getBorrowIndex(address)
-		if err != nil {
-			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowIndex error: %s", err)
-		}
 
 		market := new(common.Market)
 		market.Name = this.cfg.AssetMap[address.ToHexString()]
@@ -406,7 +410,6 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		market.SupplyApy = utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"])
 		market.BorrowApy = utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"])
 		market.ExchangeRate = utils.ToStringByPrecise(exchangeRate, 0)
-		market.BorrowIndex = utils.ToStringByPrecise(borrowIndex, 0)
 		//market.InsuranceApy = utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"])
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
@@ -577,7 +580,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 		ba := new(big.Int).Mul(borrowDollar, borrowApy)
 		netApy = new(big.Int).Add(netApy, new(big.Int).Sub(new(big.Int).Add(sa, ia), ba))
 
-		claimWingAtMarket, err := this.getClaimWingAtMarket(account, []interface{}{address})
+		claimWingAtMarket, err := this.getClaimWingAtMarket(account, []ocommon.Address{address})
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.getClaimWingAtMarket account %s asset %s error: %s",
 				account.ToBase58(), address.ToHexString(), err)
@@ -647,7 +650,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 	return userFlashPoolOverview, nil
 }
 
-func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borrowIndex string) error {
+func (this *FlashPoolManager) UserBalanceForStore(accountStr string) error {
 	account, err := ocommon.AddressFromBase58(accountStr)
 	if err != nil {
 		return fmt.Errorf("UserBalanceForStore, ocommon.AddressFromBase58 error: %s", err)
@@ -655,10 +658,6 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borr
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
 		return fmt.Errorf("UserBalanceForStore, this.GetAllMarkets error: %s", err)
-	}
-	userBalance, err := this.store.LoadUserBalance(accountStr)
-	if err != nil {
-		return fmt.Errorf("UserBalanceForStore, this.store.LoadUserBalance error: %s", err)
 	}
 	assetsIn, _ := this.getAssetsIn(account)
 	for _, address := range allMarkets {
@@ -670,6 +669,14 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borr
 		if err != nil {
 			return fmt.Errorf("UserBalanceForStore, this.getInsuranceAmountByAccount error: %s", err)
 		}
+		borrowAmount, err := this.getBorrowAmount(address, account)
+		if err != nil {
+			return fmt.Errorf("UserBalanceForStore, this.getBorrowAmount error: %s", err)
+		}
+		borrowIndex, err := this.getBorrowIndex(address)
+		if err != nil {
+			return fmt.Errorf("UserBalanceForStore, this.getBorrowIndex error: %s", err)
+		}
 		name := this.cfg.AssetMap[address.ToHexString()]
 		isAssetIn := false
 		for _, a := range assetsIn {
@@ -678,30 +685,24 @@ func (this *FlashPoolManager) UserBalanceForStore(accountStr, borrowAmount, borr
 				break
 			}
 		}
-		if borrowAmount == "" && borrowIndex == "" {
-			userAssetBalance := store.UserAssetBalance{}
-			for _, v := range userBalance {
-				if v.AssetName == name {
-					userAssetBalance = v
-				}
-			}
-			borrowAmount = userAssetBalance.BorrowAmount
-			borrowIndex = userAssetBalance.BorrowIndex
-		}
 		userBalance := &store.UserAssetBalance{
 			UserAddress:  accountStr,
 			AssetAddress: address.ToHexString(),
 			AssetName:    name,
 			Icon:         this.cfg.IconMap[name],
 			FToken:       utils.ToStringByPrecise(fToken, 0),
-			BorrowAmount: borrowAmount,
-			BorrowIndex:  borrowIndex,
+			BorrowAmount: utils.ToStringByPrecise(borrowAmount, 0),
+			BorrowIndex:  utils.ToStringByPrecise(borrowIndex, 0),
 			Itoken:       utils.ToStringByPrecise(iToken, 0),
 			IfCollateral: isAssetIn,
 		}
 		err = this.store.SaveUserAssetBalance(userBalance)
 		if err != nil {
 			return fmt.Errorf("UserBalanceForStore, this.store.SaveUserAssetBalance error: %s", err)
+		}
+		err = this.store.UpdateFlashMarketBorrowIndex(name, userBalance.BorrowIndex)
+		if err != nil {
+			return fmt.Errorf("UserBalanceForStore, this.store.UpdateFlashMarketBorrowIndex error: %s", err)
 		}
 	}
 	return nil
@@ -818,8 +819,9 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		if err != nil {
 			return fmt.Errorf("WingApy, this.getWingSBIPortion error: %s", err)
 		}
-		totalPortion := new(big.Int).Add(wingSBIPortion.InsurancePortion.ToBigInt(),
-			new(big.Int).Add(wingSBIPortion.SupplyPortion.ToBigInt(), wingSBIPortion.BorrowPortion.ToBigInt()))
+		totalPortion := new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.InsurancePortion),
+			new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.SupplyPortion),
+				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)))
 		price, err := this.AssetStoredPrice("WING")
 		if err != nil {
 			return fmt.Errorf("WingApy, this.AssetStoredPrice error: %s", err)
@@ -834,19 +836,19 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 {
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
-				wingSBIPortion.SupplyPortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 		if totalBorrowDollar.Uint64() != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
-				wingSBIPortion.BorrowPortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 		if totalInsuranceDollar.Uint64() != 0 {
 			insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
-				wingSBIPortion.InsurancePortion.ToBigInt()), price), new(big.Int).SetUint64(governance.YearSecond)),
+				new(big.Int).SetUint64(wingSBIPortion.InsurancePortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
@@ -870,6 +872,10 @@ func (this *FlashPoolManager) WingApys() ([]common.WingApy, error) {
 		return nil, fmt.Errorf("WingApy, this.store.LoadWingApys error: %s", err)
 	}
 	return wingApys, nil
+}
+
+func (this *FlashPoolManager) GetInsuranceAddress(address ocommon.Address) (ocommon.Address, error) {
+	return this.getInsuranceAddress(address)
 }
 
 func (this *FlashPoolManager) Reserves() (*common.Reserves, error) {

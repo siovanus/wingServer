@@ -106,7 +106,7 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("governance manager is nil")
 		return
 	}
-	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, sdk, store, servConfig)
+	fpMgr := flashpool.NewFlashPoolManager(fpAddress, oracleAddress, store, servConfig)
 	if fpMgr == nil {
 		log.Errorf("flashpool manager is nil")
 		return

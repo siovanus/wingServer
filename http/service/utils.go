@@ -15,7 +15,6 @@ func (this *Service) trackSnapshotEvent(height uint32) (bool, []string, error) {
 	}
 	flag := false
 	for _, event := range events {
-		var borrowAccount, borrowAmount, borrowIndex string
 		for _, notify := range event.Notify {
 			var ok bool
 			states, ok := notify.States.([]interface{})
@@ -28,28 +27,6 @@ func (this *Service) trackSnapshotEvent(height uint32) (bool, []string, error) {
 			name, _ := states[0].(string)
 			if name == "PutUnderlyingPrice" {
 				flag = true
-				continue
-			}
-
-			if name == "Borrow" {
-				borrowAccount, ok = states[1].(string)
-				if !ok {
-					log.Errorf("trackSnapshotEvent, Borrow event, parse account error")
-					continue
-				}
-				borrowAmount, ok = states[2].(string)
-				if !ok {
-					log.Errorf("trackSnapshotEvent, Borrow event, parse borrowAmount error")
-					continue
-				}
-				continue
-			}
-			if name == "AccrueInterest" {
-				borrowIndex, ok = states[3].(string)
-				if !ok {
-					log.Errorf("trackSnapshotEvent, Borrow event, parse borrowIndex error")
-					continue
-				}
 				continue
 			}
 
@@ -80,9 +57,6 @@ func (this *Service) trackSnapshotEvent(height uint32) (bool, []string, error) {
 				}
 			}
 		}
-		if borrowAccount != "" {
-			this.StoreUserBalance(borrowAccount, borrowAmount, borrowIndex)
-		}
 	}
 	return flag, accounts, nil
 }
@@ -107,8 +81,8 @@ func (this *Service) PriceFeed() error {
 	return nil
 }
 
-func (this *Service) StoreUserBalance(accountStr, borrowAmount, borrowIndex string) {
-	err := this.fpMgr.UserBalanceForStore(accountStr, borrowAmount, borrowIndex)
+func (this *Service) StoreUserBalance(accountStr string) {
+	err := this.fpMgr.UserBalanceForStore(accountStr)
 	if err != nil {
 		log.Errorf("StoreUserBalance, this.fpMgr.UserFlashPoolOverviewForStore error: %s", err)
 	}

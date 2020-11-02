@@ -195,6 +195,10 @@ func (client Client) SaveFlashMarket(market *common.Market) error {
 	return client.db.Save(market).Error
 }
 
+func (client Client) UpdateFlashMarketBorrowIndex(name, borrowIndex string) error {
+	return client.db.Where("name = ?", name).Update("borrow_index", borrowIndex).Error
+}
+
 func (client Client) LoadWingApys() ([]common.WingApy, error) {
 	wingApys := make([]common.WingApy, 0)
 	err := client.db.Find(&wingApys).Error
