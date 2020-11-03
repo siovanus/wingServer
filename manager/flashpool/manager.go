@@ -377,10 +377,6 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowApy error: %s", err)
 		}
-		//insuranceApy, err := this.getInsuranceApy(address)
-		//if err != nil {
-		//	return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getInsuranceApy error: %s", err)
-		//}
 		marketMeta, err := this.getMarketMeta(address)
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getMarketMeta error: %s", err)
@@ -407,8 +403,8 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		market.TotalInsuranceDollar = utils.ToStringByPrecise(new(big.Int).Mul(insuranceAmount, price),
 			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
 		market.CollateralFactor = utils.ToStringByPrecise(marketMeta.CollateralFactorMantissa, this.cfg.TokenDecimal["flash"])
-		market.SupplyApy = utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["flash"])
-		market.BorrowApy = utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"])
+		market.SupplyApy = utils.ToStringByPrecise(supplyApy, this.cfg.TokenDecimal["interest"])
+		market.BorrowApy = utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["interest"])
 		market.ExchangeRate = utils.ToStringByPrecise(exchangeRate, 0)
 		//market.InsuranceApy = utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"])
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)

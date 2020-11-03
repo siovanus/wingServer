@@ -100,7 +100,13 @@ func (this *FlashPoolManager) getReserveFactor(contractAddress common.Address) (
 
 func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big.Int, error) {
 	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.SupplyRatePerBlock()
+	ratePerBlock, err := this.FlashToken.SupplyRatePerBlock()
+	if err != nil {
+		return nil, fmt.Errorf("getSupplyApy, this.FlashToken.SupplyRatePerBlock error: %s", err)
+	}
+
+	result := new(big.Int).Mul(ratePerBlock, new(big.Int).SetUint64(BlockPerYear))
+	return result, nil
 }
 
 func (this *FlashPoolManager) getBorrowRatePerBlock(contractAddress common.Address) (*big.Int, error) {
