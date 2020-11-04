@@ -20,32 +20,27 @@ func (this *FlashPoolManager) getAssetsIn(account common.Address) ([]common.Addr
 }
 
 func (this *FlashPoolManager) getFTokenAmount(contractAddress, account common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.BalanceOf(account)
+	return this.FlashTokenMap[contractAddress].BalanceOf(account)
 }
 
 func (this *FlashPoolManager) getITokenAmount(contractAddress, account common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	iAddress, err := this.FlashToken.InsuranceAddr()
+	iAddress, err := this.FlashTokenMap[contractAddress].InsuranceAddr()
 	if err != nil {
 		return nil, fmt.Errorf("getITokenAmount, this.FlashToken.InsuranceAddr error: %s", err)
 	}
-	this.FlashToken.SetAddr(iAddress)
-	return this.FlashToken.BalanceOf(account)
+	return this.FlashTokenMap[iAddress].BalanceOf(account)
 }
 
 func (this *FlashPoolManager) getBorrowAmount(contractAddress, account common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.BorrowBalanceStored(account)
+	return this.FlashTokenMap[contractAddress].BorrowBalanceStored(account)
 }
 
 func (this *FlashPoolManager) getTotalSupply(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	totalCash, err := this.FlashToken.GetCash()
+	totalCash, err := this.FlashTokenMap[contractAddress].GetCash()
 	if err != nil {
 		return nil, fmt.Errorf("getTotalSupply, this.FlashToken.GetCash error: %s", err)
 	}
-	totalBorrows, err := this.FlashToken.TotalBorrows()
+	totalBorrows, err := this.FlashTokenMap[contractAddress].TotalBorrows()
 	if err != nil {
 		return nil, fmt.Errorf("getTotalSupply, this.FlashToken.TotalBorrows error: %s", err)
 	}
@@ -55,28 +50,23 @@ func (this *FlashPoolManager) getTotalSupply(contractAddress common.Address) (*b
 }
 
 func (this *FlashPoolManager) getTotalBorrows(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.TotalBorrows()
+	return this.FlashTokenMap[contractAddress].TotalBorrows()
 }
 
 func (this *FlashPoolManager) getTotalReserves(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.TotalReserves()
+	return this.FlashTokenMap[contractAddress].TotalReserves()
 }
 
 func (this *FlashPoolManager) getTotalInsurance(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	iAddress, err := this.FlashToken.InsuranceAddr()
+	iAddress, err := this.FlashTokenMap[contractAddress].InsuranceAddr()
 	if err != nil {
 		return nil, fmt.Errorf("getTotalInsurance, this.FlashToken.InsuranceAddr error: %s", err)
 	}
-	this.FlashToken.SetAddr(iAddress)
-	return this.FlashToken.GetCash()
+	return this.FlashTokenMap[iAddress].GetCash()
 }
 
 func (this *FlashPoolManager) getInsuranceAddress(contractAddress common.Address) (common.Address, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.InsuranceAddr()
+	return this.FlashTokenMap[contractAddress].InsuranceAddr()
 }
 
 func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) (*big.Int, error) {
@@ -84,23 +74,19 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 }
 
 func (this *FlashPoolManager) getExchangeRate(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.ExchangeRateStored()
+	return this.FlashTokenMap[contractAddress].ExchangeRateStored()
 }
 
 func (this *FlashPoolManager) getBorrowIndex(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.BorrowIndex()
+	return this.FlashTokenMap[contractAddress].BorrowIndex()
 }
 
 func (this *FlashPoolManager) getReserveFactor(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.ReserveFactorMantissa()
+	return this.FlashTokenMap[contractAddress].ReserveFactorMantissa()
 }
 
 func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	ratePerBlock, err := this.FlashToken.SupplyRatePerBlock()
+	ratePerBlock, err := this.FlashTokenMap[contractAddress].SupplyRatePerBlock()
 	if err != nil {
 		return nil, fmt.Errorf("getSupplyApy, this.FlashToken.SupplyRatePerBlock error: %s", err)
 	}
@@ -110,13 +96,11 @@ func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big
 }
 
 func (this *FlashPoolManager) getBorrowRatePerBlock(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	return this.FlashToken.BorrowRatePerBlock()
+	return this.FlashTokenMap[contractAddress].BorrowRatePerBlock()
 }
 
 func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (*big.Int, error) {
-	this.FlashToken.SetAddr(contractAddress)
-	ratePerBlock, err := this.FlashToken.BorrowRatePerBlock()
+	ratePerBlock, err := this.FlashTokenMap[contractAddress].BorrowRatePerBlock()
 	if err != nil {
 		return nil, fmt.Errorf("getBorrowApy, this.FlashToken.BorrowRatePerBlock error: %s", err)
 	}

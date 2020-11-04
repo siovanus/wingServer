@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/log"
 	flash_ctrl "github.com/wing-groups/wing-contract-tools/contracts/flash-ctrl"
 	price_oracle "github.com/wing-groups/wing-contract-tools/contracts/price-oracle"
 	"math"
@@ -24,27 +25,43 @@ const (
 var GAP = new(big.Int).SetUint64(198684465873214)
 
 type FlashPoolManager struct {
-	cfg         *config.Config
-	store       *store.Client
-	Comptroller *flash_ctrl.Comptroller
-	FlashToken  *flash_token.FlashToken
-	Oracle      *price_oracle.Oracle
+	cfg           *config.Config
+	store         *store.Client
+	Comptroller   *flash_ctrl.Comptroller
+	FlashTokenMap map[ocommon.Address]*flash_token.FlashToken
+	Oracle        *price_oracle.Oracle
 }
 
 func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *store.Client,
 	cfg *config.Config) *FlashPoolManager {
-	flashToken, _ := flash_token.NewFlashToken(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
-		2500, 20000)
 	comptroller, _ := flash_ctrl.NewComptroller(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
 		2500, 20000)
 	oracle, _ := price_oracle.NewOracle(cfg.JsonRpcAddress, oracleAddress.ToHexString(), nil,
 		2500, 20000)
+	flashTokenMap := make(map[ocommon.Address]*flash_token.FlashToken)
+	allMarket, err := comptroller.AllMarkets()
+	if err != nil {
+		log.Errorf("NewFlashPoolManager, comptroller.AllMarkets error: %s", err)
+	}
+	for _, addr := range allMarket {
+		flashToken, _ := flash_token.NewFlashToken(cfg.JsonRpcAddress, addr.ToHexString(), nil,
+			2500, 20000)
+		insuranceAddr, err := flashToken.InsuranceAddr()
+		if err != nil {
+			log.Errorf("NewFlashPoolManager, flashToken.InsuranceAddrs error: %s", err)
+		}
+		insuranceToken, _ := flash_token.NewFlashToken(cfg.JsonRpcAddress, insuranceAddr.ToHexString(), nil,
+			2500, 20000)
+		flashTokenMap[addr] = flashToken
+		flashTokenMap[insuranceAddr] = insuranceToken
+	}
+
 	manager := &FlashPoolManager{
-		cfg:         cfg,
-		store:       store,
-		FlashToken:  flashToken,
-		Comptroller: comptroller,
-		Oracle:      oracle,
+		cfg:           cfg,
+		store:         store,
+		FlashTokenMap: flashTokenMap,
+		Comptroller:   comptroller,
+		Oracle:        oracle,
 	}
 
 	return manager

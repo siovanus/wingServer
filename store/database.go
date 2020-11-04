@@ -196,7 +196,7 @@ func (client Client) SaveFlashMarket(market *common.Market) error {
 }
 
 func (client Client) UpdateFlashMarketBorrowIndex(name, borrowIndex string) error {
-	return client.db.Where("name = ?", name).Update("borrow_index", borrowIndex).Error
+	return client.db.Model(&common.Market{Name: name}).Update("borrow_index", borrowIndex).Error
 }
 
 func (client Client) LoadWingApys() ([]common.WingApy, error) {
