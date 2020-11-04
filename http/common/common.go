@@ -110,9 +110,10 @@ type FlashPoolBanner struct {
 }
 
 type FlashPoolDetail struct {
-	TotalSupply    string
-	TotalBorrow    string
-	TotalInsurance string
+	TotalSupply               string
+	TotalBorrow               string
+	TotalWingInsuranceBalance string
+	TotalWingInsuranceDollar  string
 }
 
 type UserFlashPoolOverviewRequest struct {
@@ -127,8 +128,9 @@ type UserFlashPoolOverviewResponse struct {
 }
 
 type UserFlashPoolOverview struct {
-	BorrowLimit string
-	NetApy      string
+	BorrowLimit         string
+	NetApy              string
+	WingInsuranceAmount string
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow
@@ -181,8 +183,6 @@ type UserMarket struct {
 	SupplyApy             string
 	BorrowApy             string
 	BorrowLiquidity       string
-	InsuranceApy          string
-	InsuranceAmount       string
 	CollateralFactor      string
 	SupplyDistribution    string
 	BorrowDistribution    string
@@ -254,6 +254,11 @@ type LiquidationListResponse struct {
 type LiquidationListRequest struct {
 	Id      string
 	Address string
+}
+
+type WingApys struct {
+	InsuranceApy string
+	WingApyList  []*WingApy
 }
 
 type WingApy struct {
