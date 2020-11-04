@@ -130,7 +130,6 @@ type UserFlashPoolOverviewResponse struct {
 type UserFlashPoolOverview struct {
 	BorrowLimit         string
 	NetApy              string
-	WingInsuranceAmount string
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow
@@ -211,6 +210,7 @@ type Market struct {
 	BorrowDistribution    string
 	InsuranceDistribution string
 	ExchangeRate          string
+	IExchangeRate         string
 	BorrowIndex           string
 }
 
