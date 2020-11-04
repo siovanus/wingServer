@@ -3,6 +3,7 @@ package flashpool
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	"github.com/siovanus/wingServer/manager/governance"
 	flash_ctrl "github.com/wing-groups/wing-contract-tools/contracts/flash-ctrl"
 	"math/big"
 )
@@ -91,7 +92,7 @@ func (this *FlashPoolManager) getSupplyApy(contractAddress common.Address) (*big
 		return nil, fmt.Errorf("getSupplyApy, this.FlashToken.SupplyRatePerBlock error: %s", err)
 	}
 
-	result := new(big.Int).Mul(ratePerBlock, new(big.Int).SetUint64(BlockPerYear))
+	result := new(big.Int).Mul(ratePerBlock, new(big.Int).SetUint64(governance.YearSecond))
 	return result, nil
 }
 
@@ -105,7 +106,7 @@ func (this *FlashPoolManager) getBorrowApy(contractAddress common.Address) (*big
 		return nil, fmt.Errorf("getBorrowApy, this.FlashToken.BorrowRatePerBlock error: %s", err)
 	}
 
-	result := new(big.Int).Mul(ratePerBlock, new(big.Int).SetUint64(BlockPerYear))
+	result := new(big.Int).Mul(ratePerBlock, new(big.Int).SetUint64(governance.YearSecond))
 	return result, nil
 }
 

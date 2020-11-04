@@ -128,8 +128,8 @@ type UserFlashPoolOverviewResponse struct {
 }
 
 type UserFlashPoolOverview struct {
-	BorrowLimit         string
-	NetApy              string
+	BorrowLimit string
+	NetApy      string
 
 	CurrentSupply    []*Supply
 	CurrentBorrow    []*Borrow

@@ -18,10 +18,6 @@ import (
 	flash_token "github.com/wing-groups/wing-contract-tools/contracts/flash-token"
 )
 
-const (
-	BlockPerYear = 60 * 60 * 24 * 365 * 2 / 5
-)
-
 var GAP = new(big.Int).SetUint64(198684465873214)
 
 type FlashPoolManager struct {
@@ -415,6 +411,10 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getExchangeRate error: %s", err)
 		}
+		borrowIndex, err := this.getBorrowIndex(address)
+		if err != nil {
+			return nil, fmt.Errorf("FlashPoolAllMarketForStore, this.getBorrowIndex error: %s", err)
+		}
 
 		market := new(common.Market)
 		market.Name = this.cfg.AssetMap[address.ToHexString()]
@@ -437,6 +437,7 @@ func (this *FlashPoolManager) FlashPoolAllMarketForStore() (*common.FlashPoolAll
 		market.BorrowApy = utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["interest"])
 		market.ExchangeRate = utils.ToStringByPrecise(exchangeRate, 0)
 		market.IExchangeRate = utils.ToStringByPrecise(iExchangeRate, 0)
+		market.BorrowIndex = utils.ToStringByPrecise(borrowIndex, 0)
 		//market.InsuranceApy = utils.ToStringByPrecise(insuranceApy, this.cfg.TokenDecimal["flash"])
 		flashPoolAllMarket.FlashPoolAllMarket = append(flashPoolAllMarket.FlashPoolAllMarket, market)
 	}
@@ -621,7 +622,7 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 			borrow := &common.Borrow{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
-				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]+this.cfg.TokenDecimal["flash"]),
+				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				WingEarned:       utils.ToStringByPrecise(claimWingAtMarket, this.cfg.TokenDecimal["WING"]),
 				CollateralFactor: market.CollateralFactor,
