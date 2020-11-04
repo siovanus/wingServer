@@ -71,7 +71,15 @@ func (this *FlashPoolManager) getInsuranceAddress(contractAddress common.Address
 }
 
 func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) (*big.Int, error) {
-	return this.Comptroller.WingDistributedNum(assetAddress)
+	result, err := this.Comptroller.WingDistributedNum(assetAddress)
+	if err != nil {
+		return nil, fmt.Errorf("getTotalDistribution, this.Comptroller.WingDistributedNum error: %s", err)
+	}
+	if this.cfg.AssetMap[assetAddress.ToHexString()] == "pWBTC" {
+		return new(big.Int).Sub(result, GAP), nil
+	} else {
+		return result, nil
+	}
 }
 
 func (this *FlashPoolManager) getExchangeRate(contractAddress common.Address) (*big.Int, error) {
