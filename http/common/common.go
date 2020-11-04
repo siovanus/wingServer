@@ -258,7 +258,7 @@ type LiquidationListRequest struct {
 
 type WingApys struct {
 	InsuranceApy string
-	WingApyList  []*WingApy
+	WingApyList  []WingApy
 }
 
 type WingApy struct {

@@ -909,6 +909,7 @@ func (this *FlashPoolManager) WingApys() (*common.WingApys, error) {
 			wingApys.InsuranceApy = v.InsuranceApy
 		}
 	}
+	wingApys.WingApyList = wingApyList
 	return wingApys, nil
 }
 
