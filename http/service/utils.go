@@ -111,6 +111,20 @@ func (this *Service) StoreWingApy() {
 	}
 }
 
+func (this *Service) StoreIFInfo() {
+	err := this.ifMgr.StoreIFInfo()
+	if err != nil {
+		log.Errorf("StoreIFInfo, this.fpMgr.StoreIFInfo error: %s", err)
+	}
+}
+
+func (this *Service) StoreIFMarketInfo() {
+	err := this.ifMgr.StoreIFMarketInfo()
+	if err != nil {
+		log.Errorf("StoreIFMarketInfo, this.fpMgr.StoreIFMarketInfo error: %s", err)
+	}
+}
+
 func listContains(list []string, arg string) bool {
 	for _, v := range list {
 		if arg == v {

@@ -169,6 +169,8 @@ func (this *Service) SnapshotMinute() {
 	for {
 		go this.StoreFlashPoolAllMarket()
 		go this.StoreWingApy()
+		go this.StoreIFInfo()
+		go this.StoreIFMarketInfo()
 		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
 }

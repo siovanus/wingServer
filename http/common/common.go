@@ -286,11 +286,11 @@ type Reserve struct {
 type IFPoolInfo struct {
 	Total       string
 	Cap         string
-	IFAssetList []*IFAssetList
+	IFAssetList []*IFAsset
 	UserIFInfo  *UserIFInfo
 }
 
-type IFAssetList struct {
+type IFAsset struct {
 	Name                 string
 	Icon                 string
 	Price                string

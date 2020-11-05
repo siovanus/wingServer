@@ -214,3 +214,40 @@ func (client Client) LoadWingApy(assetName string) (common.WingApy, error) {
 func (client Client) SaveWingApy(wingApy *common.WingApy) error {
 	return client.db.Save(wingApy).Error
 }
+
+type IFInfo struct {
+	Name  string `gorm:"primary_key"`
+	Total string
+	Cap   string
+}
+
+func (client Client) LoadIFInfo() (IFInfo, error) {
+	var ifInfo IFInfo
+	err := client.db.Where(IFInfo{Name: "IFInfo"}).Last(&ifInfo).Error
+	return ifInfo, err
+}
+
+func (client Client) SaveIFInfo(ifInfo *IFInfo) error {
+	ifInfo.Name = "IFInfo"
+	return client.db.Save(ifInfo).Error
+}
+
+type IFMarketInfo struct {
+	Name             string
+	TotalCash        string
+	TotalDebt        string
+	InterestIndex    string
+	TotalInsurance string
+	InterestRate     uint64
+	CollateralFactor uint64
+}
+
+func (client Client) LoadIFMarketInfo(name string) (IFMarketInfo, error) {
+	var ifMarketInfo IFMarketInfo
+	err := client.db.Where(IFInfo{Name: name}).Last(&ifMarketInfo).Error
+	return ifMarketInfo, err
+}
+
+func (client Client) SaveIFMarketInfo(ifMarketInfo *IFMarketInfo) error {
+	return client.db.Save(ifMarketInfo).Error
+}

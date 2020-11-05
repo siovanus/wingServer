@@ -53,6 +53,11 @@
     "d5bfee3988bbdd4161c65cbe0cc7326c56ad6aa8": "UNI",
     "a664a485338dc50ff613304454f2675aee9406b0": "ETH9"
   },
+  "if_map": {
+    "SUSD": "pSUSD",
+    "USDT": "pUSDT",
+    "USDC": "pUSDC"
+  },
   "token_decimal":{
     "percentage": 12,
     "ONTd": 9,

@@ -51,6 +51,12 @@ type WingApy struct {
 	InsuranceApy string
 }
 
+type IFInfo struct {
+	Name  string `gorm:"primary_key"`
+	Total string
+	Cap   string
+}
+
 // Migrate runs the initial migration
 func Migrate(tx *gorm.DB) error {
 	err := tx.AutoMigrate(&FlashPoolDetail{}).Error
@@ -86,6 +92,11 @@ func Migrate(tx *gorm.DB) error {
 	err = tx.AutoMigrate(WingApy{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate WingApy")
+	}
+
+	err = tx.AutoMigrate(IFInfo{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate IFInfo")
 	}
 
 	return nil

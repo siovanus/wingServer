@@ -1,8 +1,14 @@
 package ifpool
 
 import (
+	"fmt"
+	"github.com/siovanus/wingServer/manager/governance"
+	"github.com/siovanus/wingServer/utils"
 	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
+	"math"
+	"math/big"
 	"os"
+	"time"
 
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
@@ -14,6 +20,10 @@ import (
 	"github.com/wing-groups/wing-contract-tools/contracts/iftoken"
 	"github.com/wing-groups/wing-contract-tools/contracts/iitoken"
 )
+
+var GenesisTime = time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix()
+
+const MaxLevel = 0x03
 
 type IFPoolManager struct {
 	cfg          *config.Config
@@ -68,64 +78,131 @@ func NewIFPoolManager(contractAddress, oscoreOracleAddress ocommon.Address, stor
 	return manager
 }
 
+func (this *IFPoolManager) StoreIFInfo() error {
+	ifInfo := new(store.IFInfo)
+	capacity, err := this.Comptroller.MaxSupplyValue()
+	if err != nil {
+		return fmt.Errorf("StoreIFInfo, this.Comptroller.MaxSupplyValue error: %s", err)
+	}
+	ifInfo.Cap = utils.ToStringByPrecise(capacity, this.cfg.TokenDecimal["oracle"])
+	total, err := this.Comptroller.TotalSupplyValue()
+	if err != nil {
+		return fmt.Errorf("StoreIFInfo, this.Comptroller.TotalSupplyValue error: %s", err)
+	}
+	ifInfo.Total = utils.ToStringByPrecise(total, this.cfg.TokenDecimal["oracle"])
+	err = this.store.SaveIFInfo(ifInfo)
+	if err != nil {
+		return fmt.Errorf("StoreIFInfo, this.store.SaveIFInfo error: %s", err)
+	}
+	return nil
+}
+
+func (this *IFPoolManager) StoreIFMarketInfo() error {
+	allMarket, err := this.Comptroller.AllMarkets()
+	if err != nil {
+		return fmt.Errorf("StoreIFMarketInfo, this.Comptroller.AllMarkets error: %s", err)
+	}
+	for _, name := range allMarket {
+		ifMarketInfo := new(store.IFMarketInfo)
+		marketInfo, err := this.Comptroller.MarketInfo(name)
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.Comptroller.MarketInfo error: %s", err)
+		}
+		ifMarketInfo.Name = name
+		totalCash, err := this.FTokenMap[marketInfo.SupplyPool].TotalCash()
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.FTokenMap[marketInfo.SupplyPool].TotalCash error: %s", err)
+		}
+		totalDebt, err := this.FTokenMap[marketInfo.SupplyPool].TotalDebt()
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.FTokenMap[marketInfo.SupplyPool].TotalDebt error: %s", err)
+		}
+		interestIndex, err := this.Comptroller.InterestIndex(name)
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.Comptroller.InterestIndex error: %s", err)
+		}
+		ifMarketInfo.TotalCash = utils.ToStringByPrecise(totalCash, 0)
+		ifMarketInfo.TotalDebt = utils.ToStringByPrecise(totalDebt, 0)
+		ifMarketInfo.InterestIndex = utils.ToStringByPrecise(interestIndex, 0)
+
+		oscoreInfo, err := this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel(MaxLevel)
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel error: %s", err)
+		}
+		ifMarketInfo.InterestRate = oscoreInfo.InterestRate
+		ifMarketInfo.CollateralFactor = oscoreInfo.CollateralFactor
+		totalInsurance, err := this.ITokenMap[marketInfo.InsurancePool].TotalCash()
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.ITokenMap[marketInfo.InsurancePool].TotalCash error: %s", err)
+		}
+		ifMarketInfo.TotalInsurance = utils.ToStringByPrecise(totalInsurance, 0)
+
+		err = this.store.SaveIFMarketInfo(ifMarketInfo)
+		if err != nil {
+			return fmt.Errorf("StoreIFMarketInfo, this.store.SaveIFMarketInfo error: %s", err)
+		}
+	}
+	return nil
+}
+
 func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error) {
-	IFPoolInfo := &common.IFPoolInfo{
-		Total: "462000.13241",
-		Cap:   "500000",
-		IFAssetList: []*common.IFAssetList{
-			{
-				Name:                 "pUSDT",
-				Icon:                 "https://app.ont.io/wing/pusdt.svg",
-				Price:                "1",
-				TotalSupply:          "1435.456747",
-				SupplyInterestPerDay: "0.252536",
-				SupplyWingAPY:        "0.2436",
-				UtilizationRate:      "0.7714",
-				MaximumLTV:           "0.125",
-				TotalBorrowed:        "9656.25225",
-				BorrowInterestPerDay: "0.00024",
-				BorrowWingAPY:        "2367",
-				Liquidity:            "256.4564",
-				BorrowCap:            "30",
-				TotalInsurance:       "1769.3536",
-				InsuranceWingAPY:     "2.349",
-			},
-			{
-				Name:                 "pSUSD",
-				Icon:                 "https://app.ont.io/wing/psusd.svg",
-				Price:                "1.001",
-				TotalSupply:          "121435.4564747",
-				SupplyInterestPerDay: "0.0253463",
-				SupplyWingAPY:        "0.242536",
-				UtilizationRate:      "0.786714",
-				MaximumLTV:           "0.1425",
-				TotalBorrowed:        "965256.25225",
-				BorrowInterestPerDay: "0.000224",
-				BorrowWingAPY:        "235267",
-				Liquidity:            "2536.4564",
-				BorrowCap:            "500",
-				TotalInsurance:       "1876969.34536",
-				InsuranceWingAPY:     "25.34649",
-			},
-			{
-				Name:                 "pDAI",
-				Icon:                 "https://app.ont.io/wing/oDAI.svg",
-				Price:                "1.02",
-				TotalSupply:          "252.3636",
-				SupplyInterestPerDay: "0.0035636",
-				SupplyWingAPY:        "0.24236536536",
-				UtilizationRate:      "0.3536",
-				MaximumLTV:           "0.3536",
-				TotalBorrowed:        "35252.647",
-				BorrowInterestPerDay: "0.0002724",
-				BorrowWingAPY:        "79707",
-				Liquidity:            "890.3242",
-				BorrowCap:            "242",
-				TotalInsurance:       "34535.34575536",
-				InsuranceWingAPY:     "575.686",
-			},
+	ifPoolInfo := &common.IFPoolInfo{
+		IFAssetList: make([]*common.IFAsset, 0),
+		UserIFInfo: &common.UserIFInfo{
+			Composition: make([]*common.Composition, 0),
 		},
 	}
+	iFInfo, err := this.store.LoadIFInfo()
+	if err != nil {
+		return nil, fmt.Errorf("IFPoolInfo, this.store.LoadIFInfo error: %s", err)
+	}
+	ifPoolInfo.Cap = iFInfo.Cap
+	ifPoolInfo.Total = iFInfo.Total
+
+	allMarket, err := this.Comptroller.AllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.AllMarkets error: %s", err)
+	}
+	for _, name := range allMarket {
+		ifMarketInfo, err := this.store.LoadIFMarketInfo(name)
+		if err != nil {
+			return nil, fmt.Errorf("IFPoolInfo, this.store.LoadIFMarketInfo error: %s", err)
+		}
+		ifAsset := new(common.IFAsset)
+		ifAsset.Name = this.cfg.IFMap[name]
+		ifAsset.Icon = this.cfg.IconMap[ifAsset.Name]
+		priceStr, err := this.getPrice(name)
+		if err != nil {
+			return nil, fmt.Errorf("IFPoolInfo, this.getPrice error: %s", err)
+		}
+		ifAsset.Price = priceStr
+		totalCash := utils.ToIntByPrecise(ifMarketInfo.TotalCash, 0)
+		totalDebt := utils.ToIntByPrecise(ifMarketInfo.TotalDebt, 0)
+		totalInsurance := utils.ToIntByPrecise(ifMarketInfo.TotalInsurance, 0)
+		totalSupply := new(big.Int).Add(totalCash, totalDebt)
+		ifAsset.TotalSupply = utils.ToStringByPrecise(totalSupply, this.cfg.TokenDecimal[ifAsset.Name])
+		interestIndex := utils.ToIntByPrecise(ifMarketInfo.InterestIndex, 0)
+		now := time.Now().UTC().Unix()
+		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(interestIndex,
+			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["interest"])
+		//TODO supplyWingAPy
+		ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
+			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["interest"]))))), totalSupply), this.cfg.TokenDecimal["interest"])
+		//TODO MaximumLTV
+		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
+		//TODO BorrowInterestPerDay
+		//TODO BorrowWingAPY
+		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])
+		ifAsset.BorrowCap = "500"
+		ifAsset.TotalInsurance = utils.ToStringByPrecise(totalInsurance, this.cfg.TokenDecimal[ifAsset.Name])
+		//TODO InsuranceWingAPY
+		ifPoolInfo.IFAssetList = append(ifPoolInfo.IFAssetList, ifAsset)
+	}
+
+	if account != "" {
+		ifPoolInfo.UserIFInfo.TotalSupplyDollar
+	}
+
 	if account != "" {
 		IFPoolInfo.UserIFInfo = &common.UserIFInfo{
 			TotalSupplyDollar:    "23526.3647",
@@ -184,7 +261,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			},
 		}
 	}
-	return IFPoolInfo, nil
+	return ifPoolInfo, nil
 }
 
 func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo, pageSize uint64) (*common.IFHistoryResponse, error) {
