@@ -107,6 +107,11 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("oracleAddress common.AddressFromHexString error: %s", err)
 		return
 	}
+	oscoreOracleAddress, err := common.AddressFromHexString(servConfig.OscoreOracleAddress)
+	if err != nil {
+		log.Errorf("oscoreOracleAddress common.AddressFromHexString error: %s", err)
+		return
+	}
 	govMgr := governance.NewGovernanceManager(govAddress, servConfig.WingAddress, sdk, servConfig)
 	if govMgr == nil {
 		log.Errorf("governance manager is nil")
@@ -117,7 +122,7 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
-	ifMgr := ifpool.NewIFPoolManager(ifAddress, sdk, store, servConfig)
+	ifMgr := ifpool.NewIFPoolManager(ifAddress, oscoreOracleAddress, store, servConfig)
 	if ifMgr == nil {
 		log.Errorf("ifpool manager is nil")
 		return

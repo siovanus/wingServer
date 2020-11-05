@@ -1,27 +1,68 @@
 package ifpool
 
 import (
-	sdk "github.com/ontio/ontology-go-sdk"
+	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
+	"os"
+
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
+	if_borrow "github.com/wing-groups/wing-contract-tools/contracts/if-borrow"
+	if_ctrl "github.com/wing-groups/wing-contract-tools/contracts/if-ctrl"
+	"github.com/wing-groups/wing-contract-tools/contracts/iftoken"
+	"github.com/wing-groups/wing-contract-tools/contracts/iitoken"
 )
 
 type IFPoolManager struct {
-	cfg             *config.Config
-	contractAddress ocommon.Address
-	sdk             *sdk.OntologySdk
-	store           *store.Client
+	cfg          *config.Config
+	store        *store.Client
+	Comptroller  *if_ctrl.Comptroller
+	FTokenMap    map[ocommon.Address]*iftoken.IFToken
+	ITokenMap    map[ocommon.Address]*iitoken.IIToken
+	BorrowMap    map[ocommon.Address]*if_borrow.BorrowPool
+	OscoreOracle *oscore_oracle.Oracle
 }
 
-func NewIFPoolManager(contractAddress ocommon.Address, sdk *sdk.OntologySdk, store *store.Client,
+func NewIFPoolManager(contractAddress, oscoreOracleAddress ocommon.Address, store *store.Client,
 	cfg *config.Config) *IFPoolManager {
+	comptroller, _ := if_ctrl.NewComptroller(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
+		2500, 20000)
+	oracle, _ := oscore_oracle.NewOracle(cfg.JsonRpcAddress, oscoreOracleAddress.ToHexString(), nil,
+		2500, 20000)
+	fTokenMap := make(map[ocommon.Address]*iftoken.IFToken)
+	iTokenMap := make(map[ocommon.Address]*iitoken.IIToken)
+	borrowPoolMap := make(map[ocommon.Address]*if_borrow.BorrowPool)
+	allMarket, err := comptroller.AllMarkets()
+	if err != nil {
+		log.Errorf("NewFlashPoolManager, comptroller.AllMarkets error: %s", err)
+		os.Exit(1)
+	}
+	for _, name := range allMarket {
+		marketInfo, err := comptroller.MarketInfo(name)
+		if err != nil {
+			log.Errorf("NewFlashPoolManager, comptroller.MarketInfo error: %s", err)
+			os.Exit(1)
+		}
+		iFToken, _ := iftoken.NewIFToken(cfg.JsonRpcAddress, marketInfo.SupplyPool.ToHexString(), nil,
+			2500, 20000)
+		iIToken, _ := iitoken.NewIIToken(cfg.JsonRpcAddress, marketInfo.InsurancePool.ToHexString(), nil,
+			2500, 20000)
+		borrowPool, _ := if_borrow.NewBorrowPool(cfg.JsonRpcAddress, marketInfo.BorrowPool.ToHexString(), nil,
+			2500, 20000)
+		fTokenMap[marketInfo.SupplyPool] = iFToken
+		iTokenMap[marketInfo.InsurancePool] = iIToken
+		borrowPoolMap[marketInfo.BorrowPool] = borrowPool
+	}
+
 	manager := &IFPoolManager{
-		cfg:             cfg,
-		contractAddress: contractAddress,
-		sdk:             sdk,
-		store:           store,
+		cfg:          cfg,
+		store:        store,
+		FTokenMap:    fTokenMap,
+		ITokenMap:    iTokenMap,
+		BorrowMap:    borrowPoolMap,
+		OscoreOracle: oracle,
 	}
 
 	return manager
