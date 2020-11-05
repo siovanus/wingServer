@@ -12,10 +12,11 @@ import (
 )
 
 const (
-	Total       = 2000000000000000
-	YearSecond  = 31536000
-	DaySecond   = 86400
-	ZeroAddress = "AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM"
+	Total             = 2000000000000000
+	YearSecond        = 31536000
+	DaySecond         = 86400
+	ZeroAddress       = "AFmseVrdL9f9oyCzZefL9tG6UbvhPbdYzM"
+	FoundationAddress = "AUKZ3KL1FRRhgcijH6DBdBtswUdtmqL8Wo"
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
@@ -57,6 +58,19 @@ func (this *GovernanceManager) Wing() (*common.Wing, error) {
 		return nil, err
 	}
 
+	fAddress, err := ocommon.AddressFromBase58(FoundationAddress)
+	if err != nil {
+		return nil, err
+	}
+	fResult, err := this.sdk.NeoVM.PreExecInvokeNeoVMContract(wingAddress, []interface{}{"balanceOf", []interface{}{fAddress}})
+	if err != nil {
+		return nil, err
+	}
+	fBalance, err := fResult.Result.ToInteger()
+	if err != nil {
+		return nil, err
+	}
+
 	gap := uint64(time.Now().Unix()) - GenesisTime
 	length := len(DailyDistibute)
 	epoch := []uint64{0}
@@ -78,11 +92,12 @@ func (this *GovernanceManager) Wing() (*common.Wing, error) {
 	}
 	distributed += (gap - epoch[index]) * DailyDistibute[index]
 
-	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).SetUint64(distributed+Total), 9))
-	t, _ := total.Float64()
-	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).SetUint64(distributed),
-		burned), 9))
+	circulating, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).Sub(new(big.Int).Sub(new(big.Int).SetUint64(
+		distributed+Total), fBalance), burned), 9))
 	c, _ := circulating.Float64()
+	total, _ := new(big.Float).SetString(utils.ToStringByPrecise(new(big.Int).Add(new(big.Int).Sub(new(big.Int).Sub(new(big.Int).SetUint64(
+		distributed+Total), fBalance), burned), fBalance), 9))
+	t, _ := total.Float64()
 
 	return &common.Wing{
 		Total:       t,
