@@ -759,6 +759,32 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 	totalBorrowDollar := new(big.Int)
 	totalCollateralDollar := new(big.Int)
 	collateralAssets := make([]*common.CollateralAsset, 0)
+
+	for _, v := range userBalance {
+		price, err := this.AssetStoredPrice(this.cfg.OracleMap[v.AssetAddress])
+		if err != nil {
+			return nil, fmt.Errorf("LiquidationList, this.AssetStoredPrice error: %s", err)
+		}
+		flashMarket, err := this.store.LoadFlashMarket(v.AssetName)
+		if err != nil {
+			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadFlashMarket error: %s", err)
+		}
+		supplyBalance := new(big.Int).Mul(utils.ToIntByPrecise(v.FToken, 0),
+			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
+		if v.IfCollateral && supplyBalance.Uint64() != 0 {
+			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
+				this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]), this.cfg.TokenDecimal["pETH"])
+			totalCollateralDollar = new(big.Int).Add(totalCollateralDollar, supplyDollar)
+			collateralAsset := &common.CollateralAsset{
+				Icon:    v.Icon,
+				Name:    v.AssetName,
+				Balance: utils.ToStringByPrecise(supplyBalance, this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]),
+				Dollar:  utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pETH"]+this.cfg.TokenDecimal["oracle"]),
+			}
+			collateralAssets = append(collateralAssets, collateralAsset)
+		}
+	}
+
 	for _, v := range userBalance {
 		price, err := this.AssetStoredPrice(this.cfg.OracleMap[v.AssetAddress])
 		if err != nil {
@@ -774,20 +800,6 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowBalance, price),
 			this.cfg.TokenDecimal[v.AssetName]), this.cfg.TokenDecimal["pETH"])
 		totalBorrowDollar = new(big.Int).Add(totalBorrowDollar, borrowDollar)
-		supplyBalance := new(big.Int).Mul(utils.ToIntByPrecise(v.FToken, 0),
-			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
-		if v.IfCollateral && supplyBalance.Uint64() != 0 {
-			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
-				this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]), this.cfg.TokenDecimal["pETH"])
-			totalCollateralDollar = new(big.Int).Add(totalCollateralDollar, supplyDollar)
-			collateralAsset := &common.CollateralAsset{
-				Icon:    v.Icon,
-				Name:    v.AssetName,
-				Balance: utils.ToStringByPrecise(supplyBalance, this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]),
-				Dollar:  utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal["pETH"]+this.cfg.TokenDecimal["oracle"]),
-			}
-			collateralAssets = append(collateralAssets, collateralAsset)
-		}
 
 		if borrowBalance.Uint64() != 0 {
 			price, err := this.AssetStoredPrice(this.cfg.OracleMap[v.AssetAddress])
