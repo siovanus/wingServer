@@ -841,7 +841,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		return fmt.Errorf("WingApy, this.GetAllMarkets error: %s", err)
 	}
 	for _, address := range allMarkets {
-		initialWingSpeeds, err := this.getWingSpeeds(address)
+		wingSpeeds, err := this.getWingSpeeds(address)
 		if err != nil {
 			return fmt.Errorf("WingApy, this.getWingSpeeds error: %s", err)
 		}
@@ -849,13 +849,10 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		if err != nil {
 			return fmt.Errorf("WingApy, this.getWingSBIPortion error: %s", err)
 		}
-		insuranceWingRatio, err := this.Comptroller.InsuranceWingRatio()
+		insuranceWingSpeeds, err := this.Comptroller.InsuranceWingSpeed()
 		if err != nil {
-			return fmt.Errorf("WingApy, this.Comptroller.InsuranceWingRatio error: %s", err)
+			return fmt.Errorf("WingApy, this.Comptroller.InsuranceWingSpeed error: %s", err)
 		}
-		wingSpeeds := new(big.Int).Mul(insuranceWingRatio, initialWingSpeeds)
-		insuranceWingSpeeds := new(big.Int).Sub(new(big.Int).Mul(initialWingSpeeds,
-			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["flash"]))))), wingSpeeds)
 		totalPortion := new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.InsurancePortion),
 			new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.SupplyPortion),
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)))
@@ -874,13 +871,13 @@ func (this *FlashPoolManager) WingApyForStore() error {
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
 				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
-				totalSupplyDollar), this.cfg.TokenDecimal["flash"]+this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 		if totalBorrowDollar.Uint64() != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
-				totalBorrowDollar), this.cfg.TokenDecimal["flash"]+this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 
 		if this.cfg.AssetMap[address.ToHexString()] == "WING" {
@@ -888,7 +885,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 			if totalInsuranceDollar.Uint64() != 0 {
 				insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(insuranceWingSpeeds, price),
 					new(big.Int).SetUint64(governance.YearSecond)), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))),
-					totalInsuranceDollar), this.cfg.TokenDecimal["flash"]+this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+					totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 			}
 		}
 
