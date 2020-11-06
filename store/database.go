@@ -237,7 +237,7 @@ type IFMarketInfo struct {
 	TotalCash        string
 	TotalDebt        string
 	InterestIndex    string
-	TotalInsurance string
+	TotalInsurance   string
 	InterestRate     uint64
 	CollateralFactor uint64
 }

@@ -298,9 +298,7 @@ type IFAsset struct {
 	SupplyInterestPerDay string
 	SupplyWingAPY        string
 	UtilizationRate      string
-	MaximumLTV           string
 	TotalBorrowed        string
-	BorrowInterestPerDay string
 	BorrowWingAPY        string
 	Liquidity            string
 	BorrowCap            string
@@ -313,7 +311,6 @@ type UserIFInfo struct {
 	SupplyWingEarned     string
 	TotalBorrowDollar    string
 	BorrowWingEarned     string
-	BorrowInterestPerDay string
 	TotalInsuranceDollar string
 	InsuranceWingEarned  string
 	Composition          []*Composition
@@ -325,12 +322,10 @@ type Composition struct {
 	SupplyBalance         string
 	SupplyWingEarned      string
 	BorrowWingEarned      string
-	LastBorrowTimestamp   string
+	LastBorrowTimestamp   uint64
 	InsuranceBalance      string
 	InsuranceWingEarned   string
 	CollateralBalance     string
-	CollateralName        string
-	CollateralIcon        string
 	BorrowUnpaidPrincipal string
 	BorrowInterestBalance string
 }

@@ -2,12 +2,14 @@ package ifpool
 
 import (
 	"fmt"
+	"github.com/siovanus/wingServer/utils"
+	"math/big"
 )
 
-func (this *IFPoolManager) getPrice(name string) (string, error) {
-	price, err := this.store.LoadPrice(name)
+func (this *IFPoolManager) assetStoredPrice(asset string) (*big.Int, error) {
+	price, err := this.store.LoadPrice(asset)
 	if err != nil {
-		return "", fmt.Errorf("getPrice, this.store.LoadPrice: %s", err)
+		return nil, fmt.Errorf("AssetStoredPrice, this.store.LoadPrice error: %s", err)
 	}
-	return price.Price, nil
+	return utils.ToIntByPrecise(price.Price, this.cfg.TokenDecimal["oracle"]), nil
 }

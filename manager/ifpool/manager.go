@@ -31,7 +31,7 @@ type IFPoolManager struct {
 	Comptroller  *if_ctrl.Comptroller
 	FTokenMap    map[ocommon.Address]*iftoken.IFToken
 	ITokenMap    map[ocommon.Address]*iitoken.IIToken
-	BorrowMap    map[ocommon.Address]*if_borrow.BorrowPool
+	BorrowMap    map[ocommon.Address]*if_borrow.IfBorrowPool
 	OscoreOracle *oscore_oracle.Oracle
 }
 
@@ -43,7 +43,7 @@ func NewIFPoolManager(contractAddress, oscoreOracleAddress ocommon.Address, stor
 		2500, 20000)
 	fTokenMap := make(map[ocommon.Address]*iftoken.IFToken)
 	iTokenMap := make(map[ocommon.Address]*iitoken.IIToken)
-	borrowPoolMap := make(map[ocommon.Address]*if_borrow.BorrowPool)
+	borrowPoolMap := make(map[ocommon.Address]*if_borrow.IfBorrowPool)
 	allMarket, err := comptroller.AllMarkets()
 	if err != nil {
 		log.Errorf("NewFlashPoolManager, comptroller.AllMarkets error: %s", err)
@@ -59,7 +59,7 @@ func NewIFPoolManager(contractAddress, oscoreOracleAddress ocommon.Address, stor
 			2500, 20000)
 		iIToken, _ := iitoken.NewIIToken(cfg.JsonRpcAddress, marketInfo.InsurancePool.ToHexString(), nil,
 			2500, 20000)
-		borrowPool, _ := if_borrow.NewBorrowPool(cfg.JsonRpcAddress, marketInfo.BorrowPool.ToHexString(), nil,
+		borrowPool, _ := if_borrow.NewIfBorrowPool(cfg.JsonRpcAddress, marketInfo.BorrowPool.ToHexString(), nil,
 			2500, 20000)
 		fTokenMap[marketInfo.SupplyPool] = iFToken
 		iTokenMap[marketInfo.InsurancePool] = iIToken
@@ -163,6 +163,12 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	if err != nil {
 		return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.AllMarkets error: %s", err)
 	}
+	totalSupplyDollar := new(big.Int)
+	totalSupplyWingEarned := new(big.Int)
+	totalBorrowDollar := new(big.Int)
+	totalBorrowWingEarned := new(big.Int)
+	totalInsuranceDollar := new(big.Int)
+	totalInsuranceWingEarned := new(big.Int)
 	for _, name := range allMarket {
 		ifMarketInfo, err := this.store.LoadIFMarketInfo(name)
 		if err != nil {
@@ -171,11 +177,11 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		ifAsset := new(common.IFAsset)
 		ifAsset.Name = this.cfg.IFMap[name]
 		ifAsset.Icon = this.cfg.IconMap[ifAsset.Name]
-		priceStr, err := this.getPrice(name)
+		price, err := this.assetStoredPrice(name)
 		if err != nil {
-			return nil, fmt.Errorf("IFPoolInfo, this.getPrice error: %s", err)
+			return nil, fmt.Errorf("IFPoolInfo, this.assetStoredPrice error: %s", err)
 		}
-		ifAsset.Price = priceStr
+		ifAsset.Price = utils.ToStringByPrecise(price, this.cfg.TokenDecimal["oracle"])
 		totalCash := utils.ToIntByPrecise(ifMarketInfo.TotalCash, 0)
 		totalDebt := utils.ToIntByPrecise(ifMarketInfo.TotalDebt, 0)
 		totalInsurance := utils.ToIntByPrecise(ifMarketInfo.TotalInsurance, 0)
@@ -188,78 +194,84 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		//TODO supplyWingAPy
 		ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
 			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["interest"]))))), totalSupply), this.cfg.TokenDecimal["interest"])
-		//TODO MaximumLTV
 		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
-		//TODO BorrowInterestPerDay
 		//TODO BorrowWingAPY
 		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])
 		ifAsset.BorrowCap = "500"
 		ifAsset.TotalInsurance = utils.ToStringByPrecise(totalInsurance, this.cfg.TokenDecimal[ifAsset.Name])
 		//TODO InsuranceWingAPY
 		ifPoolInfo.IFAssetList = append(ifPoolInfo.IFAssetList, ifAsset)
-	}
 
-	if account != "" {
-		ifPoolInfo.UserIFInfo.TotalSupplyDollar
-	}
-
-	if account != "" {
-		IFPoolInfo.UserIFInfo = &common.UserIFInfo{
-			TotalSupplyDollar:    "23526.3647",
-			SupplyWingEarned:     "25.3647",
-			TotalBorrowDollar:    "25364.485",
-			BorrowWingEarned:     "789.36536",
-			BorrowInterestPerDay: "0.837636",
-			TotalInsuranceDollar: "96747.474747",
-			InsuranceWingEarned:  "36796.366",
-			Composition: []*common.Composition{
-				{
-					Name:                  "pUSDT",
-					Icon:                  "https://app.ont.io/wing/pusdt.svg",
-					SupplyBalance:         "42526.3636",
-					SupplyWingEarned:      "242.2525",
-					BorrowWingEarned:      "235.3677",
-					LastBorrowTimestamp:   "1604026092000",
-					InsuranceBalance:      "141536.47",
-					InsuranceWingEarned:   "14.25265",
-					CollateralName:        "pSUSD",
-					CollateralIcon:        "https://app.ont.io/wing/psusd.svg",
-					CollateralBalance:     "242.236363",
-					BorrowUnpaidPrincipal: "2452.3636",
-					BorrowInterestBalance: "242.242",
-				},
-				{
-					Name:                  "pSUSD",
-					Icon:                  "https://app.ont.io/wing/psusd.svg",
-					SupplyBalance:         "235546.4647",
-					SupplyWingEarned:      "22.225",
-					BorrowWingEarned:      "25.377",
-					LastBorrowTimestamp:   "1604026082000",
-					InsuranceBalance:      "14136.47",
-					InsuranceWingEarned:   "1.2265",
-					CollateralName:        "pDAI",
-					CollateralIcon:        "https://app.ont.io/wing/oDAI.svg",
-					CollateralBalance:     "24.6868",
-					BorrowUnpaidPrincipal: "0",
-					BorrowInterestBalance: "0",
-				},
-				{
-					Name:                  "pDAI",
-					Icon:                  "https://app.ont.io/wing/oDAI.svg",
-					SupplyBalance:         "235544566.464467",
-					SupplyWingEarned:      "224.225",
-					BorrowWingEarned:      "265.37697",
-					LastBorrowTimestamp:   "1604026082000",
-					InsuranceBalance:      "696.47",
-					InsuranceWingEarned:   "1141.2265",
-					CollateralName:        "pUSDT",
-					CollateralIcon:        "https://app.ont.io/wing/pusdt.svg",
-					CollateralBalance:     "2242.57578",
-					BorrowUnpaidPrincipal: "0",
-					BorrowInterestBalance: "0",
-				},
-			},
+		//user data
+		if account != "" {
+			addr, err := ocommon.AddressFromBase58(account)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, ocommon.AddressFromBase58 error: %s", err)
+			}
+			marketInfo, err := this.Comptroller.MarketInfo(name)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.MarketInfo error: %s", err)
+			}
+			assetName := this.cfg.AssetMap[marketInfo.SupplyPool.ToHexString()]
+			supplyBalance, err := this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying(addr)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying error: %s", err)
+			}
+			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
+				this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["USDT"])
+			totalSupplyDollar = new(big.Int).Add(totalSupplyDollar, supplyDollar)
+			_, supplyWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, true, false, true)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+			}
+			totalSupplyWingEarned = new(big.Int).Add(totalSupplyWingEarned, supplyWingEarned)
+			_, borrowWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, true, false, false, true)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+			}
+			totalBorrowWingEarned = new(big.Int).Add(totalBorrowWingEarned, borrowWingEarned)
+			_, insuranceWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, false, true, true)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+			}
+			totalInsuranceWingEarned = new(big.Int).Add(totalInsuranceWingEarned, insuranceWingEarned)
+			insuranceBalance, err := this.ITokenMap[marketInfo.InsurancePool].BalanceOfUnderlying(addr)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.ITokenMap[marketInfo.InsurancePool].BalanceOfUnderlying error: %s", err)
+			}
+			insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceBalance, price),
+				this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["USDT"])
+			totalInsuranceDollar = new(big.Int).Add(totalInsuranceDollar, insuranceDollar)
+			accountSnapshot, err := this.BorrowMap[marketInfo.BorrowPool].AccountSnapshot(addr)
+			if err != nil {
+				return nil, fmt.Errorf("IFPoolInfo, this.BorrowMap[marketInfo.BorrowPool].AccountSnapshot error: %s", err)
+			}
+			borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Add(accountSnapshot.Principal,
+				accountSnapshot.Interest), price), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["USDT"])
+			totalBorrowDollar = new(big.Int).Add(totalBorrowDollar, borrowDollar)
+			composition := &common.Composition{
+				Name:                  assetName,
+				Icon:                  this.cfg.IconMap[assetName],
+				SupplyBalance:         utils.ToStringByPrecise(supplyBalance, this.cfg.TokenDecimal[assetName]),
+				SupplyWingEarned:      utils.ToStringByPrecise(supplyWingEarned, this.cfg.TokenDecimal["WING"]),
+				BorrowWingEarned:      utils.ToStringByPrecise(borrowWingEarned, this.cfg.TokenDecimal["WING"]),
+				LastBorrowTimestamp:   accountSnapshot.BorrowTime,
+				InsuranceBalance:      utils.ToStringByPrecise(insuranceBalance, this.cfg.TokenDecimal[assetName]),
+				InsuranceWingEarned:   utils.ToStringByPrecise(insuranceWingEarned, this.cfg.TokenDecimal["WING"]),
+				CollateralBalance:     utils.ToStringByPrecise(accountSnapshot.Collateral, this.cfg.TokenDecimal[assetName]),
+				BorrowUnpaidPrincipal: utils.ToStringByPrecise(accountSnapshot.Principal, this.cfg.TokenDecimal[assetName]),
+				BorrowInterestBalance: utils.ToStringByPrecise(accountSnapshot.Interest, this.cfg.TokenDecimal[assetName]),
+			}
+			ifPoolInfo.UserIFInfo.Composition = append(ifPoolInfo.UserIFInfo.Composition, composition)
 		}
+	}
+	if account != "" {
+		ifPoolInfo.UserIFInfo.TotalSupplyDollar = utils.ToStringByPrecise(totalSupplyDollar, this.cfg.TokenDecimal["USDT"])
+		ifPoolInfo.UserIFInfo.SupplyWingEarned = utils.ToStringByPrecise(totalSupplyWingEarned, this.cfg.TokenDecimal["WING"])
+		ifPoolInfo.UserIFInfo.TotalBorrowDollar = utils.ToStringByPrecise(totalBorrowDollar, this.cfg.TokenDecimal["USDT"])
+		ifPoolInfo.UserIFInfo.BorrowWingEarned = utils.ToStringByPrecise(totalBorrowWingEarned, this.cfg.TokenDecimal["WING"])
+		ifPoolInfo.UserIFInfo.TotalInsuranceDollar = utils.ToStringByPrecise(totalInsuranceDollar, this.cfg.TokenDecimal["USDT"])
+		ifPoolInfo.UserIFInfo.InsuranceWingEarned = utils.ToStringByPrecise(totalInsuranceDollar, this.cfg.TokenDecimal["USDT"])
 	}
 	return ifPoolInfo, nil
 }
