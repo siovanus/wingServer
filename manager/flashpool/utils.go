@@ -33,7 +33,11 @@ func (this *FlashPoolManager) getITokenAmount(contractAddress, account common.Ad
 }
 
 func (this *FlashPoolManager) getBorrowAmount(contractAddress, account common.Address) (*big.Int, error) {
-	return this.FlashTokenMap[contractAddress].BorrowBalanceStored(account)
+	borrow, _, err := this.FlashTokenMap[contractAddress].BorrowBalanceStored(account)
+	if err != nil {
+		return nil, fmt.Errorf("getBorrowAmount, this.FlashTokenMap[contractAddress].BorrowBalanceStored error: %s", err)
+	}
+	return borrow, nil
 }
 
 func (this *FlashPoolManager) getTotalSupply(contractAddress common.Address) (*big.Int, error) {

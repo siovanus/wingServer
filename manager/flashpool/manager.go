@@ -623,12 +623,18 @@ func (this *FlashPoolManager) userFlashPoolOverview(accountStr string) (*common.
 				return nil, fmt.Errorf("UserFlashPoolOverview, this.Comptroller.ClaimAllWing account %s asset %s error: %s",
 					account.ToBase58(), address.ToHexString(), err)
 			}
+			collateralWing, err := this.Comptroller.UserMarketWingCollateralNum(address, account)
+			if err != nil {
+				return nil, fmt.Errorf("UserFlashPoolOverview, this.Comptroller.UserMarketWingCollateralNum account %s asset %s error: %s",
+					account.ToBase58(), address.ToHexString(), err)
+			}
 			borrow := &common.Borrow{
 				Name:             this.cfg.AssetMap[address.ToHexString()],
 				Icon:             this.cfg.IconMap[this.cfg.AssetMap[address.ToHexString()]],
 				BorrowBalance:    utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[assetName]),
 				Apy:              utils.ToStringByPrecise(borrowApy, this.cfg.TokenDecimal["flash"]),
 				WingEarned:       utils.ToStringByPrecise(claimWing, this.cfg.TokenDecimal["WING"]),
+				CollateralWing:   utils.ToStringByPrecise(collateralWing, this.cfg.TokenDecimal["WING"]),
 				CollateralFactor: market.CollateralFactor,
 			}
 			if accountLiquidity.Liquidity.ToBigInt().Uint64() != 0 {
@@ -874,7 +880,10 @@ func (this *FlashPoolManager) WingApyForStore() error {
 			return fmt.Errorf("WingApy, this.store.LoadFlashMarket error: %s", err)
 		}
 		totalSupplyDollar := utils.ToIntByPrecise(market.TotalSupplyDollar, this.cfg.TokenDecimal["pUSDT"])
-		totalBorrowDollar := utils.ToIntByPrecise(market.TotalBorrowDollar, this.cfg.TokenDecimal["pUSDT"])
+		totalValidBorrowDollar, err := this.FlashTokenMap[address].TotalValidBorrows()
+		if err != nil {
+			return fmt.Errorf("WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
+		}
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 {
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
@@ -882,11 +891,11 @@ func (this *FlashPoolManager) WingApyForStore() error {
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
-		if totalBorrowDollar.Uint64() != 0 {
+		if totalValidBorrowDollar.Uint64() != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), price), new(big.Int).SetUint64(governance.YearSecond)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
-				totalBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 
 		if this.cfg.AssetMap[address.ToHexString()] == "WING" {

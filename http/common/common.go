@@ -162,6 +162,7 @@ type Borrow struct {
 	BorrowDistribution    string
 	InsuranceDistribution string
 	WingEarned            string
+	CollateralWing        string
 }
 
 type Insurance struct {
