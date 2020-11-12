@@ -786,6 +786,12 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		}
 		supplyBalance := new(big.Int).Mul(utils.ToIntByPrecise(v.FToken, 0),
 			utils.ToIntByPrecise(flashMarket.ExchangeRate, 0))
+		borrowBalance := new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(v.BorrowAmount, 0),
+			utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
+			utils.ToIntByPrecise(v.BorrowIndex, 0))
+		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowBalance, price),
+			this.cfg.TokenDecimal[v.AssetName]), this.cfg.TokenDecimal["pETH"])
+		totalBorrowDollar = new(big.Int).Add(totalBorrowDollar, borrowDollar)
 		if v.IfCollateral && supplyBalance.Uint64() != 0 {
 			supplyDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(supplyBalance, price),
 				this.cfg.TokenDecimal[v.AssetName]+this.cfg.TokenDecimal["flash"]), this.cfg.TokenDecimal["pETH"])
@@ -801,10 +807,6 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 	}
 
 	for _, v := range userBalance {
-		price, err := this.AssetStoredPrice(this.cfg.OracleMap[v.AssetAddress])
-		if err != nil {
-			return nil, fmt.Errorf("LiquidationList, this.AssetStoredPrice error: %s", err)
-		}
 		flashMarket, err := this.store.LoadFlashMarket(v.AssetName)
 		if err != nil {
 			return nil, fmt.Errorf("UserFlashPoolOverview, this.store.LoadFlashMarket error: %s", err)
@@ -812,9 +814,6 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 		borrowBalance := new(big.Int).Div(new(big.Int).Mul(utils.ToIntByPrecise(v.BorrowAmount, 0),
 			utils.ToIntByPrecise(flashMarket.BorrowIndex, 0)),
 			utils.ToIntByPrecise(v.BorrowIndex, 0))
-		borrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(borrowBalance, price),
-			this.cfg.TokenDecimal[v.AssetName]), this.cfg.TokenDecimal["pETH"])
-		totalBorrowDollar = new(big.Int).Add(totalBorrowDollar, borrowDollar)
 
 		if borrowBalance.Uint64() != 0 {
 			price, err := this.AssetStoredPrice(this.cfg.OracleMap[v.AssetAddress])
