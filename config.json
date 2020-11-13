@@ -21,7 +21,7 @@
     "81f6ac5e46e8471f078cfe16d47b0d1a81f549c9": "pNEO",
     "8b4a7180be2504ba772d4cbcdd5cce5835c27e08": "pOKB",
     "d5bfee3988bbdd4161c65cbe0cc7326c56ad6aa8": "pUNI",
-    "a664a485338dc50ff613304454f2675aee9406b0": "pETH9"
+    "3744593948b69fa486d72601c81c96d8dbee91dd": "ONG"
   },
   "icon_map": {
     "ONTd":  "https://app.ont.io/wing/ONTd.svg",
@@ -51,10 +51,10 @@
     "81f6ac5e46e8471f078cfe16d47b0d1a81f549c9": "NEO",
     "8b4a7180be2504ba772d4cbcdd5cce5835c27e08": "OKB",
     "d5bfee3988bbdd4161c65cbe0cc7326c56ad6aa8": "UNI",
-    "a664a485338dc50ff613304454f2675aee9406b0": "ETH9"
+    "3744593948b69fa486d72601c81c96d8dbee91dd": "ONG"
   },
   "if_map": {
-    "SUSD": "pSUSD",
+    "DAI":  "pDAI",
     "USDT": "pUSDT",
     "USDC": "pUSDC"
   },

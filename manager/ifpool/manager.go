@@ -212,7 +212,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.MarketInfo error: %s", err)
 			}
-			assetName := this.cfg.AssetMap[marketInfo.SupplyPool.ToHexString()]
+			assetName := this.cfg.IFMap[name]
 			supplyBalance, err := this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying(addr)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying error: %s", err)
