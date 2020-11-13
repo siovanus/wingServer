@@ -154,7 +154,8 @@ type Supply struct {
 type Borrow struct {
 	Icon                  string
 	Name                  string
-	BorrowBalance         string
+	TotalBorrowBalance    string
+	ValidBorrowBalance    string
 	Apy                   string
 	Limit                 string
 	CollateralFactor      string
