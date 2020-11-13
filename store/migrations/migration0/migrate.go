@@ -57,6 +57,16 @@ type IFInfo struct {
 	Cap   string
 }
 
+type IFMarketInfo struct {
+	Name             string `gorm:"primary_key"`
+	TotalCash        string
+	TotalDebt        string
+	InterestIndex    string
+	TotalInsurance   string
+	InterestRate     uint64
+	CollateralFactor uint64
+}
+
 // Migrate runs the initial migration
 func Migrate(tx *gorm.DB) error {
 	err := tx.AutoMigrate(&FlashPoolDetail{}).Error
@@ -97,6 +107,10 @@ func Migrate(tx *gorm.DB) error {
 	err = tx.AutoMigrate(IFInfo{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate IFInfo")
+	}
+	err = tx.AutoMigrate(IFMarketInfo{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate IFMarketInfo")
 	}
 
 	return nil

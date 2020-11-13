@@ -233,7 +233,7 @@ func (client Client) SaveIFInfo(ifInfo *IFInfo) error {
 }
 
 type IFMarketInfo struct {
-	Name             string
+	Name             string `gorm:"primary_key"`
 	TotalCash        string
 	TotalDebt        string
 	InterestIndex    string
