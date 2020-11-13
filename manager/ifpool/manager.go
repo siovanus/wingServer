@@ -69,6 +69,7 @@ func NewIFPoolManager(contractAddress, oscoreOracleAddress ocommon.Address, stor
 	manager := &IFPoolManager{
 		cfg:          cfg,
 		store:        store,
+		Comptroller:  comptroller,
 		FTokenMap:    fTokenMap,
 		ITokenMap:    iTokenMap,
 		BorrowMap:    borrowPoolMap,
