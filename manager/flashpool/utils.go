@@ -9,7 +9,7 @@ import (
 )
 
 func (this *FlashPoolManager) assetPrice(asset string) (*big.Int, error) {
-	return this.Oracle.GetUnderlyingPrice(asset)
+	return this.PriceOracle.GetUnderlyingPrice(asset)
 }
 
 func (this *FlashPoolManager) GetAllMarkets() ([]common.Address, error) {
