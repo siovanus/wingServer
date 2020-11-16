@@ -23,7 +23,7 @@ import (
 
 var GenesisTime = time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix()
 
-const MaxLevel = 0x03
+const MaxLevel uint64 = 3
 
 type IFPoolManager struct {
 	cfg          *config.Config
@@ -128,7 +128,7 @@ func (this *IFPoolManager) StoreIFMarketInfo() error {
 
 		oscoreInfo, err := this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel(MaxLevel)
 		if err != nil {
-			return fmt.Errorf("StoreIFMarketInfo, this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel error: %s", err)
+			return fmt.Errorf("StoreIFMarketInfo, this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel error: %s, market %s", err, name)
 		}
 		ifMarketInfo.InterestRate = oscoreInfo.InterestRate
 		ifMarketInfo.CollateralFactor = oscoreInfo.CollateralFactor
@@ -191,10 +191,12 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		interestIndex := utils.ToIntByPrecise(ifMarketInfo.InterestIndex, 0)
 		now := time.Now().UTC().Unix()
 		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(interestIndex,
-			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["interest"])
+			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["ifindex"])
 		//TODO supplyWingAPy
-		ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
-			new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["interest"]))))), totalSupply), this.cfg.TokenDecimal["interest"])
+		if totalSupply.Uint64() != 0 {
+			ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
+				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[ifAsset.Name]))))), totalSupply), this.cfg.TokenDecimal[ifAsset.Name])
+		}
 		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
 		//TODO BorrowWingAPY
 		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])

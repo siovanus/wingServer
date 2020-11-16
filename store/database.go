@@ -244,7 +244,7 @@ type IFMarketInfo struct {
 
 func (client Client) LoadIFMarketInfo(name string) (IFMarketInfo, error) {
 	var ifMarketInfo IFMarketInfo
-	err := client.db.Where(IFInfo{Name: name}).Last(&ifMarketInfo).Error
+	err := client.db.Where(IFMarketInfo{Name: name}).Last(&ifMarketInfo).Error
 	return ifMarketInfo, err
 }
 
