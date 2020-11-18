@@ -36,7 +36,8 @@
     "pSUSD": "https://app.ont.io/wing/psusd.svg",
     "pNEO": "https://app.ont.io/wing/neo-ont.svg",
     "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
-    "pUNI": "https://app.ont.io/wing/UNI-ONT.svg"
+    "pUNI": "https://app.ont.io/wing/UNI-ONT.svg",
+    "ONG": "https://app.ont.io/wing/ONG_icon.svg"
   },
   "oracle_map": {
     "07af3fec7874def611f0f435df6bc65344315029": "WBTC",
@@ -70,7 +71,7 @@
     "pUSDT": 6,
     "pNEO": 8,
     "pUNI": 18,
-    "pETH9": 9,
+    "ONG": 9,
     "pOKB": 18
   },
   "scan_interval": 2,
