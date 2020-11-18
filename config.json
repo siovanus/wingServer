@@ -21,7 +21,8 @@
     "pSUSD": "https://app.ont.io/wing/psusd.svg",
     "pNEO": "https://app.ont.io/wing/neo-ont.svg",
     "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
-    "pUNI": "https://app.ont.io/wing/UNI-ONT.svg"
+    "pUNI": "https://app.ont.io/wing/UNI-ONT.svg",
+    "ONG": "https://app.ont.io/wing/ONG_icon.svg"
   },
   "flash_asset_map": {
     "WBTC": "pWBTC",
@@ -61,7 +62,7 @@
     "pUSDT": 6,
     "pNEO": 8,
     "pUNI": 18,
-    "pETH9": 9,
+    "ONG": 9,
     "pOKB": 18
   },
   "scan_interval": 2,
