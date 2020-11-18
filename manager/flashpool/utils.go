@@ -79,7 +79,7 @@ func (this *FlashPoolManager) getTotalDistribution(assetAddress common.Address) 
 	if err != nil {
 		return nil, fmt.Errorf("getTotalDistribution, this.Comptroller.WingDistributedNum error: %s", err)
 	}
-	if this.cfg.AssetMap[assetAddress.ToHexString()] == "pWBTC" {
+	if this.cfg.FlashAssetMap[this.AssetMap[assetAddress]] == "pWBTC" {
 		return new(big.Int).Sub(result, GAP), nil
 	} else {
 		return result, nil

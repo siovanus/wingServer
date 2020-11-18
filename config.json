@@ -8,23 +8,8 @@
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "oscore_oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@172.168.3.18:5432/wing?sslmode=disable",
-  "asset_map": {
-    "07af3fec7874def611f0f435df6bc65344315029": "pWBTC",
-    "14ff98e5362296cb02cbfc72a92dd1cee72ecc11": "ONTd",
-    "f4cfb146e679651261b4e01dab19c4b138b90186": "prenBTC",
-    "3b07546444c09ed3475086a1381102635cdeb007": "pUSDC",
-    "35ea02c6c3e0144f75fd1c62d4693bd6af37ce91": "WING",
-    "d49bef9c7686fd672e5efde40899325d9f61c56e": "pETH",
-    "5ee23ca793e2069fe3b8f231583508a0fe0449ad": "pDAI",
-    "59f9fb269391ea0242a7632201b0a154e6d09b2c": "pUSDT",
-    "7bd02e7c26cd9f6d40fe9628e068d5c2597e60e3": "pSUSD",
-    "81f6ac5e46e8471f078cfe16d47b0d1a81f549c9": "pNEO",
-    "8b4a7180be2504ba772d4cbcdd5cce5835c27e08": "pOKB",
-    "d5bfee3988bbdd4161c65cbe0cc7326c56ad6aa8": "pUNI",
-    "3744593948b69fa486d72601c81c96d8dbee91dd": "ONG"
-  },
   "icon_map": {
-    "ONTd":  "https://app.ont.io/wing/ONTd.svg",
+    "ONTd": "https://app.ont.io/wing/ONTd.svg",
     "pWBTC": "https://app.ont.io/wing/pWBTC.svg",
     "prenBTC": "https://app.ont.io/wing/prenBTC.svg",
     "pUSDC": "https://app.ont.io/wing/pUSDC.svg",
@@ -38,27 +23,27 @@
     "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
     "pUNI": "https://app.ont.io/wing/UNI-ONT.svg"
   },
-  "oracle_map": {
-    "07af3fec7874def611f0f435df6bc65344315029": "WBTC",
-    "14ff98e5362296cb02cbfc72a92dd1cee72ecc11": "ONTd",
-    "f4cfb146e679651261b4e01dab19c4b138b90186": "renBTC",
-    "3b07546444c09ed3475086a1381102635cdeb007": "USDC",
-    "35ea02c6c3e0144f75fd1c62d4693bd6af37ce91": "WING",
-    "d49bef9c7686fd672e5efde40899325d9f61c56e": "ETH",
-    "5ee23ca793e2069fe3b8f231583508a0fe0449ad": "DAI",
-    "59f9fb269391ea0242a7632201b0a154e6d09b2c": "USDT",
-    "7bd02e7c26cd9f6d40fe9628e068d5c2597e60e3": "SUSD",
-    "81f6ac5e46e8471f078cfe16d47b0d1a81f549c9": "NEO",
-    "8b4a7180be2504ba772d4cbcdd5cce5835c27e08": "OKB",
-    "d5bfee3988bbdd4161c65cbe0cc7326c56ad6aa8": "UNI",
-    "3744593948b69fa486d72601c81c96d8dbee91dd": "ONG"
+  "flash_asset_map": {
+    "WBTC": "pWBTC",
+    "ONTd": "ONTd",
+    "renBTC": "prenBTC",
+    "USDC": "pUSDC",
+    "WING": "WING",
+    "ETH": "pETH",
+    "DAI": "pDAI",
+    "USDT": "pUSDT",
+    "SUSD": "pSUSD",
+    "NEO": "pNEO",
+    "OKB": "pOKB",
+    "UNI": "pUNI",
+    "ONG": "ONG"
   },
   "if_map": {
-    "DAI":  "pDAI",
+    "DAI": "pDAI",
     "USDT": "pUSDT",
     "USDC": "pUSDC"
   },
-  "token_decimal":{
+  "token_decimal": {
     "percentage": 12,
     "ONTd": 9,
     "pUSDC": 6,

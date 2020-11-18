@@ -22,9 +22,8 @@ type Config struct {
 	OracleAddress       string            `json:"oracle_address"`
 	OscoreOracleAddress string            `json:"oscore_oracle_address"`
 	DatabaseURL         string            `json:"database_url"`
-	AssetMap            map[string]string `json:"asset_map"`
 	IconMap             map[string]string `json:"icon_map"`
-	OracleMap           map[string]string `json:"oracle_map"`
+	FlashAssetMap       map[string]string `json:"flash_asset_map"`
 	IFMap               map[string]string `json:"if_map"`
 	TrackEventInterval  uint64            `json:"track_event_interval"`
 	SystemContract      []string          `json:"system_contract"`
