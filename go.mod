@@ -8,6 +8,6 @@ require (
 	github.com/ontio/ontology-go-sdk v1.11.8
 	github.com/pkg/errors v0.8.1
 	github.com/urfave/cli v1.22.4
-	github.com/wing-groups/wing-contract-tools v0.0.0-20201116032410-4277319a6aeb
+	github.com/wing-groups/wing-contract-tools v0.0.0-20201119030905-c00e976484c4
 	gopkg.in/gormigrate.v1 v1.6.0
 )
