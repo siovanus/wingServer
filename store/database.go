@@ -251,3 +251,26 @@ func (client Client) LoadIFMarketInfo(name string) (IFMarketInfo, error) {
 func (client Client) SaveIFMarketInfo(ifMarketInfo *IFMarketInfo) error {
 	return client.db.Save(ifMarketInfo).Error
 }
+
+type IfPoolHistory struct {
+	ID        uint64 `gorm:"primary_key"`
+	Address   string
+	Token     string
+	Operation string
+	Amount    string
+	Timestamp uint64
+	TxHash    string
+}
+
+func (client Client) SaveIFHistory(history *IfPoolHistory) error {
+	return client.db.Save(history).Error
+}
+
+func (client Client) LoadIFHistory(userAddress string) ([]IfPoolHistory, error) {
+	IfPoolHistory := make([]IfPoolHistory, 0)
+	err := client.db.Where("user_address = ?", userAddress).Find(&IfPoolHistory).Error
+	if err != nil {
+		return IfPoolHistory, err
+	}
+	return IfPoolHistory, err
+}

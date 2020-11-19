@@ -22,7 +22,6 @@ type Service struct {
 	store                *store.Client
 	trackHeight          uint32
 	listeningAddressList []string
-	assetList            []string
 }
 
 func NewService(sdk *sdk.OntologySdk, govMgr *governance.GovernanceManager, fpMgr *flashpool.FlashPoolManager,
@@ -36,9 +35,9 @@ func (this *Service) AddListeningAddressList() {
 		log.Errorf("AddListeningAddressList, this.fpMgr.GetAllMarkets error: %s", err)
 		os.Exit(1)
 	}
+
 	for _, v := range allMarkets {
 		log.Infof("ftoken address: %s", v.ToHexString())
-		this.assetList = append(this.assetList, this.fpMgr.AssetMap[v])
 		this.listeningAddressList = append(this.listeningAddressList, v.ToHexString())
 		addr, err := this.fpMgr.GetInsuranceAddress(v)
 		if err != nil {
@@ -136,7 +135,13 @@ func (this *Service) TrackEvent() {
 		}
 		for i := this.trackHeight + 1; i <= currentHeight; i++ {
 			log.Infof("TrackEvent, parse block: %d", i)
-			ifOracle, accounts, err := this.trackSnapshotEvent(i)
+			events, err := this.sdk.GetSmartContractEventByBlock(i)
+			if err != nil {
+				log.Errorf("TrackEvent, this.sdk.GetSmartContractEventByBlock error:", err)
+				break
+			}
+
+			ifOracle, accounts, err := this.trackSnapshotEvent(events)
 			if err != nil {
 				log.Errorf("TrackEvent, this.TrackOracle error:", err)
 				break
@@ -151,6 +156,19 @@ func (this *Service) TrackEvent() {
 				for _, v := range accounts {
 					log.Infof("TrackEvent, account: %s", v)
 					go this.StoreUserBalance(v)
+				}
+			}
+
+			ifPoolHistories, err := this.trackIfOperationEvent(i, events)
+			if err != nil {
+				log.Errorf("TrackEvent, this.trackIfOperationEvent error:", err)
+				break
+			}
+
+			if len(ifPoolHistories) != 0 {
+				for _, v := range ifPoolHistories {
+					log.Infof("Track IF Event, ifPoolHistories: %s", v)
+					go this.StoreUserIfOperation(v)
 				}
 			}
 

@@ -146,6 +146,14 @@ func (this *IFPoolManager) StoreIFMarketInfo() error {
 	return nil
 }
 
+func (this *IFPoolManager) StoreUserIfOperation(history *store.IfPoolHistory) error {
+	err := this.store.SaveIFHistory(history)
+	if err != nil {
+		return fmt.Errorf("StoreIFInfo, this.store.SaveIFInfo error: %s", err)
+	}
+	return nil
+}
+
 func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error) {
 	ifPoolInfo := &common.IFPoolInfo{
 		IFAssetList: make([]*common.IFAsset, 0),

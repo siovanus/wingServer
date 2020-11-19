@@ -67,6 +67,16 @@ type IFMarketInfo struct {
 	CollateralFactor uint64
 }
 
+type IfPoolHistory struct {
+	ID        uint64 `gorm:"primary_key"`
+	Address   string
+	Token     string
+	Operation string
+	Amount    string
+	Timestamp uint64
+	TxHash    string
+}
+
 // Migrate runs the initial migration
 func Migrate(tx *gorm.DB) error {
 	err := tx.AutoMigrate(&FlashPoolDetail{}).Error
@@ -108,9 +118,15 @@ func Migrate(tx *gorm.DB) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate IFInfo")
 	}
+
 	err = tx.AutoMigrate(IFMarketInfo{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate IFMarketInfo")
+	}
+
+	err = tx.AutoMigrate(IfPoolHistory{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate IfPoolHistory")
 	}
 
 	return nil
