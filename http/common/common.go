@@ -328,6 +328,7 @@ type Composition struct {
 	CollateralBalance     string
 	BorrowUnpaidPrincipal string
 	BorrowInterestBalance string
+	BorrowExtraInterest   string
 }
 
 type IFHistoryRequest struct {

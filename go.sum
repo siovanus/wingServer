@@ -228,8 +228,8 @@ github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtX
 github.com/urfave/cli v1.22.4 h1:u7tSpNPPswAFymm8IehJhy4uJMlUuU/GmqSkvJ1InXA=
 github.com/urfave/cli v1.22.4/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-github.com/wing-groups/wing-contract-tools v0.0.0-20201116032410-4277319a6aeb h1:FdCZjc26T+tbnvizt6sTJSzrk5PjSb1uu5zN8eV09PM=
-github.com/wing-groups/wing-contract-tools v0.0.0-20201116032410-4277319a6aeb/go.mod h1:IYHa8NxXnUjSFZX9PTXA9pE1hj4Uk9HjP3RmwwVow30=
+github.com/wing-groups/wing-contract-tools v0.0.0-20201119030905-c00e976484c4 h1:zg/xUlQhTNLEj4dfQLCfcYng4WmOFVFlfiy523dZqbw=
+github.com/wing-groups/wing-contract-tools v0.0.0-20201119030905-c00e976484c4/go.mod h1:IYHa8NxXnUjSFZX9PTXA9pE1hj4Uk9HjP3RmwwVow30=
 github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208/go.mod h1:IotVbo4F+mw0EzQ08zFqg7pK3FebNXpaMsRy2RT+Ees=
 golang.org/x/crypto v0.0.0-20170930174604-9419663f5a44/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=

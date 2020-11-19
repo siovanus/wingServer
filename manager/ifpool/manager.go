@@ -253,7 +253,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			insuranceDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(insuranceBalance, price),
 				this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[assetName]), this.cfg.TokenDecimal["USDT"])
 			totalInsuranceDollar = new(big.Int).Add(totalInsuranceDollar, insuranceDollar)
-			accountSnapshot, err := this.BorrowMap[marketInfo.BorrowPool].AccountSnapshot(addr)
+			accountSnapshot, err := this.BorrowMap[marketInfo.BorrowPool].AccountSnapshotCurrent(addr)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.BorrowMap[marketInfo.BorrowPool].AccountSnapshot error: %s", err)
 			}
@@ -272,6 +272,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 				CollateralBalance:     utils.ToStringByPrecise(accountSnapshot.Collateral, this.cfg.TokenDecimal[assetName]),
 				BorrowUnpaidPrincipal: utils.ToStringByPrecise(accountSnapshot.Principal, this.cfg.TokenDecimal[assetName]),
 				BorrowInterestBalance: utils.ToStringByPrecise(accountSnapshot.Interest, this.cfg.TokenDecimal[assetName]),
+				BorrowExtraInterest:   utils.ToStringByPrecise(new(big.Int).Sub(accountSnapshot.Interest, accountSnapshot.FormalInterest), this.cfg.TokenDecimal[assetName]),
 			}
 			ifPoolInfo.UserIFInfo.Composition = append(ifPoolInfo.UserIFInfo.Composition, composition)
 		}
