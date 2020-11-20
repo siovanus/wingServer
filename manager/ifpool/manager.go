@@ -271,7 +271,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 				InsuranceWingEarned:   utils.ToStringByPrecise(insuranceWingEarned, this.cfg.TokenDecimal["WING"]),
 				CollateralBalance:     utils.ToStringByPrecise(accountSnapshot.Collateral, this.cfg.TokenDecimal[assetName]),
 				BorrowUnpaidPrincipal: utils.ToStringByPrecise(accountSnapshot.Principal, this.cfg.TokenDecimal[assetName]),
-				BorrowInterestBalance: utils.ToStringByPrecise(accountSnapshot.Interest, this.cfg.TokenDecimal[assetName]),
+				BorrowInterestBalance: utils.ToStringByPrecise(accountSnapshot.FormalInterest, this.cfg.TokenDecimal[assetName]),
 				BorrowExtraInterest:   utils.ToStringByPrecise(new(big.Int).Sub(accountSnapshot.Interest, accountSnapshot.FormalInterest), this.cfg.TokenDecimal[assetName]),
 			}
 			ifPoolInfo.UserIFInfo.Composition = append(ifPoolInfo.UserIFInfo.Composition, composition)

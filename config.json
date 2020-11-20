@@ -1,10 +1,10 @@
 {
-  "json_rpc_address": "http://polaris2.ont.io:20336",
+  "json_rpc_address": "http://128.1.38.248:20336",
   "port": 10337,
   "governance_address": "3ff111a0204f5ef28d4c0ad1d05820f0dd785840",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "8b90f8aab5fcbd184bcbd13a7e63a64c5caaf358",
-  "if_pool_address": "27060263c35c420cca1737ee50db366918b69622",
+  "if_pool_address": "19ffed15d5e31d9a4d192eb5d426ba1d86c104f9",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "oscore_oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "database_url": "postgresql://postgres:zmh630323@172.168.3.18:5432/wing?sslmode=disable",
