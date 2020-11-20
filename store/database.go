@@ -279,7 +279,12 @@ func (client Client) LoadIFHistory(asset, operation string, start, end, pageNo, 
 	if operation != "" {
 		db.Where("operation = ?", operation)
 	}
-	db.Where("timestamp BETWEEN ? AND ?", start, end)
+	if start > 0 {
+		db.Where("timestamp >= ?", start)
+	}
+	if end > 0 {
+		db.Where("timestamp <= ?", end)
+	}
 	db.Order("timestamp desc")
 	//count := db.Count(&count)
 	db.Offset(startPage)

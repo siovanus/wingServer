@@ -64,6 +64,7 @@ func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *
 		flashTokenMap[insuranceAddr] = insuranceToken
 		addressMap[assetName] = addr
 		assetMap[addr] = assetName
+		log.Infof("fToken name:%s", assetName)
 	}
 
 	manager := &FlashPoolManager{
