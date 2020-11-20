@@ -289,27 +289,25 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 }
 
 func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo, pageSize uint64) (*common.IFHistoryResponse, error) {
+	history, err := this.store.LoadIFHistory(asset, operation, start, end, pageNo, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("IFHistory, this.store.LoadIFHistory error: %s", err)
+	}
+	histories := make([]*common.IFHistory, 0)
+	for _, v := range history {
+		i := &common.IFHistory{
+			Name:      this.cfg.IFMap[v.Token],
+			Icon:      this.cfg.IconMap[this.cfg.IFMap[v.Token]],
+			Operation: v.Operation,
+			Timestamp: v.Timestamp,
+			Balance:   v.Amount,
+			Dollar:    "23526.464",
+			Address:   v.Address,
+		}
+		histories = append(histories, i)
+	}
 	return &common.IFHistoryResponse{
 		MaxPageNum: 1,
-		PageItems: []*common.IFHistory{
-			{
-				Name:      "pUSDT",
-				Icon:      "https://app.ont.io/wing/pusdt.svg",
-				Operation: "Supply",
-				Timestamp: 1604026092000,
-				Balance:   "32532.58",
-				Dollar:    "23526.464",
-				Address:   "Af3Etnp5ffrXR3swrCx9f7KuvChYLgqsTZ",
-			},
-			{
-				Name:      "pDAI",
-				Icon:      "https://app.ont.io/wing/oDAI.svg",
-				Operation: "Borrow",
-				Timestamp: 1604026092000,
-				Balance:   "6968.58",
-				Dollar:    "797.464",
-				Address:   "AR36E5jLdWDKW3Yg51qDFWPGKSLvfPhbqS",
-			},
-		},
+		PageItems:  histories,
 	}, nil
 }

@@ -266,9 +266,25 @@ func (client Client) SaveIFHistory(history *IfPoolHistory) error {
 	return client.db.Save(history).Error
 }
 
-func (client Client) LoadIFHistory(userAddress string) ([]IfPoolHistory, error) {
+func (client Client) LoadIFHistory(asset, operation string, start, end, pageNo, pageSize uint64) ([]IfPoolHistory, error) {
+	startPage := pageSize * (pageNo - 1)
+	if startPage < 0 {
+		startPage = 0
+	}
 	IfPoolHistory := make([]IfPoolHistory, 0)
-	err := client.db.Where("user_address = ?", userAddress).Find(&IfPoolHistory).Error
+	db := client.db
+	if asset != "" {
+		db.Where("token = ?", asset)
+	}
+	if operation != "" {
+		db.Where("operation = ?", operation)
+	}
+	db.Where("timestamp BETWEEN ? AND ?", start, end)
+	db.Order("timestamp desc")
+	//count := db.Count(&count)
+	db.Offset(startPage)
+	db.Limit(pageSize)
+	err := db.Find(&IfPoolHistory).Error
 	if err != nil {
 		return IfPoolHistory, err
 	}
