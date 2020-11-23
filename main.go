@@ -122,7 +122,7 @@ func startServer(ctx *cli.Context) {
 		log.Errorf("flashpool manager is nil")
 		return
 	}
-	ifMgr := ifpool.NewIFPoolManager(ifAddress, oscoreOracleAddress, store, servConfig)
+	ifMgr := ifpool.NewIFPoolManager(sdk, ifAddress, oscoreOracleAddress, store, servConfig)
 	if ifMgr == nil {
 		log.Errorf("ifpool manager is nil")
 		return

@@ -7,10 +7,12 @@ import (
 
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
+	IFPOOLMARKETDISTRIBUTION    = "/api/v1/ifpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
 	GOVBANNEROVERVIEW           = "/api/v1/govbanneroverview"
 	GOVBANNER                   = "/api/v1/govbanner"
 	RESERVES                    = "/api/v1/reserves"
+	IFRESERVES                  = "/api/v1/ifreserves"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
 	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
@@ -31,10 +33,12 @@ const (
 
 const (
 	ACTION_FLASHPOOLMARKETDISTRIBUTION = "flashpoolmarketdistribution"
+	ACTION_IFPOOLMARKETDISTRIBUTION    = "ifpoolmarketdistribution"
 	ACTION_POOLDISTRIBUTION            = "pooldistribution"
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
 	ACTION_RESERVES                    = "reserves"
+	ACTION_IFRESERVES                  = "ifreserves"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
@@ -90,8 +94,8 @@ type GovBanner struct {
 	Distributed string
 }
 
-type FlashPoolMarketDistribution struct {
-	FlashPoolMarketDistribution []*Distribution
+type MarketDistribution struct {
+	MarketDistribution []*Distribution
 }
 
 type PoolDistribution struct {
@@ -101,7 +105,6 @@ type PoolDistribution struct {
 type Distribution struct {
 	Icon            string
 	Name            string
-	PerDay          string
 	SupplyAmount    string
 	BorrowAmount    string
 	InsuranceAmount string

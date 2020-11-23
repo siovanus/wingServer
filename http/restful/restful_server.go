@@ -67,10 +67,12 @@ func (this *restServer) registryRestServerAction(web Web) {
 	}
 	getMethodMap := map[string]Action{
 		common.FLASHPOOLMARKETDISTRIBUTION: {name: common.ACTION_FLASHPOOLMARKETDISTRIBUTION, handler: web.FlashPoolMarketDistribution},
+		common.IFPOOLMARKETDISTRIBUTION:    {name: common.ACTION_IFPOOLMARKETDISTRIBUTION, handler: web.IfPoolMarketDistribution},
 		common.POOLDISTRIBUTION:            {name: common.ACTION_POOLDISTRIBUTION, handler: web.PoolDistribution},
 		common.GOVBANNEROVERVIEW:           {name: common.ACTION_GOVBANNEROVERVIEW, handler: web.GovBannerOverview},
 		common.GOVBANNER:                   {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
 		common.RESERVES:                    {name: common.ACTION_RESERVES, handler: web.Reserves},
+		common.IFRESERVES:                  {name: common.ACTION_IFRESERVES, handler: web.IfReserves},
 		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
 		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
 		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
