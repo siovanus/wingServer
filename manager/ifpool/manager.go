@@ -293,6 +293,10 @@ func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo
 	if err != nil {
 		return nil, fmt.Errorf("IFHistory, this.store.LoadIFHistory error: %s", err)
 	}
+	count, err := this.store.LoadIFHistoryCount(asset, operation, start, end)
+	if err != nil {
+		return nil, fmt.Errorf("IFHistory, this.store.LoadIFHistoryCount error: %s", err)
+	}
 	histories := make([]*common.IFHistory, 0)
 	for _, v := range history {
 		i := &common.IFHistory{
@@ -307,7 +311,7 @@ func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo
 		histories = append(histories, i)
 	}
 	return &common.IFHistoryResponse{
-		MaxPageNum: 1,
-		PageItems:  histories,
+		Count:     count,
+		PageItems: histories,
 	}, nil
 }

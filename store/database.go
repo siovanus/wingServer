@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/siovanus/wingServer/http/common"
+	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store/migrations"
 )
 
@@ -273,25 +274,73 @@ func (client Client) LoadIFHistory(asset, operation string, start, end, pageNo, 
 	}
 	IfPoolHistory := make([]IfPoolHistory, 0)
 	db := client.db
+	sql := ""
 	if asset != "" {
-		db.Where("token = ?", asset)
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("token = '%s'", asset)
 	}
 	if operation != "" {
-		db.Where("operation = ?", operation)
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("operation = '%s'", operation)
 	}
 	if start > 0 {
-		db.Where("timestamp >= ?", start)
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("timestamp >= '%d'", start)
 	}
 	if end > 0 {
-		db.Where("timestamp <= ?", end)
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("timestamp <= '%d'", end)
 	}
-	db.Order("timestamp desc")
-	//count := db.Count(&count)
-	db.Offset(startPage)
-	db.Limit(pageSize)
-	err := db.Find(&IfPoolHistory).Error
+	err := db.Where(sql).Order("timestamp desc").Offset(startPage).Limit(pageSize).Find(&IfPoolHistory).Error
 	if err != nil {
-		return IfPoolHistory, err
+		log.Errorf("LoadIFHistory, Find error:%s", err)
 	}
+	//var count int
+	//db.Where(sql).Count(&count)
+	//db.Raw("select count(1) as c from if_pool_histories where "+sql).Select("c").Find(&count)
 	return IfPoolHistory, err
+}
+
+func (client Client) LoadIFHistoryCount(asset, operation string, start, end uint64) (uint64, error) {
+	IfPoolHistory := make([]IfPoolHistory, 0)
+	db := client.db
+	sql := ""
+	if asset != "" {
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("token = '%s'", asset)
+	}
+	if operation != "" {
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("operation = '%s'", operation)
+	}
+	if start > 0 {
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("timestamp >= '%d'", start)
+	}
+	if end > 0 {
+		if sql != "" {
+			sql = sql + " AND "
+		}
+		sql = sql + fmt.Sprintf("timestamp <= '%d'", end)
+	}
+	err := db.Where(sql).Order("timestamp desc").Find(&IfPoolHistory).Error
+	if err != nil {
+		log.Errorf("LoadIFHistory, Find error:%s", err)
+	}
+	size := len(IfPoolHistory)
+	return uint64(size), err
 }

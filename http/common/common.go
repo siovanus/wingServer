@@ -1,5 +1,10 @@
 package common
 
+import (
+	"github.com/ontio/ontology/common"
+	"math/big"
+)
+
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
@@ -341,8 +346,8 @@ type IFHistoryRequest struct {
 }
 
 type IFHistoryResponse struct {
-	MaxPageNum uint64
-	PageItems  []*IFHistory
+	Count     uint64
+	PageItems []*IFHistory
 }
 
 type IFHistory struct {
@@ -353,4 +358,16 @@ type IFHistory struct {
 	Balance   string
 	Dollar    string
 	Address   string
+}
+
+type MarketUtility struct {
+	UtilityMap map[common.Address]*big.Int
+	Total      *big.Int
+}
+
+type PoolWeight struct {
+	PoolStaticMap  map[common.Address]*big.Int
+	PoolDynamicMap map[common.Address]*big.Int
+	TotalStatic    *big.Int
+	TotalDynamic   *big.Int
 }

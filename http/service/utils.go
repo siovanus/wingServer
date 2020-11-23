@@ -5,6 +5,7 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
+	"strings"
 )
 
 func (this *Service) trackSnapshotEvent(events []*gocommon.SmartContactEvent) (bool, []string, error) {
@@ -158,6 +159,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, fToken.Name error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -172,6 +175,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, fToken.Name error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -189,6 +194,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, bToken.MarketName error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -203,6 +210,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, bToken.MarketName error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -220,6 +229,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, iToken.Name error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -234,6 +245,8 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, iToken.Name error: %s", err)
 					}
+					index := strings.LastIndex(name, " ") + 1
+					name = name[index:len(name)]
 					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)

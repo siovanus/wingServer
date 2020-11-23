@@ -3,6 +3,7 @@ package flashpool
 import (
 	"fmt"
 	"github.com/ontio/ontology/common"
+	hcommon "github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/manager/governance"
 	flash_ctrl "github.com/wing-groups/wing-contract-tools/contracts/flash-ctrl"
 	"math/big"
@@ -157,4 +158,124 @@ func (this *FlashPoolManager) getClaimWingAtMarket(account common.Address, contr
 		return nil, fmt.Errorf("getClaimWingAtMarket, this.Comptroller.ClaimWingAtMarkets error: %s", err)
 	}
 	return result, nil
+}
+
+func (this *FlashPoolManager) getUtilities() (*hcommon.MarketUtility, error) {
+	method := "getUtilities"
+	params := []interface{}{}
+	contractAddress, err := common.AddressFromHexString(this.cfg.FlashPoolAddress)
+	if err != nil {
+		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+	}
+	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
+	if err != nil {
+		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+	}
+	bs, err := res.Result.ToByteArray()
+	if err != nil {
+		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+	}
+	source := common.NewZeroCopySource(bs)
+	number, eof := source.NextByte()
+	if eof {
+		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+	}
+	size := int(number)
+	total := new(big.Int)
+	utilityMap := make(map[common.Address]*big.Int)
+	for i := 0; i < size; i++ {
+		address, err := source.NextAddress()
+		if err {
+			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
+		}
+		data, err := source.NextBytes(32)
+		if err {
+			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+		}
+		utility := common.BigIntFromNeoBytes(data)
+		utilityMap[address] = utility
+		total = new(big.Int).Add(total, utility)
+	}
+	return &hcommon.MarketUtility{
+		UtilityMap: utilityMap,
+		Total:      total,
+	}, nil
+}
+
+func (this *FlashPoolManager) getDynamicPercent() (*big.Int, error) {
+	method := "get_dynamic_percent"
+	params := []interface{}{}
+	contractAddress, err := common.AddressFromHexString(this.cfg.GovernanceAddress)
+	if err != nil {
+		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+	}
+	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
+	if err != nil {
+		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+	}
+	bs, err := res.Result.ToByteArray()
+	if err != nil {
+		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+	}
+	source := common.NewZeroCopySource(bs)
+	number, eof := source.NextI128()
+	if eof {
+		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+	}
+	return number.ToBigInt(), nil
+}
+
+func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
+	method := "get_pool_weight_info"
+	params := []interface{}{}
+	contractAddress, err := common.AddressFromHexString(this.cfg.GovernanceAddress)
+	if err != nil {
+		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+	}
+	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
+	if err != nil {
+		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+	}
+	bs, err := res.Result.ToByteArray()
+	if err != nil {
+		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+	}
+	source := common.NewZeroCopySource(bs)
+	number, eof := source.NextByte()
+	if eof {
+		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+	}
+	size := int(number)
+	totalStatic := new(big.Int)
+	totalDynamic := new(big.Int)
+	poolStaticMap := make(map[common.Address]*big.Int)
+	poolDynamicMap := make(map[common.Address]*big.Int)
+	for i := 0; i < size; i++ {
+		address, err := source.NextAddress()
+		if err {
+			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
+		}
+		staticData, err := source.NextBytes(32)
+		if err {
+			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+		}
+		staticWeight := common.BigIntFromNeoBytes(staticData)
+		poolStaticMap[address] = staticWeight
+		totalStatic = new(big.Int).Add(totalStatic, staticWeight)
+
+		dynamicData, err := source.NextBytes(32)
+		if err {
+			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+		}
+		dynamicWeight := common.BigIntFromNeoBytes(dynamicData)
+		poolDynamicMap[address] = dynamicWeight
+		totalDynamic = new(big.Int).Add(totalDynamic, dynamicWeight)
+
+	}
+	return &hcommon.PoolWeight{
+		PoolStaticMap:  poolStaticMap,
+		PoolDynamicMap: poolDynamicMap,
+		TotalStatic:    totalStatic,
+		TotalDynamic:   totalDynamic,
+	}, nil
 }

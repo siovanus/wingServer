@@ -2,6 +2,7 @@ package flashpool
 
 import (
 	"fmt"
+	sdk "github.com/ontio/ontology-go-sdk"
 	"math"
 	"math/big"
 	"os"
@@ -29,10 +30,12 @@ type FlashPoolManager struct {
 	PriceOracle   *price_oracle.Oracle
 	AddressMap    map[string]ocommon.Address
 	AssetMap      map[ocommon.Address]string
+	GovMgr        *governance.GovernanceManager
+	Sdk           *sdk.OntologySdk
 }
 
 func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *store.Client,
-	cfg *config.Config) *FlashPoolManager {
+	cfg *config.Config, govMgr *governance.GovernanceManager, sdk *sdk.OntologySdk) *FlashPoolManager {
 	comptroller, _ := flash_ctrl.NewComptroller(cfg.JsonRpcAddress, contractAddress.ToHexString(), nil,
 		2500, 20000)
 	oracle, _ := price_oracle.NewOracle(cfg.JsonRpcAddress, oracleAddress.ToHexString(), nil,
@@ -58,6 +61,10 @@ func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *
 			log.Errorf("NewFlashPoolManager, flashToken.UnderlyingName error: %s", err)
 			os.Exit(1)
 		}
+		if err != nil {
+			log.Errorf("NewFlashPoolManager, flashToken.MarketAddr error: %s", err)
+			os.Exit(1)
+		}
 		insuranceToken, _ := flash_token.NewFlashToken(cfg.JsonRpcAddress, insuranceAddr.ToHexString(), nil,
 			2500, 20000)
 		flashTokenMap[addr] = flashToken
@@ -75,6 +82,8 @@ func NewFlashPoolManager(contractAddress, oracleAddress ocommon.Address, store *
 		PriceOracle:   oracle,
 		AddressMap:    addressMap,
 		AssetMap:      assetMap,
+		GovMgr:        govMgr,
+		Sdk:           sdk,
 	}
 
 	return manager
@@ -872,22 +881,70 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 }
 
 func (this *FlashPoolManager) WingApyForStore() error {
+	dynamicPercent, err := this.getDynamicPercent()
+	if err != nil {
+		return fmt.Errorf("WingApy, this.getDynamicPercent error: %s", err)
+	}
+	log.Infof("dynamicPercent:%d", dynamicPercent)
+	staticPercent := new(big.Int).Sub(new(big.Int).SetUint64(100), dynamicPercent)
+	log.Infof("staticPercent:%d", staticPercent)
+
+	poolWeight, err := this.getPoolWeight()
+	if err != nil {
+		return fmt.Errorf("WingApy, this.getPoolWeight error: %s", err)
+	}
+	poolStaticMap := poolWeight.PoolStaticMap
+	flashStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
+	log.Infof("flashStaticWeight:%d", flashStaticWeight)
+	totalStaticWeight := poolWeight.TotalStatic
+	log.Infof("totalStaticWeight:%d", totalStaticWeight)
+	flashStaticPercent := new(big.Int).SetUint64(0)
+	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
+		flashStaticPercent = new(big.Int).Div(new(big.Int).Mul(flashStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
+	}
+	log.Infof("flashStaticPercent:%d", flashStaticPercent)
+
+	poolDynamicMap := poolWeight.PoolDynamicMap
+	flashDynamicWeight := poolDynamicMap[this.Comptroller.GetAddr()]
+	log.Infof("flashDynamicWeight:%d", flashDynamicWeight)
+	totalDynamicWeight := poolWeight.TotalDynamic
+	log.Infof("totalDynamicWeight:%d", totalDynamicWeight)
+	flashDynamicPercent := new(big.Int).SetUint64(0)
+	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
+		flashDynamicPercent = new(big.Int).Div(new(big.Int).Mul(flashDynamicWeight, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
+	}
+	log.Infof("flashDynamicPercent:%d", flashDynamicPercent)
+
+	utilities, err := this.getUtilities()
+	if err != nil {
+		return fmt.Errorf("WingApy, this.getUtilities error: %s", err)
+	}
+	utilityMap := utilities.UtilityMap
+	total := utilities.Total
+
+	banner, err := this.GovMgr.GovBanner()
+	if err != nil {
+		return fmt.Errorf("WingApy, this.GovMgr.GovBanner error: %s", err)
+	}
+	daily := banner.Daily
+	dailyTotal := utils.ToIntByPrecise(daily, 9)
+	log.Infof("origin dailyTotal:%d", dailyTotal)
+	dailyTotal = new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(60)), new(big.Int).SetUint64(100))
+	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
+	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, flashStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, flashDynamicPercent))), new(big.Int).SetUint64(100000000000))
+	log.Infof("flash weight dailyTotal:%d", dailyTotal)
+	dailyInsurance := new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(10)), new(big.Int).SetUint64(100))
+	log.Infof("dailyInsurance:%d", dailyInsurance)
+	dailySB := new(big.Int).Sub(dailyTotal, dailyInsurance)
+	log.Infof("dailySB:%d", dailySB)
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
 		return fmt.Errorf("WingApy, this.GetAllMarkets error: %s", err)
 	}
 	for _, address := range allMarkets {
-		wingSpeeds, err := this.getWingSpeeds(address)
-		if err != nil {
-			return fmt.Errorf("WingApy, this.getWingSpeeds error: %s", err)
-		}
 		wingSBIPortion, err := this.getWingSBIPortion(address)
 		if err != nil {
 			return fmt.Errorf("WingApy, this.getWingSBIPortion error: %s", err)
-		}
-		insuranceWingSpeeds, err := this.Comptroller.InsuranceWingSpeed()
-		if err != nil {
-			return fmt.Errorf("WingApy, this.Comptroller.InsuranceWingSpeed error: %s", err)
 		}
 		totalPortion := new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.InsurancePortion),
 			new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.SupplyPortion),
@@ -913,14 +970,16 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		}
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 {
-			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
-				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), wingPrice), new(big.Int).SetUint64(governance.YearSecond)),
+			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
+				new(big.Int).Div(new(big.Int).Mul(dailySB, utilityMap[address]), total),
+				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
 		if totalValidBorrowDollar.Uint64() != 0 {
-			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(wingSpeeds,
-				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), wingPrice), new(big.Int).SetUint64(governance.YearSecond)),
+			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
+				new(big.Int).Div(new(big.Int).Mul(dailySB, utilityMap[address]), total),
+				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
@@ -928,8 +987,8 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		if this.cfg.FlashAssetMap[this.AssetMap[address]] == "WING" {
 			totalInsuranceDollar := utils.ToIntByPrecise(market.TotalInsuranceDollar, this.cfg.TokenDecimal["pUSDT"])
 			if totalInsuranceDollar.Uint64() != 0 {
-				insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(insuranceWingSpeeds, wingPrice),
-					new(big.Int).SetUint64(governance.YearSecond)), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))),
+				insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(dailyInsurance, wingPrice),
+					new(big.Int).SetUint64(governance.YearDay)), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))),
 					totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 			}
 		}

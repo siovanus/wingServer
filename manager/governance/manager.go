@@ -16,6 +16,7 @@ const (
 	Total80    = 8000000
 	YearSecond = 31536000
 	DaySecond  = 86400
+	YearDay    = 365
 )
 
 var GenesisTime = uint64(time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix())
