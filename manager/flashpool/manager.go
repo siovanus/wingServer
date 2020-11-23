@@ -96,17 +96,17 @@ func (this *FlashPoolManager) AssetStoredPrice(asset string) (*big.Int, error) {
 	return utils.ToIntByPrecise(price.Price, this.cfg.TokenDecimal["oracle"]), nil
 }
 
-func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMarketDistribution, error) {
+func (this *FlashPoolManager) MarketDistribution() (*common.MarketDistribution, error) {
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("FlashPoolMarketDistribution, this.GetAllMarkets error: %s", err)
+		return nil, fmt.Errorf("MarketDistribution, this.GetAllMarkets error: %s", err)
 	}
 	flashPoolMarketDistribution := make([]*common.Distribution, 0)
 	for _, address := range allMarkets {
 		//market, err := this.store.LoadFlashMarket(this.cfg.AssetMap[address.ToHexString()])
 		market, err := this.store.LoadFlashMarket(this.cfg.FlashAssetMap[this.AssetMap[address]])
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.store.LoadFlashMarket error: %s", err)
+			return nil, fmt.Errorf("MarketDistribution, this.store.LoadFlashMarket error: %s", err)
 		}
 		supplyAmount := market.TotalSupplyDollar
 		borrowAmount := market.TotalBorrowDollar
@@ -114,7 +114,7 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 
 		totalDistribution, err := this.getTotalDistribution(address)
 		if err != nil {
-			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getTotalDistribution error: %s", err)
+			return nil, fmt.Errorf("MarketDistribution, this.getTotalDistribution error: %s", err)
 		}
 		distribution := &common.Distribution{
 			Icon:            this.cfg.IconMap[this.cfg.FlashAssetMap[this.AssetMap[address]]],
@@ -126,7 +126,7 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 		}
 		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
 	}
-	return &common.FlashPoolMarketDistribution{FlashPoolMarketDistribution: flashPoolMarketDistribution}, nil
+	return &common.MarketDistribution{MarketDistribution: flashPoolMarketDistribution}, nil
 }
 
 func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {

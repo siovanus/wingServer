@@ -10,36 +10,68 @@ import (
 
 func (this *Service) FlashPoolMarketDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	marketDistribution, err := this.fpMgr.FlashPoolMarketDistribution()
+	marketDistribution, err := this.fpMgr.MarketDistribution()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
-		log.Errorf("MarketDistribution error: %s", err)
+		log.Errorf("FlashPoolMarketDistribution error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
 		resp.Result = marketDistribution
-		log.Infof("MarketDistribution success")
+		log.Infof("FlashPoolMarketDistribution success")
 	}
 
 	m, err := utils.RefactorResp(resp, resp.Error)
 	if err != nil {
-		log.Errorf("MarketDistribution: failed, err: %s", err)
+		log.Errorf("FlashPoolMarketDistribution: failed, err: %s", err)
 	} else {
-		log.Debug("MarketDistribution: resp success")
+		log.Debug("FlashPoolMarketDistribution: resp success")
+	}
+	return m
+}
+
+func (this *Service) IfPoolMarketDistribution(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	marketDistribution, err := this.ifMgr.MarketDistribution()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("IfPoolMarketDistribution error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = marketDistribution
+		log.Infof("IfPoolMarketDistribution success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IfPoolMarketDistribution: failed, err: %s", err)
+	} else {
+		log.Debug("IfPoolMarketDistribution: resp success")
 	}
 	return m
 }
 
 func (this *Service) PoolDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
+	flag := true
 	flashPoolDistribution, err := this.fpMgr.PoolDistribution()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("PoolDistribution error: %s", err)
-	} else {
+		flag = false
+	}
+	ifPoolDistribution, err := this.ifMgr.PoolDistribution()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("PoolDistribution error: %s", err)
+		flag = false
+	}
+	if flag {
 		resp.Error = restful.SUCCESS
-		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{flashPoolDistribution}}
+		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{flashPoolDistribution, ifPoolDistribution}}
 		log.Infof("PoolDistribution success")
 	}
 
@@ -48,6 +80,28 @@ func (this *Service) PoolDistribution(param map[string]interface{}) map[string]i
 		log.Errorf("PoolDistribution: failed, err: %s", err)
 	} else {
 		log.Debug("PoolDistribution: resp success")
+	}
+	return m
+}
+
+func (this *Service) IfPoolDistribution(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	flashPoolDistribution, err := this.ifMgr.PoolDistribution()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("IfPoolDistribution error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{flashPoolDistribution}}
+		log.Infof("IfPoolDistribution success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IfPoolDistribution: failed, err: %s", err)
+	} else {
+		log.Debug("IfPoolDistribution: resp success")
 	}
 	return m
 }

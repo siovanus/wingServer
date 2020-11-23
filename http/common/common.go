@@ -2,6 +2,7 @@ package common
 
 const (
 	FLASHPOOLMARKETDISTRIBUTION = "/api/v1/flashpoolmarketdistribution"
+	IFPOOLMARKETDISTRIBUTION    = "/api/v1/ifpoolmarketdistribution"
 	POOLDISTRIBUTION            = "/api/v1/pooldistribution"
 	GOVBANNEROVERVIEW           = "/api/v1/govbanneroverview"
 	GOVBANNER                   = "/api/v1/govbanner"
@@ -27,6 +28,7 @@ const (
 
 const (
 	ACTION_FLASHPOOLMARKETDISTRIBUTION = "flashpoolmarketdistribution"
+	ACTION_IFPOOLMARKETDISTRIBUTION    = "ifpoolmarketdistribution"
 	ACTION_POOLDISTRIBUTION            = "pooldistribution"
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
@@ -87,8 +89,8 @@ type GovBanner struct {
 	Distributed string
 }
 
-type FlashPoolMarketDistribution struct {
-	FlashPoolMarketDistribution []*Distribution
+type MarketDistribution struct {
+	MarketDistribution []*Distribution
 }
 
 type PoolDistribution struct {

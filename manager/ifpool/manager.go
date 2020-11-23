@@ -376,7 +376,6 @@ func (this *IFPoolManager) PoolDistribution() (*common.Distribution, error) {
 	if err != nil {
 		return nil, fmt.Errorf("PoolDistribution, this.Comptroller.AllMarkets error: %s", err)
 	}
-	flashPoolMarketDistribution := make([]*common.Distribution, 0)
 	distribution := new(common.Distribution)
 	s := new(big.Int).SetUint64(0)
 	b := new(big.Int).SetUint64(0)
@@ -428,6 +427,61 @@ func (this *IFPoolManager) PoolDistribution() (*common.Distribution, error) {
 		// insuranceAmount * price
 		i = new(big.Int).Add(i, insuranceDollar)
 		d = new(big.Int).Add(d, totalDistribution)
+	}
+	distribution.Name = "IF"
+	distribution.Icon = this.cfg.IconMap[distribution.Name]
+	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
+	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
+	return distribution, nil
+}
+
+func (this *IFPoolManager) MarketDistribution() (*common.MarketDistribution, error) {
+	allMarket, err := this.Comptroller.AllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("MarketDistribution, this.Comptroller.AllMarkets error: %s", err)
+	}
+	ifPoolMarketDistribution := make([]*common.Distribution, 0)
+	for _, name := range allMarket {
+		marketInfo, err := this.Comptroller.MarketInfo(name)
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.Comptroller.MarketInfo error: %s", err)
+		}
+		cash, err := this.FTokenMap[marketInfo.SupplyPool].TotalCash()
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.FTokenMap[marketInfo.SupplyPool].TotalCash error: %s", err)
+		}
+		borrow, err := this.FTokenMap[marketInfo.SupplyPool].TotalDebt()
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.FTokenMap[marketInfo.SupplyPool].TotalDebt error: %s", err)
+		}
+		supplyAmount := new(big.Int).Add(cash, borrow)
+		borrowAmount := borrow
+		insuranceAmount, err := this.ITokenMap[marketInfo.InsurancePool].TotalCash()
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.ITokenMap[marketInfo.InsurancePool].TotalCash error: %s", err)
+		}
+
+		supplyAmountFormal := utils.ToIntByPrecise(utils.ToStringByPrecise(supplyAmount, this.cfg.TokenDecimal[name]),
+			this.cfg.TokenDecimal["pUSDT"])
+		borrowAmountFormal := utils.ToIntByPrecise(utils.ToStringByPrecise(borrowAmount, this.cfg.TokenDecimal[name]),
+			this.cfg.TokenDecimal["pUSDT"])
+		insuranceAmountFormal := utils.ToIntByPrecise(utils.ToStringByPrecise(insuranceAmount, this.cfg.TokenDecimal[name]),
+			this.cfg.TokenDecimal["pUSDT"])
+
+		totalDistribution, err := this.Comptroller.WingDistributedNum(name)
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.Comptroller.WingDistributedNum error: %s", err)
+		}
+		price, err := this.assetStoredPrice(name)
+		if err != nil {
+			return nil, fmt.Errorf("MarketDistribution, this.assetStoredPrice error: %s", err)
+		}
+
+		supplyDollar := new(big.Int).Mul(supplyAmountFormal, price)
+		borrowAmountDollar := new(big.Int).Mul(borrowAmountFormal, price)
+		insuranceDollar := new(big.Int).Mul(insuranceAmountFormal, price)
 
 		distribution := &common.Distribution{
 			Icon:            this.cfg.IconMap[this.cfg.FlashAssetMap[name]],
@@ -437,14 +491,7 @@ func (this *IFPoolManager) PoolDistribution() (*common.Distribution, error) {
 			InsuranceAmount: utils.ToStringByPrecise(insuranceDollar, this.cfg.TokenDecimal["USDT"]+this.cfg.TokenDecimal["oracle"]),
 			Total:           utils.ToStringByPrecise(totalDistribution, this.cfg.TokenDecimal["WING"]),
 		}
-		flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
+		ifPoolMarketDistribution = append(ifPoolMarketDistribution, distribution)
 	}
-	distribution.Name = "IF"
-	distribution.Icon = this.cfg.IconMap[distribution.Name]
-	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
-	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
-	flashPoolMarketDistribution = append(flashPoolMarketDistribution, distribution)
-	return distribution, nil
+	return &common.MarketDistribution{MarketDistribution: ifPoolMarketDistribution}, nil
 }
