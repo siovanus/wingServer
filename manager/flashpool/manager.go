@@ -116,13 +116,9 @@ func (this *FlashPoolManager) FlashPoolMarketDistribution() (*common.FlashPoolMa
 		if err != nil {
 			return nil, fmt.Errorf("FlashPoolMarketDistribution, this.getTotalDistribution error: %s", err)
 		}
-		distributedDay := (uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond
 		distribution := &common.Distribution{
-			Icon: this.cfg.IconMap[this.cfg.FlashAssetMap[this.AssetMap[address]]],
-			Name: this.cfg.FlashAssetMap[this.AssetMap[address]],
-			// totalDistribution / distributedDay
-			PerDay: utils.ToStringByPrecise(new(big.Int).Div(totalDistribution,
-				new(big.Int).SetUint64(distributedDay)), this.cfg.TokenDecimal["WING"]),
+			Icon:            this.cfg.IconMap[this.cfg.FlashAssetMap[this.AssetMap[address]]],
+			Name:            this.cfg.FlashAssetMap[this.AssetMap[address]],
 			SupplyAmount:    supplyAmount,
 			BorrowAmount:    borrowAmount,
 			InsuranceAmount: insuranceAmount,
@@ -167,11 +163,9 @@ func (this *FlashPoolManager) PoolDistribution() (*common.Distribution, error) {
 	}
 	distribution.Name = "Flash"
 	distribution.Icon = this.cfg.IconMap[distribution.Name]
-	distributedDay := new(big.Int).SetUint64((uint64(time.Now().Unix()) - governance.GenesisTime) / governance.DaySecond)
 	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"])
 	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"])
 	distribution.InsuranceAmount = utils.ToStringByPrecise(i, this.cfg.TokenDecimal["pUSDT"])
-	distribution.PerDay = utils.ToStringByPrecise(new(big.Int).Div(d, distributedDay), this.cfg.TokenDecimal["WING"])
 	distribution.Total = utils.ToStringByPrecise(d, this.cfg.TokenDecimal["WING"])
 	return distribution, nil
 }
@@ -970,7 +964,7 @@ func (this *FlashPoolManager) GetInsuranceAddress(address ocommon.Address) (ocom
 func (this *FlashPoolManager) Reserves() (*common.Reserves, error) {
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return nil, fmt.Errorf("TotalReserve, this.GetAllMarkets error: %s", err)
+		return nil, fmt.Errorf("Reserves, this.GetAllMarkets error: %s", err)
 	}
 	totalReserve := new(big.Int)
 	reserves := &common.Reserves{
@@ -980,19 +974,23 @@ func (this *FlashPoolManager) Reserves() (*common.Reserves, error) {
 		name := this.cfg.FlashAssetMap[this.AssetMap[address]]
 		price, err := this.AssetStoredPrice(this.AssetMap[address])
 		if err != nil {
-			return nil, fmt.Errorf("TotalReserve, this.AssetStoredPrice error: %s", err)
+			return nil, fmt.Errorf("Reserves, this.AssetStoredPrice error: %s", err)
 		}
 		reserveBalance, err := this.getTotalReserves(address)
 		if err != nil {
-			return nil, fmt.Errorf("TotalReserve, this.getTotalReserves error: %s", err)
+			return nil, fmt.Errorf("Reserves, this.getTotalReserves error: %s", err)
 		}
 		reserveBalanceStr := utils.ToStringByPrecise(reserveBalance, this.cfg.TokenDecimal[name])
 		reserveDollarStr := utils.ToStringByPrecise(new(big.Int).Mul(price, reserveBalance),
 			this.cfg.TokenDecimal[name]+this.cfg.TokenDecimal["oracle"])
+		reserveFactorMantissa, err := this.FlashTokenMap[address].ReserveFactorMantissa()
+		if err != nil {
+			return nil, fmt.Errorf("Reserves, this.FlashTokenMap[address].ReserveFactorMantissa error: %s", err)
+		}
 		assetReserve := &common.Reserve{
 			Name:           name,
 			Icon:           this.cfg.IconMap[name],
-			ReserveFactor:  "0.15",
+			ReserveFactor:  utils.ToStringByPrecise(reserveFactorMantissa, this.cfg.TokenDecimal["flash"]),
 			ReserveBalance: reserveBalanceStr,
 			ReserveDollar:  reserveDollarStr,
 		}

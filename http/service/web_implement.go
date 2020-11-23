@@ -405,6 +405,28 @@ func (this *Service) Reserves(param map[string]interface{}) map[string]interface
 	return m
 }
 
+func (this *Service) IfReserves(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	reserves, err := this.ifMgr.Reserves()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("IfReserves error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = reserves
+		log.Infof("IfReserves success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IfReserves: failed, err: %s", err)
+	} else {
+		log.Debug("IfReserves: resp success")
+	}
+	return m
+}
+
 func (this *Service) IFPoolInfo(param map[string]interface{}) map[string]interface{} {
 	req := &common.IFPoolInfoRequest{}
 	resp := &common.Response{}

@@ -6,6 +6,7 @@ const (
 	GOVBANNEROVERVIEW           = "/api/v1/govbanneroverview"
 	GOVBANNER                   = "/api/v1/govbanner"
 	RESERVES                    = "/api/v1/reserves"
+	IFRESERVES                  = "/api/v1/ifreserves"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
 
 	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
@@ -30,6 +31,7 @@ const (
 	ACTION_GOVBANNEROVERVIEW           = "govbanneroverview"
 	ACTION_GOVBANNER                   = "govbanner"
 	ACTION_RESERVES                    = "reserves"
+	ACTION_IFRESERVES                  = "ifreserves"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
 
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
@@ -96,7 +98,6 @@ type PoolDistribution struct {
 type Distribution struct {
 	Icon            string
 	Name            string
-	PerDay          string
 	SupplyAmount    string
 	BorrowAmount    string
 	InsuranceAmount string

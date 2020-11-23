@@ -71,6 +71,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.GOVBANNEROVERVIEW:           {name: common.ACTION_GOVBANNEROVERVIEW, handler: web.GovBannerOverview},
 		common.GOVBANNER:                   {name: common.ACTION_GOVBANNER, handler: web.GovBanner},
 		common.RESERVES:                    {name: common.ACTION_RESERVES, handler: web.Reserves},
+		common.IFRESERVES:                  {name: common.ACTION_IFRESERVES, handler: web.IfReserves},
 		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
 		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
 		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
