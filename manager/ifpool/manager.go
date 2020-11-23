@@ -2,24 +2,24 @@ package ifpool
 
 import (
 	"fmt"
-	sdk "github.com/ontio/ontology-go-sdk"
-	"github.com/siovanus/wingServer/manager/governance"
-	"github.com/siovanus/wingServer/utils"
-	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
 	"math"
 	"math/big"
 	"os"
 	"time"
 
+	sdk "github.com/ontio/ontology-go-sdk"
 	ocommon "github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/http/common"
 	"github.com/siovanus/wingServer/log"
+	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/siovanus/wingServer/store"
+	"github.com/siovanus/wingServer/utils"
 	if_borrow "github.com/wing-groups/wing-contract-tools/contracts/if-borrow"
 	if_ctrl "github.com/wing-groups/wing-contract-tools/contracts/if-ctrl"
 	"github.com/wing-groups/wing-contract-tools/contracts/iftoken"
 	"github.com/wing-groups/wing-contract-tools/contracts/iitoken"
+	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
 )
 
 var GenesisTime = time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix()
@@ -433,7 +433,7 @@ func (this *IFPoolManager) PoolDistribution() (*common.Distribution, error) {
 		i = new(big.Int).Add(i, insuranceDollar)
 		d = new(big.Int).Add(d, totalDistribution)
 	}
-	distribution.Name = "IF"
+	distribution.Name = "Inclusive"
 	distribution.Icon = this.cfg.IconMap[distribution.Name]
 	distribution.SupplyAmount = utils.ToStringByPrecise(s, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
 	distribution.BorrowAmount = utils.ToStringByPrecise(b, this.cfg.TokenDecimal["pUSDT"]+this.cfg.TokenDecimal["oracle"])
