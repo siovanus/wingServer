@@ -923,8 +923,8 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	daily := banner.Daily
 	dailyTotal := utils.ToIntByPrecise(daily, 9)
 	log.Infof("origin dailyTotal:%d", dailyTotal)
-	dailyTotal = new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(60)), new(big.Int).SetUint64(100))
-	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
+	//dailyTotal = new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(60)), new(big.Int).SetUint64(100))
+	//log.Infof("0.6 times dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, flashStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, flashDynamicPercent))), new(big.Int).SetUint64(100000000000))
 	log.Infof("flash weight dailyTotal:%d", dailyTotal)
 	dailyInsurance := new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(10)), new(big.Int).SetUint64(100))
