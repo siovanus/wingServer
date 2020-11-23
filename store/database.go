@@ -267,14 +267,14 @@ func (client Client) SaveIFHistory(history *IfPoolHistory) error {
 	return client.db.Save(history).Error
 }
 
-func (client Client) LoadIFHistory(asset, operation string, start, end, pageNo, pageSize uint64) ([]IfPoolHistory, error) {
+func (client Client) LoadIFHistory(address, asset, operation string, start, end, pageNo, pageSize uint64) ([]IfPoolHistory, error) {
 	startPage := pageSize * (pageNo - 1)
 	if startPage < 0 {
 		startPage = 0
 	}
 	IfPoolHistory := make([]IfPoolHistory, 0)
 	db := client.db
-	sql := ""
+	sql := fmt.Sprintf("address = '%s'", address)
 	if asset != "" {
 		if sql != "" {
 			sql = sql + " AND "
@@ -309,10 +309,10 @@ func (client Client) LoadIFHistory(asset, operation string, start, end, pageNo, 
 	return IfPoolHistory, err
 }
 
-func (client Client) LoadIFHistoryCount(asset, operation string, start, end uint64) (uint64, error) {
+func (client Client) LoadIFHistoryCount(address, asset, operation string, start, end uint64) (uint64, error) {
 	IfPoolHistory := make([]IfPoolHistory, 0)
 	db := client.db
-	sql := ""
+	sql := fmt.Sprintf("address = '%s'", address)
 	if asset != "" {
 		if sql != "" {
 			sql = sql + " AND "

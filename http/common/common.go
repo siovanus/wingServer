@@ -340,6 +340,7 @@ type Composition struct {
 }
 
 type IFHistoryRequest struct {
+	Address        string
 	Asset          string
 	Operation      string
 	StartTimestamp uint64

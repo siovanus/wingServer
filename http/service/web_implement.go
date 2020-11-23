@@ -520,7 +520,7 @@ func (this *Service) IFHistory(param map[string]interface{}) map[string]interfac
 		resp.Desc = err.Error()
 		log.Errorf("IFHistory: decode params failed, err: %s", err)
 	} else {
-		IFHistory, err := this.ifMgr.IFHistory(req.Asset, req.Operation, req.StartTimestamp, req.EndTimestamp,
+		IFHistory, err := this.ifMgr.IFHistory(req.Address, req.Asset, req.Operation, req.StartTimestamp, req.EndTimestamp,
 			req.PageNo, req.PageSize)
 		if err != nil {
 			resp.Error = restful.INTERNAL_ERROR

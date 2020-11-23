@@ -246,8 +246,8 @@ func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 		fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
 	size := int(number)
-	totalStatic := new(big.Int)
-	totalDynamic := new(big.Int)
+	totalStatic := big.NewInt(0)
+	totalDynamic := big.NewInt(0)
 	poolStaticMap := make(map[common.Address]*big.Int)
 	poolDynamicMap := make(map[common.Address]*big.Int)
 	for i := 0; i < size; i++ {
@@ -255,22 +255,21 @@ func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 		if err {
 			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
 		}
-		staticData, err := source.NextBytes(32)
+		staticData, err := source.NextI128()
 		if err {
 			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
 		}
-		staticWeight := common.BigIntFromNeoBytes(staticData)
+		staticWeight := staticData.ToBigInt()
 		poolStaticMap[address] = staticWeight
 		totalStatic = new(big.Int).Add(totalStatic, staticWeight)
 
-		dynamicData, err := source.NextBytes(32)
+		dynamicData, err := source.NextI128()
 		if err {
 			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
 		}
-		dynamicWeight := common.BigIntFromNeoBytes(dynamicData)
+		dynamicWeight := dynamicData.ToBigInt()
 		poolDynamicMap[address] = dynamicWeight
 		totalDynamic = new(big.Int).Add(totalDynamic, dynamicWeight)
-
 	}
 	return &hcommon.PoolWeight{
 		PoolStaticMap:  poolStaticMap,

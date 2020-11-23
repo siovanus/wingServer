@@ -48,7 +48,7 @@ func NewIFPoolManager(sdk *sdk.OntologySdk, contractAddress, oscoreOracleAddress
 	borrowPoolMap := make(map[ocommon.Address]*if_borrow.IfBorrowPool)
 	allMarket, err := comptroller.AllMarkets()
 	if err != nil {
-		log.Errorf("NewFlashPoolManager, comptroller.AllMarkets error: %s", err)
+		log.Errorf("NewIFPoolManager, comptroller.AllMarkets error: %s", err)
 		os.Exit(1)
 	}
 	for _, name := range allMarket {
@@ -292,12 +292,12 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	return ifPoolInfo, nil
 }
 
-func (this *IFPoolManager) IFHistory(asset, operation string, start, end, pageNo, pageSize uint64) (*common.IFHistoryResponse, error) {
-	history, err := this.store.LoadIFHistory(asset, operation, start, end, pageNo, pageSize)
+func (this *IFPoolManager) IFHistory(address, asset, operation string, start, end, pageNo, pageSize uint64) (*common.IFHistoryResponse, error) {
+	history, err := this.store.LoadIFHistory(address, asset, operation, start, end, pageNo, pageSize)
 	if err != nil {
 		return nil, fmt.Errorf("IFHistory, this.store.LoadIFHistory error: %s", err)
 	}
-	count, err := this.store.LoadIFHistoryCount(asset, operation, start, end)
+	count, err := this.store.LoadIFHistoryCount(address, asset, operation, start, end)
 	if err != nil {
 		return nil, fmt.Errorf("IFHistory, this.store.LoadIFHistoryCount error: %s", err)
 	}
