@@ -197,8 +197,9 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		totalSupply := new(big.Int).Add(totalCash, totalDebt)
 		ifAsset.TotalSupply = utils.ToStringByPrecise(totalSupply, this.cfg.TokenDecimal[ifAsset.Name])
 		interestIndex := utils.ToIntByPrecise(ifMarketInfo.InterestIndex, 0)
+		index := new(big.Int).Sub(interestIndex, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["ifindex"])))))
 		now := time.Now().UTC().Unix()
-		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(interestIndex,
+		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(index,
 			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["ifindex"])
 		//TODO supplyWingAPy
 		if totalSupply.Uint64() != 0 {
