@@ -168,10 +168,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					log.Infof("###### supply bigAmount:%d", bigAmount)
-					log.Infof("###### supply TokenDecimal:%d", this.cfg.TokenDecimal[name])
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
-					log.Infof("###### supply amount:%s", amount)
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -193,7 +190,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -218,7 +215,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -240,7 +237,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -265,7 +262,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -287,7 +284,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
-					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[pName])
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
