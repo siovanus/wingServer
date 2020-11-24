@@ -185,7 +185,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 
 	addr := ocommon.ADDRESS_EMPTY
 	if account != "" {
-		addr, err := ocommon.AddressFromBase58(account)
+		addr, err = ocommon.AddressFromBase58(account)
 		if err != nil {
 			return nil, fmt.Errorf("IFPoolInfo, ocommon.AddressFromBase58 error: %s", err)
 		}
