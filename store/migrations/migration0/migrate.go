@@ -61,7 +61,7 @@ type IFMarketInfo struct {
 	Name             string `gorm:"primary_key"`
 	TotalCash        string
 	TotalDebt        string
-	InterestIndex    string
+	TotalInterest    string
 	TotalInsurance   string
 	InterestRate     uint64
 	CollateralFactor uint64
