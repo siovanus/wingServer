@@ -168,7 +168,10 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					if !b {
 						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
 					}
+					log.Infof("###### supply bigAmount:%d", bigAmount)
+					log.Infof("###### supply TokenDecimal:%d", this.cfg.TokenDecimal[name])
 					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					log.Infof("###### supply amount:%s", amount)
 					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
@@ -248,7 +251,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 				method, _ := states[0].(string)
 				if method == "Mint" {
 					txHash := event.TxHash
-					operation := "supply"
+					operation := "insure"
 					addr, _ := states[1].(string)
 					amount, _ := states[2].(string)
 					name, err := iToken.Name()
@@ -270,7 +273,7 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					ifPoolHistories = append(ifPoolHistories, history)
 				} else if method == "Redeem" {
 					txHash := event.TxHash
-					operation := "withdraw"
+					operation := "surrender"
 					addr, _ := states[1].(string)
 					amount, _ := states[2].(string)
 					name, err := iToken.Name()
