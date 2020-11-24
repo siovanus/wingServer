@@ -5,6 +5,8 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
+	"github.com/siovanus/wingServer/utils"
+	"math/big"
 	"strings"
 )
 
@@ -161,7 +163,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
@@ -177,7 +185,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
@@ -196,7 +210,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
@@ -212,7 +232,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
@@ -231,7 +257,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
@@ -247,7 +279,13 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 					}
 					index := strings.LastIndex(name, " ") + 1
 					name = name[index:len(name)]
-					history, err := this.constructHistory(addr, name, operation, amount, txHash, height)
+					pName := this.cfg.IFMap[name]
+					bigAmount, b := new(big.Int).SetString(amount, 10)
+					if !b {
+						log.Errorf("trackIfOperationEvent, new(big.Int).SetString error")
+					}
+					amount = utils.ToStringByPrecise(bigAmount, this.cfg.TokenDecimal[name])
+					history, err := this.constructHistory(addr, pName, operation, amount, txHash, height)
 					if err != nil {
 						log.Errorf("trackIfOperationEvent, this.constructHistory error: %s", err)
 					}
