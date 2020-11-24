@@ -22,7 +22,7 @@ import (
 	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
 )
 
-var GenesisTime = time.Date(2020, time.September, 12, 0, 0, 0, 0, time.UTC).Unix()
+var GenesisTime = time.Date(2020, time.November, 23, 0, 0, 0, 0, time.UTC).Unix()
 
 const MaxLevel uint64 = 3
 
@@ -200,7 +200,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		totalSupply := new(big.Int).Add(totalCash, totalDebt)
 		ifAsset.TotalSupply = utils.ToStringByPrecise(totalSupply, this.cfg.TokenDecimal[ifAsset.Name])
 		interestIndex := utils.ToIntByPrecise(ifMarketInfo.InterestIndex, 0)
-		index := new(big.Int).Sub(interestIndex, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["ifindex"])))))
+		index := new(big.Int).Sub(interestIndex, utils.ToIntByPrecise("1", this.cfg.TokenDecimal["ifindex"]))
 		now := time.Now().UTC().Unix()
 		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(index,
 			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["ifindex"])
