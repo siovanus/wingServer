@@ -121,13 +121,13 @@ func (this *IFPoolManager) StoreIFMarketInfo() error {
 		if err != nil {
 			return fmt.Errorf("StoreIFMarketInfo, this.FTokenMap[marketInfo.SupplyPool].TotalDebt error: %s", err)
 		}
-		interestIndex, err := this.Comptroller.InterestIndex(name)
+		totalInterest, err := this.BorrowMap[marketInfo.BorrowPool].TotalInterest()
 		if err != nil {
-			return fmt.Errorf("StoreIFMarketInfo, this.Comptroller.InterestIndex error: %s", err)
+			return fmt.Errorf("StoreIFMarketInfo, this.BorrowMap[marketInfo.BorrowPool].TotalInterest error: %s", err)
 		}
 		ifMarketInfo.TotalCash = utils.ToStringByPrecise(totalCash, 0)
 		ifMarketInfo.TotalDebt = utils.ToStringByPrecise(totalDebt, 0)
-		ifMarketInfo.InterestIndex = utils.ToStringByPrecise(interestIndex, 0)
+		ifMarketInfo.TotalInterest = utils.ToStringByPrecise(totalInterest.ToBigInt(), 0)
 
 		oscoreInfo, err := this.BorrowMap[marketInfo.BorrowPool].GetOscoreInfoByLevel(MaxLevel)
 		if err != nil {
@@ -199,11 +199,11 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		totalInsurance := utils.ToIntByPrecise(ifMarketInfo.TotalInsurance, 0)
 		totalSupply := new(big.Int).Add(totalCash, totalDebt)
 		ifAsset.TotalSupply = utils.ToStringByPrecise(totalSupply, this.cfg.TokenDecimal[ifAsset.Name])
-		interestIndex := utils.ToIntByPrecise(ifMarketInfo.InterestIndex, 0)
-		index := new(big.Int).Sub(interestIndex, utils.ToIntByPrecise("1", this.cfg.TokenDecimal["ifindex"]))
+		totalInterest := utils.ToIntByPrecise(ifMarketInfo.TotalInterest, this.cfg.TokenDecimal["percentage"])
+		index := new(big.Int).Div(totalInterest, totalSupply)
 		now := time.Now().UTC().Unix()
 		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(index,
-			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["ifindex"])
+			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["percentage"])
 		//TODO supplyWingAPy
 		if totalSupply.Uint64() != 0 {
 			ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
@@ -212,7 +212,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
 		//TODO BorrowWingAPY
 		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])
-		ifAsset.BorrowCap = "500"
+		ifAsset.BorrowCap = "1000"
 		ifAsset.TotalInsurance = utils.ToStringByPrecise(totalInsurance, this.cfg.TokenDecimal[ifAsset.Name])
 		//TODO InsuranceWingAPY
 		ifPoolInfo.IFAssetList = append(ifPoolInfo.IFAssetList, ifAsset)
