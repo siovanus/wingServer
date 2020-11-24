@@ -303,13 +303,19 @@ func (this *IFPoolManager) IFHistory(address, asset, operation string, start, en
 	}
 	histories := make([]*common.IFHistory, 0)
 	for _, v := range history {
+		price, err := this.AssetStoredPrice(this.cfg.IFOracleMap[v.Token])
+		if err != nil {
+			log.Errorf("IFHistory, this.AssetStoredPrice error: %s", err)
+		}
+		amount := utils.ToIntByPrecise(v.Amount, this.cfg.TokenDecimal[v.Token])
+		dollar := utils.ToStringByPrecise(new(big.Int).Mul(amount, price), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
 		i := &common.IFHistory{
-			Name:      this.cfg.IFMap[v.Token],
-			Icon:      this.cfg.IconMap[this.cfg.IFMap[v.Token]],
+			Name:      v.Token,
+			Icon:      this.cfg.IconMap[v.Token],
 			Operation: v.Operation,
 			Timestamp: v.Timestamp,
 			Balance:   v.Amount,
-			Dollar:    "23526.464",
+			Dollar:    dollar,
 			Address:   v.Address,
 		}
 		histories = append(histories, i)
@@ -500,4 +506,12 @@ func (this *IFPoolManager) MarketDistribution() (*common.MarketDistribution, err
 		ifPoolMarketDistribution = append(ifPoolMarketDistribution, distribution)
 	}
 	return &common.MarketDistribution{MarketDistribution: ifPoolMarketDistribution}, nil
+}
+
+func (this *IFPoolManager) AssetStoredPrice(asset string) (*big.Int, error) {
+	price, err := this.store.LoadPrice(asset)
+	if err != nil {
+		return nil, fmt.Errorf("AssetStoredPrice, this.store.LoadPrice error: %s", err)
+	}
+	return utils.ToIntByPrecise(price.Price, this.cfg.TokenDecimal["oracle"]), nil
 }

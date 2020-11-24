@@ -25,6 +25,7 @@ type Config struct {
 	IconMap             map[string]string `json:"icon_map"`
 	FlashAssetMap       map[string]string `json:"flash_asset_map"`
 	IFMap               map[string]string `json:"if_map"`
+	IFOracleMap         map[string]string `json:"if_oracle_map"`
 	TrackEventInterval  uint64            `json:"track_event_interval"`
 	SystemContract      []string          `json:"system_contract"`
 	TokenDecimal        map[string]uint64 `json:"token_decimal"`

@@ -44,6 +44,11 @@
     "USDT": "pUSDT",
     "USDC": "pUSDC"
   },
+  "if_oracle_map": {
+    "pDAI": "DAI",
+    "pUSDT": "USDT",
+    "pUSDC": "USDC"
+  },
   "token_decimal": {
     "percentage": 12,
     "ONTd": 9,
