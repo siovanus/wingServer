@@ -4,7 +4,7 @@
   "governance_address": "507ca8dbee84c69bfa96448785eea32cdb1dc99b",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "2806d58ba7d50656018abd20b7376aa229b2205e",
-  "if_pool_address": "b66ee7811e4795ae92cb2ac93b5b50bb9ae7e522",
+  "if_pool_address": "986feceb42fd3b684302285bf167b9aca64c01a6",
   "oracle_address": "2927cb865be38d0fddce9cd42b38864074c82ad5",
   "oscore_oracle_address": "0ece89ce4b0eb9657fafb4166fdd417e670fda2a",
   "database_url": "postgresql://postgres:zmh630323@172.168.3.18:5432/wing?sslmode=disable",
