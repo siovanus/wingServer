@@ -181,7 +181,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	totalBorrowWingEarned := new(big.Int)
 	totalInsuranceDollar := new(big.Int)
 	totalInsuranceWingEarned := new(big.Int)
-	accrued := new(big.Int)
+	var accrued *big.Int
 
 	addr := ocommon.ADDRESS_EMPTY
 	if account != "" {
@@ -189,7 +189,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		if err != nil {
 			return nil, fmt.Errorf("IFPoolInfo, ocommon.AddressFromBase58 error: %s", err)
 		}
-		accrued, err := this.Comptroller.WingUserAccrued(addr)
+		accrued, err = this.Comptroller.WingUserAccrued(addr)
 		if err != nil {
 			return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.WingUserAccrued error: %s", err)
 		}
