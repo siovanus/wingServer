@@ -136,6 +136,21 @@ func listContains(list []string, arg string) bool {
 func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.SmartContactEvent) ([]*store.IfPoolHistory, error) {
 	ifPoolHistories := make([]*store.IfPoolHistory, 0)
 	for _, event := range events {
+		var parse = true
+		for _, notify := range event.Notify {
+			var ok bool
+			states, ok := notify.States.([]interface{})
+			if !ok {
+				continue
+			}
+			if states[0] == "Failure" {
+				parse = false
+				break
+			}
+		}
+		if !parse {
+			continue
+		}
 		for _, notify := range event.Notify {
 			var ok bool
 			states, ok := notify.States.([]interface{})
