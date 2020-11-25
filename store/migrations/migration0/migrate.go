@@ -65,6 +65,9 @@ type IFMarketInfo struct {
 	TotalInsurance   string
 	InterestRate     uint64
 	CollateralFactor uint64
+	SupplyWingApy    string
+	BorrowWingApy    string
+	InsuranceWingApy string
 }
 
 type IfPoolHistory struct {

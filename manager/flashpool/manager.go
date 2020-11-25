@@ -877,7 +877,7 @@ func (this *FlashPoolManager) LiquidationList(accountStr string) ([]*common.Liqu
 func (this *FlashPoolManager) WingApyForStore() error {
 	dynamicPercent, err := this.getDynamicPercent()
 	if err != nil {
-		return fmt.Errorf("WingApy, this.getDynamicPercent error: %s", err)
+		return fmt.Errorf("FlashPoolManager WingApy, this.getDynamicPercent error: %s", err)
 	}
 	log.Infof("dynamicPercent:%d", dynamicPercent)
 	staticPercent := new(big.Int).Sub(new(big.Int).SetUint64(100), dynamicPercent)
@@ -885,7 +885,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 
 	poolWeight, err := this.getPoolWeight()
 	if err != nil {
-		return fmt.Errorf("WingApy, this.getPoolWeight error: %s", err)
+		return fmt.Errorf("FlashPoolManager WingApy, this.getPoolWeight error: %s", err)
 	}
 	poolStaticMap := poolWeight.PoolStaticMap
 	flashStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
@@ -911,14 +911,14 @@ func (this *FlashPoolManager) WingApyForStore() error {
 
 	utilities, err := this.getUtilities()
 	if err != nil {
-		return fmt.Errorf("WingApy, this.getUtilities error: %s", err)
+		return fmt.Errorf("FlashPoolManager WingApy, this.getUtilities error: %s", err)
 	}
 	utilityMap := utilities.UtilityMap
 	total := utilities.Total
 
 	banner, err := this.GovMgr.GovBanner()
 	if err != nil {
-		return fmt.Errorf("WingApy, this.GovMgr.GovBanner error: %s", err)
+		return fmt.Errorf("FlashPoolManager WingApy, this.GovMgr.GovBanner error: %s", err)
 	}
 	daily := banner.Daily
 	dailyTotal := utils.ToIntByPrecise(daily, 9)
@@ -933,34 +933,34 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	log.Infof("dailySB:%d", dailySB)
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
-		return fmt.Errorf("WingApy, this.GetAllMarkets error: %s", err)
+		return fmt.Errorf("FlashPoolManager WingApy, this.GetAllMarkets error: %s", err)
 	}
 	for _, address := range allMarkets {
 		wingSBIPortion, err := this.getWingSBIPortion(address)
 		if err != nil {
-			return fmt.Errorf("WingApy, this.getWingSBIPortion error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.getWingSBIPortion error: %s", err)
 		}
 		totalPortion := new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.InsurancePortion),
 			new(big.Int).Add(new(big.Int).SetUint64(wingSBIPortion.SupplyPortion),
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)))
 		wingPrice, err := this.AssetStoredPrice("WING")
 		if err != nil {
-			return fmt.Errorf("WingApy, this.AssetStoredPrice error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.AssetStoredPrice error: %s", err)
 		}
 		market, err := this.store.LoadFlashMarket(this.cfg.FlashAssetMap[this.AssetMap[address]])
 		if err != nil {
-			return fmt.Errorf("WingApy, this.store.LoadFlashMarket error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.store.LoadFlashMarket error: %s", err)
 		}
 		totalSupplyDollar := utils.ToIntByPrecise(market.TotalSupplyDollar, this.cfg.TokenDecimal["pUSDT"])
 		totalValidBorrow, err := this.FlashTokenMap[address].TotalValidBorrows()
 		price, err := this.AssetStoredPrice(this.AssetMap[address])
 		if err != nil {
-			return fmt.Errorf("WingApy, this.AssetStoredPrice error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.AssetStoredPrice error: %s", err)
 		}
 		totalValidBorrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(totalValidBorrow, price),
 			this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.FlashAssetMap[this.AssetMap[address]]]), this.cfg.TokenDecimal["pUSDT"])
 		if err != nil {
-			return fmt.Errorf("WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
 		}
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 {
@@ -995,7 +995,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		}
 		err = this.store.SaveWingApy(wingApy)
 		if err != nil {
-			return fmt.Errorf("WingApy, this.store.SaveWingApy error: %s", err)
+			return fmt.Errorf("FlashPoolManager WingApy, this.store.SaveWingApy error: %s", err)
 		}
 	}
 	return nil

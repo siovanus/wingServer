@@ -369,6 +369,11 @@ type MarketUtility struct {
 	Total      *big.Int
 }
 
+type IfMarketUtility struct {
+	UtilityMap map[string]*big.Int
+	Total      *big.Int
+}
+
 type PoolWeight struct {
 	PoolStaticMap  map[common.Address]*big.Int
 	PoolDynamicMap map[common.Address]*big.Int

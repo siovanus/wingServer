@@ -106,7 +106,11 @@ func (this *Service) StoreFlashPoolAllMarket() error {
 func (this *Service) StoreWingApy() {
 	err := this.fpMgr.WingApyForStore()
 	if err != nil {
-		log.Errorf("StoreUserBalance, this.fpMgr.WingApyForStore error: %s", err)
+		log.Errorf("StoreWingApy, this.fpMgr.WingApyForStore error: %s", err)
+	}
+	err = this.ifMgr.WingApyForStore()
+	if err != nil {
+		log.Errorf("StoreWingApy, this.ifMgr.WingApyForStore error: %s", err)
 	}
 }
 
