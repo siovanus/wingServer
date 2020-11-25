@@ -252,29 +252,23 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			log.Infof("supplyWingEarned:%d", supplyWingEarned)
-			log.Infof("accrued:%d", accrued)
 			supplyWingEarned = new(big.Int).Sub(supplyWingEarned, accrued)
-			log.Infof("final supplyWingEarned:%d", supplyWingEarned)
 			totalSupplyWingEarned = new(big.Int).Add(totalSupplyWingEarned, supplyWingEarned)
+
 			_, borrowWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, true, false, false, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			log.Infof("borrowWingEarned:%d", borrowWingEarned)
-			log.Infof("accrued:%d", accrued)
 			borrowWingEarned = new(big.Int).Sub(borrowWingEarned, accrued)
-			log.Infof("final borrowWingEarned:%d", supplyWingEarned)
 			totalBorrowWingEarned = new(big.Int).Add(totalBorrowWingEarned, borrowWingEarned)
+
 			_, insuranceWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, false, true, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			log.Infof("insuranceWingEarned:%d", insuranceWingEarned)
-			log.Infof("accrued:%d", accrued)
 			insuranceWingEarned = new(big.Int).Sub(insuranceWingEarned, accrued)
-			log.Infof("final insuranceWingEarned:%d", insuranceWingEarned)
 			totalInsuranceWingEarned = new(big.Int).Add(totalInsuranceWingEarned, insuranceWingEarned)
+
 			insuranceBalance, err := this.ITokenMap[marketInfo.InsurancePool].BalanceOfUnderlying(addr)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.ITokenMap[marketInfo.InsurancePool].BalanceOfUnderlying error: %s", err)
