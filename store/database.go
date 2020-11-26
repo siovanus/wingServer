@@ -264,6 +264,7 @@ type IfPoolHistory struct {
 	Amount    string
 	Timestamp uint64
 	TxHash    string
+	Remark    string
 }
 
 func (client Client) SaveIFHistory(history *IfPoolHistory) error {

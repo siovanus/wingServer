@@ -223,18 +223,21 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		now := time.Now().UTC().Unix()
 		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(index,
 			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["percentage"])
-		//TODO supplyWingAPy
+		// supplyWingAPy
 		if totalSupply.Uint64() != 0 {
 			ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[ifAsset.Name]))))), totalSupply), this.cfg.TokenDecimal[ifAsset.Name])
 		}
+		ifAsset.SupplyWingAPY = ifMarketInfo.SupplyWingApy
 		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
-		//TODO BorrowWingAPY
+		// BorrowWingAPY
 		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])
 		ifAsset.BorrowCap = "1000"
+		ifAsset.BorrowWingAPY = ifMarketInfo.BorrowWingApy
 		ifAsset.TotalInsurance = utils.ToStringByPrecise(totalInsurance, this.cfg.TokenDecimal[ifAsset.Name])
-		//TODO InsuranceWingAPY
+		// InsuranceWingAPY
 		ifPoolInfo.IFAssetList = append(ifPoolInfo.IFAssetList, ifAsset)
+		ifAsset.InsuranceWingAPY = ifMarketInfo.InsuranceWingApy
 
 		//user data
 		if account != "" {
