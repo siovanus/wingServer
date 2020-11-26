@@ -879,9 +879,9 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	if err != nil {
 		return fmt.Errorf("FlashPoolManager WingApy, this.getDynamicPercent error: %s", err)
 	}
-	log.Infof("dynamicPercent:%d", dynamicPercent)
+	//log.Infof("dynamicPercent:%d", dynamicPercent)
 	staticPercent := new(big.Int).Sub(new(big.Int).SetUint64(100), dynamicPercent)
-	log.Infof("staticPercent:%d", staticPercent)
+	//log.Infof("staticPercent:%d", staticPercent)
 
 	poolWeight, err := this.getPoolWeight()
 	if err != nil {
@@ -889,25 +889,25 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	}
 	poolStaticMap := poolWeight.PoolStaticMap
 	flashStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
-	log.Infof("flashStaticWeight:%d", flashStaticWeight)
+	//log.Infof("flashStaticWeight:%d", flashStaticWeight)
 	totalStaticWeight := poolWeight.TotalStatic
-	log.Infof("totalStaticWeight:%d", totalStaticWeight)
+	//log.Infof("totalStaticWeight:%d", totalStaticWeight)
 	flashStaticPercent := new(big.Int).SetUint64(0)
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
 		flashStaticPercent = new(big.Int).Div(new(big.Int).Mul(flashStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
 	}
-	log.Infof("flashStaticPercent:%d", flashStaticPercent)
+	log.Infof("flash StaticPercent:%d", flashStaticPercent)
 
 	poolDynamicMap := poolWeight.PoolDynamicMap
 	flashDynamicWeight := poolDynamicMap[this.Comptroller.GetAddr()]
-	log.Infof("flashDynamicWeight:%d", flashDynamicWeight)
+	//log.Infof("flashDynamicWeight:%d", flashDynamicWeight)
 	totalDynamicWeight := poolWeight.TotalDynamic
-	log.Infof("totalDynamicWeight:%d", totalDynamicWeight)
+	//log.Infof("totalDynamicWeight:%d", totalDynamicWeight)
 	flashDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
 		flashDynamicPercent = new(big.Int).Div(new(big.Int).Mul(flashDynamicWeight, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
-	log.Infof("flashDynamicPercent:%d", flashDynamicPercent)
+	log.Infof("flash DynamicPercent:%d", flashDynamicPercent)
 
 	utilities, err := this.getUtilities()
 	if err != nil {
@@ -922,15 +922,15 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	}
 	daily := banner.Daily
 	dailyTotal := utils.ToIntByPrecise(daily, 9)
-	log.Infof("origin dailyTotal:%d", dailyTotal)
+	//log.Infof("origin dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(60)), new(big.Int).SetUint64(100))
-	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
+	//log.Infof("0.6 times dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, flashStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, flashDynamicPercent))), new(big.Int).SetUint64(100000000000))
-	log.Infof("flash weight dailyTotal:%d", dailyTotal)
+	//log.Infof("flash weight dailyTotal:%d", dailyTotal)
 	dailyInsurance := new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(10)), new(big.Int).SetUint64(100))
-	log.Infof("dailyInsurance:%d", dailyInsurance)
+	//log.Infof("dailyInsurance:%d", dailyInsurance)
 	dailySB := new(big.Int).Sub(dailyTotal, dailyInsurance)
-	log.Infof("dailySB:%d", dailySB)
+	//log.Infof("dailySB:%d", dailySB)
 	allMarkets, err := this.GetAllMarkets()
 	if err != nil {
 		return fmt.Errorf("FlashPoolManager WingApy, this.GetAllMarkets error: %s", err)

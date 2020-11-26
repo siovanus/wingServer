@@ -544,25 +544,25 @@ func (this *IFPoolManager) WingApyForStore() error {
 	}
 	poolStaticMap := poolWeight.PoolStaticMap
 	ifStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
-	log.Infof("ifStaticWeight:%d", ifStaticWeight)
+	log.Infof("if StaticWeight:%d", ifStaticWeight)
 	totalStaticWeight := poolWeight.TotalStatic
-	log.Infof("totalStaticWeight:%d", totalStaticWeight)
+	log.Infof("if totalStaticWeight:%d", totalStaticWeight)
 	ifStaticPercent := new(big.Int).SetUint64(0)
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
 		ifStaticPercent = new(big.Int).Div(new(big.Int).Mul(ifStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
 	}
-	log.Infof("ifStaticPercent:%d", ifStaticPercent)
+	log.Infof("if StaticPercent:%d", ifStaticPercent)
 
 	poolDynamicMap := poolWeight.PoolDynamicMap
 	ifDynamicWeight := poolDynamicMap[this.Comptroller.GetAddr()]
-	log.Infof("ifDynamicWeight:%d", ifDynamicWeight)
+	log.Infof("if DynamicWeight:%d", ifDynamicWeight)
 	totalDynamicWeight := poolWeight.TotalDynamic
-	log.Infof("totalDynamicWeight:%d", totalDynamicWeight)
+	log.Infof("if totalDynamicWeight:%d", totalDynamicWeight)
 	ifDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
 		ifDynamicPercent = new(big.Int).Div(new(big.Int).Mul(ifDynamicPercent, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
-	log.Infof("ifDynamicPercent:%d", ifDynamicPercent)
+	log.Infof("if DynamicPercent:%d", ifDynamicPercent)
 
 	utilities, err := this.getUtilities()
 	if err != nil {
@@ -582,7 +582,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 	dailyTotal = new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(60)), new(big.Int).SetUint64(100))
 	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, ifStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, ifDynamicPercent))), new(big.Int).SetUint64(100000000000))
-	log.Infof("flash weight dailyTotal:%d", dailyTotal)
+	log.Infof("if weight dailyTotal:%d", dailyTotal)
 	allMarkets, err := this.Comptroller.AllMarkets()
 	if err != nil {
 		return fmt.Errorf("IFPoolManager WingApy, this.GetAllMarkets error: %s", err)
