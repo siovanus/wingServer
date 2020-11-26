@@ -394,8 +394,11 @@ func (this *Service) StoreUserIfOperation(history *store.IfPoolHistory) {
 
 func (this *Service) checkIfDebt() {
 	now := time.Now().Unix()
+	log.Infof("+++++++++++++++++++++now:%d", now)
 	eightDay := 8 * this.cfg.OneDaySecond
+	log.Infof("+++++++++++++++++++++eightDay:%d", eightDay)
 	nineDay := 9 * this.cfg.OneDaySecond
+	log.Infof("+++++++++++++++++++++nineDay:%d", nineDay)
 	end := now - eightDay
 	start := now - nineDay
 	debtAccounts, err := this.ifMgr.CheckIfDebt(start, end)
@@ -403,6 +406,8 @@ func (this *Service) checkIfDebt() {
 		log.Errorf("checkIfDebt, this.ifMgr.checkIfDebt: %s", err)
 	}
 	reqUrl := fmt.Sprintf(this.cfg.WingBackendUrl, "if-pool/blacklist")
+	log.Infof("+++++++++++++++++++++reqUrl:%s", reqUrl)
+	log.Infof("+++++++++++++++++++++debtAccounts:%d", len(debtAccounts))
 
 	reqData, err := json.Marshal(debtAccounts)
 	if err != nil {
