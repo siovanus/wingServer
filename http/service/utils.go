@@ -155,6 +155,9 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 		if !parse {
 			continue
 		}
+		var collateraler string
+		var collateralAmount string
+		var collateralPName string
 		for _, notify := range event.Notify {
 			var ok bool
 			states, ok := notify.States.([]interface{})
@@ -218,7 +221,17 @@ func (this *Service) trackIfOperationEvent(height uint32, events []*gocommon.Sma
 				}
 			} else if isBToken {
 				method, _ := states[0].(string)
-				if method == "Borrow" {
+				if method == "IncreaseCollateral" {
+					collateraler, _ = states[1].(string)
+					collateralAmount, _ = states[2].(string)
+					collateralName, err := bToken.MarketName()
+					if err != nil {
+						log.Errorf("trackIfOperationEvent, bToken.MarketName error: %s", err)
+					}
+					collateralIndex := strings.LastIndex(collateralName, " ") + 1
+					collateralName = collateralName[collateralIndex:len(collateralName)]
+					collateralPName = this.cfg.IFMap[collateralName]
+				} else if method == "Borrow" {
 					txHash := event.TxHash
 					operation := "borrow"
 					addr, _ := states[1].(string)
