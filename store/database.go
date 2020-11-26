@@ -257,14 +257,16 @@ func (client Client) SaveIFMarketInfo(ifMarketInfo *IFMarketInfo) error {
 }
 
 type IfPoolHistory struct {
-	ID        uint64 `gorm:"primary_key"`
-	Address   string
-	Token     string
-	Operation string
-	Amount    string
-	Timestamp uint64
-	TxHash    string
-	Remark    string
+	ID               uint64 `gorm:"primary_key"`
+	Address          string
+	Token            string
+	Operation        string
+	Amount           string
+	Timestamp        uint64
+	TxHash           string
+	Remark           string
+	CollateralToken  string
+	CollateralAmount string
 }
 
 func (client Client) SaveIFHistory(history *IfPoolHistory) error {
