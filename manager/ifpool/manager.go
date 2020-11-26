@@ -549,6 +549,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 	log.Infof("if totalStaticWeight:%d", totalStaticWeight)
 	ifStaticPercent := new(big.Int).SetUint64(0)
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
+		log.Infof("_________________________________totalStaticWeight !=0")
 		ifStaticPercent = new(big.Int).Div(new(big.Int).Mul(ifStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
 	}
 	log.Infof("if StaticPercent:%d", ifStaticPercent)
@@ -560,6 +561,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 	log.Infof("if totalDynamicWeight:%d", totalDynamicWeight)
 	ifDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
+		log.Infof("_________________________________totalDynamicWeight !=0")
 		ifDynamicPercent = new(big.Int).Div(new(big.Int).Mul(ifDynamicPercent, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
 	log.Infof("if DynamicPercent:%d", ifDynamicPercent)
