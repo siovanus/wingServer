@@ -632,6 +632,8 @@ func (this *IFPoolManager) WingApyForStore() error {
 		//	return fmt.Errorf("IFPoolManager WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
 		//}
 		utility := utilityMap[name]
+		log.Infof("##########################name:%s", name)
+		log.Infof("##########################utility:%d", utility)
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			log.Infof("##########################utility:%d", utility)
