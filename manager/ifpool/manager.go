@@ -621,7 +621,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 	ifDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
 		log.Infof("_________________________________totalDynamicWeight !=0")
-		ifDynamicPercent = new(big.Int).Div(new(big.Int).Mul(ifDynamicPercent, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
+		ifDynamicPercent = new(big.Int).Div(new(big.Int).Mul(ifDynamicWeight, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
 	log.Infof("if DynamicPercent:%d", ifDynamicPercent)
 
