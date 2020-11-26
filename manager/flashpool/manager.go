@@ -962,17 +962,18 @@ func (this *FlashPoolManager) WingApyForStore() error {
 		if err != nil {
 			return fmt.Errorf("FlashPoolManager WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
 		}
+		utility := utilityMap[address]
 		var supplyApy, borrowApy, insuranceApy string
-		if totalSupplyDollar.Uint64() != 0 {
+		if totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
-				new(big.Int).Div(new(big.Int).Mul(dailySB, utilityMap[address]), total),
+				new(big.Int).Div(new(big.Int).Mul(dailySB, utility), total),
 				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
 		}
-		if totalValidBorrowDollar.Uint64() != 0 {
+		if totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
-				new(big.Int).Div(new(big.Int).Mul(dailySB, utilityMap[address]), total),
+				new(big.Int).Div(new(big.Int).Mul(dailySB, utility), total),
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
 				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])

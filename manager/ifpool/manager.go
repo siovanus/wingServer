@@ -544,25 +544,25 @@ func (this *IFPoolManager) WingApyForStore() error {
 	}
 	poolStaticMap := poolWeight.PoolStaticMap
 	ifStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
-	log.Infof("flashStaticWeight:%d", ifStaticWeight)
+	log.Infof("ifStaticWeight:%d", ifStaticWeight)
 	totalStaticWeight := poolWeight.TotalStatic
 	log.Infof("totalStaticWeight:%d", totalStaticWeight)
 	ifStaticPercent := new(big.Int).SetUint64(0)
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
 		ifStaticPercent = new(big.Int).Div(new(big.Int).Mul(ifStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
 	}
-	log.Infof("flashStaticPercent:%d", ifStaticPercent)
+	log.Infof("ifStaticPercent:%d", ifStaticPercent)
 
 	poolDynamicMap := poolWeight.PoolDynamicMap
 	ifDynamicWeight := poolDynamicMap[this.Comptroller.GetAddr()]
-	log.Infof("flashDynamicWeight:%d", ifDynamicWeight)
+	log.Infof("ifDynamicWeight:%d", ifDynamicWeight)
 	totalDynamicWeight := poolWeight.TotalDynamic
 	log.Infof("totalDynamicWeight:%d", totalDynamicWeight)
 	ifDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
 		ifDynamicPercent = new(big.Int).Div(new(big.Int).Mul(ifDynamicPercent, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
-	log.Infof("flashDynamicPercent:%d", ifDynamicPercent)
+	log.Infof("ifDynamicPercent:%d", ifDynamicPercent)
 
 	utilities, err := this.getUtilities()
 	if err != nil {
@@ -583,10 +583,6 @@ func (this *IFPoolManager) WingApyForStore() error {
 	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, ifStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, ifDynamicPercent))), new(big.Int).SetUint64(100000000000))
 	log.Infof("flash weight dailyTotal:%d", dailyTotal)
-	dailyInsurance := new(big.Int).Div(new(big.Int).Mul(dailyTotal, new(big.Int).SetUint64(10)), new(big.Int).SetUint64(100))
-	log.Infof("dailyInsurance:%d", dailyInsurance)
-	dailySB := new(big.Int).Sub(dailyTotal, dailyInsurance)
-	log.Infof("dailySB:%d", dailySB)
 	allMarkets, err := this.Comptroller.AllMarkets()
 	if err != nil {
 		return fmt.Errorf("IFPoolManager WingApy, this.GetAllMarkets error: %s", err)
@@ -631,9 +627,15 @@ func (this *IFPoolManager) WingApyForStore() error {
 		//	return fmt.Errorf("IFPoolManager WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
 		//}
 		utility := utilityMap[name]
-		log.Infof("##########################utility:%d", utility)
 		var supplyApy, borrowApy, insuranceApy string
 		if totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+			log.Infof("##########################utility:%d", utility)
+			log.Infof("##########################total:%d", total)
+			log.Infof("##########################SupplyPortion:%d", wingSBIPortion.SupplyPortion)
+			log.Infof("##########################BorrowPortion:%d", wingSBIPortion.BorrowPortion)
+			log.Infof("##########################InsurancePortion:%d", wingSBIPortion.InsurancePortion)
+			log.Infof("##########################totalPortion:%d", totalPortion)
+
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.SupplyPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
