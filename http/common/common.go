@@ -380,3 +380,16 @@ type PoolWeight struct {
 	TotalStatic    *big.Int
 	TotalDynamic   *big.Int
 }
+
+type DebtAccount struct {
+	Address          string `json:"address"`
+	Debt             string `json:"debt"`
+	DebtIcon         string `json:"debtIcon"`
+	DebtAmount       string `json:"debtAmount"`
+	DebtPrice        string `json:"debtPrice"`
+	Collateral       string `json:"collateral"`
+	CollateralIcon   string `json:"collateralIcon"`
+	CollateralAmount string `json:"collateralAmount"`
+	CollateralPrice  string `json:"collateralPrice"`
+	BorrowTime       uint64 `json:"borrowTime"`
+}

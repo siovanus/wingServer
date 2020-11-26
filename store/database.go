@@ -351,7 +351,7 @@ func (client Client) LoadIFHistoryCount(address, asset, operation string, start,
 	return uint64(size), err
 }
 
-func (client Client) LoadIFBorrowUsersInLimitDay(start, end uint64) ([]IfPoolHistory, error) {
+func (client Client) LoadIFBorrowUsersInLimitDay(start, end int64) ([]IfPoolHistory, error) {
 	IfPoolHistory := make([]IfPoolHistory, 0)
 	db := client.db
 	err := db.Where("operation = 'borrow' AND timestamp>? AND timestamp<=?", start, end).Find(&IfPoolHistory).Error

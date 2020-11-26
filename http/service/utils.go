@@ -1,6 +1,10 @@
 package service
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	gocommon "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology/common"
 	"github.com/siovanus/wingServer/log"
@@ -8,6 +12,7 @@ import (
 	"github.com/siovanus/wingServer/utils"
 	"math/big"
 	"strings"
+	"time"
 )
 
 func (this *Service) trackSnapshotEvent(events []*gocommon.SmartContactEvent) (bool, []string, error) {
@@ -389,8 +394,24 @@ func (this *Service) StoreUserIfOperation(history *store.IfPoolHistory) {
 }
 
 func (this *Service) checkIfDebt() {
-	err := this.ifMgr.CheckIfDebt()
+	now := time.Now().Unix()
+	eightDay := 8 * this.cfg.OneDaySecond
+	nineDay := 9 * this.cfg.OneDaySecond
+	end := now - eightDay
+	start := now - nineDay
+	debtAccounts, err := this.ifMgr.CheckIfDebt(start, end)
 	if err != nil {
 		log.Errorf("checkIfDebt, this.ifMgr.checkIfDebt: %s", err)
 	}
+	reqUrl := fmt.Sprintf(this.cfg.WingBackendUrl, "if-pool/blacklist")
+
+	reqData, err := json.Marshal(debtAccounts)
+	if err != nil {
+		fmt.Errorf("checkIfDebt, json.Marshal error:%s", err)
+	}
+	resp, err := this.httpClient.Post(reqUrl, "application/json", bytes.NewReader(reqData))
+	if err != nil {
+		fmt.Errorf("checkIfDebt, send http post request error:%s", err)
+	}
+	defer resp.Body.Close()
 }

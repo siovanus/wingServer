@@ -31,6 +31,9 @@ type Config struct {
 	TokenDecimal        map[string]uint64 `json:"token_decimal"`
 	ScanInterval        uint64            `json:"scan_interval"`
 	SnapshotInterval    uint64            `json:"snapshot_interval"`
+	OneDaySecond        int64             `json:"one_day_second"`
+	MonitorIfDebt       string            `json:"monitor_if_debt"`
+	WingBackendUrl      string            `json:"wing_backend_url"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

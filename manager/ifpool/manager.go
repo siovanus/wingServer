@@ -350,26 +350,60 @@ func (this *IFPoolManager) IFHistory(address, asset, operation string, start, en
 	}, nil
 }
 
-func (this *IFPoolManager) CheckIfDebt() error {
-	//history, err := this.store.LoadIFBorrowUsersInLimitDay()
-	//if err != nil {
-	//	fmt.Errorf("CheckIfDebt, this.store.LoadIFBorrowUsersInLimitDay error: %s", err)
-	//}
-	//for _, v := range history {
-	//
-	//	amount := utils.ToIntByPrecise(v.Amount, this.cfg.TokenDecimal[v.Token])
-	//	dollar := utils.ToStringByPrecise(new(big.Int).Mul(amount, price), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
-	//	i := &common.IFHistory{
-	//		Name:      v.Token,
-	//		Icon:      this.cfg.IconMap[v.Token],
-	//		Operation: v.Operation,
-	//		Timestamp: v.Timestamp,
-	//		Balance:   v.Amount,
-	//		Dollar:    dollar,
-	//		Address:   v.Address,
-	//	}
-	//}
-	return nil
+func (this *IFPoolManager) CheckIfDebt(start, end int64) ([]*common.DebtAccount, error) {
+	history, err := this.store.LoadIFBorrowUsersInLimitDay(start, end)
+	if err != nil {
+		fmt.Errorf("CheckIfDebt, this.store.LoadIFBorrowUsersInLimitDay error: %s", err)
+	}
+	debtAccounts := make([]*common.DebtAccount, 0)
+	for _, v := range history {
+		marketInfo, err := this.Comptroller.MarketInfo(this.cfg.IFOracleMap[v.Token])
+		if err != nil {
+			log.Errorf("CheckIfDebt, this.Comptroller.MarketInfo error: %s", err)
+		}
+		address := v.Address
+		addr, err := ocommon.AddressFromBase58(address)
+		if err != nil {
+			log.Errorf("CheckIfDebt, ocommon.AddressFromBase58 error: %s", err)
+		}
+		accountSnapshot, err := this.BorrowMap[marketInfo.BorrowPool].AccountSnapshotCurrent(addr)
+		if err != nil {
+			log.Errorf("CheckIfDebt, this.BorrowMap[marketInfo.BorrowPool].AccountSnapshotCurrent error: %s", err)
+		}
+		principal := accountSnapshot.Principal
+		interest := accountSnapshot.Interest
+		debt := new(big.Int).Add(principal, interest)
+		if big.NewInt(0).Cmp(debt) < 0 {
+			// 逾期违约
+			debtPrice, err := this.assetStoredPrice(this.cfg.IFOracleMap[v.Token])
+			if err != nil {
+				log.Errorf("CheckIfDebt, this.AssetStoredPrice error: %s", err)
+			}
+			debtAmount := utils.ToIntByPrecise(v.Amount, this.cfg.TokenDecimal[v.Token])
+			debtDollar := utils.ToStringByPrecise(new(big.Int).Mul(debtAmount, debtPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
+			collateralPrice, err := this.assetStoredPrice(this.cfg.IFOracleMap[v.CollateralToken])
+			if err != nil {
+				log.Errorf("CheckIfDebt, this.AssetStoredPrice error: %s", err)
+			}
+			collateralAmount := utils.ToIntByPrecise(v.CollateralAmount, this.cfg.TokenDecimal[v.CollateralToken])
+			collateralDollar := utils.ToStringByPrecise(new(big.Int).Mul(collateralAmount, collateralPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.CollateralToken])
+
+			i := &common.DebtAccount{
+				Address:          address,
+				Debt:             v.Token,
+				DebtIcon:         this.cfg.IconMap[v.Token],
+				DebtAmount:       v.Amount,
+				DebtPrice:        debtDollar,
+				Collateral:       v.CollateralToken,
+				CollateralIcon:   this.cfg.IconMap[v.CollateralToken],
+				CollateralAmount: v.CollateralAmount,
+				CollateralPrice:  collateralDollar,
+				BorrowTime:       v.Timestamp,
+			}
+			debtAccounts = append(debtAccounts, i)
+		}
+	}
+	return debtAccounts, nil
 }
 
 func (this *IFPoolManager) Reserves() (*common.Reserves, error) {

@@ -4,6 +4,7 @@ import (
 	"github.com/siovanus/wingServer/manager/flashpool"
 	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/siovanus/wingServer/manager/ifpool"
+	"net/http"
 	"os"
 	"time"
 
@@ -23,6 +24,7 @@ type Service struct {
 	store                *store.Client
 	trackHeight          uint32
 	listeningAddressList []string
+	httpClient           *http.Client
 }
 
 func NewService(sdk *sdk.OntologySdk, govMgr *governance.GovernanceManager, fpMgr *flashpool.FlashPoolManager,
@@ -195,12 +197,10 @@ func (this *Service) SnapshotMinute() {
 }
 
 func (this *Service) MonitorAddrDebt() {
-	i := 0
 	c := cron.New()
-	spec := "0 0,40 * * * ?"
+	spec := this.cfg.MonitorIfDebt
 	c.AddFunc(spec, func() {
-		i++
-		log.Infof("++++++++++++++++++++++++++++cron running:%d", i)
+		this.checkIfDebt()
 	})
 	c.Start()
 }
