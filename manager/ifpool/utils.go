@@ -78,6 +78,7 @@ func (this *IFPoolManager) getUtilities() (*hcommon.IfMarketUtility, error) {
 		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
 	}
 	bs, err := res.Result.ToByteArray()
+	log.Infof("++++++++++++++++++++++Result.ToByteArray :%s", common.ToHexString(bs))
 	if err != nil {
 		fmt.Errorf("getUtilities, ToByteArray: %s", err)
 	}
@@ -86,6 +87,8 @@ func (this *IFPoolManager) getUtilities() (*hcommon.IfMarketUtility, error) {
 	if eof {
 		fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
+
+	log.Infof("++++++++++++++++++++++source.NextByte :%d", number)
 	size := int(number)
 	total := new(big.Int)
 	utilityMap := make(map[string]*big.Int)
