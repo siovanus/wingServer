@@ -384,6 +384,13 @@ func (this *Service) constructHistory(addr string, name string, operation string
 func (this *Service) StoreUserIfOperation(history *store.IfPoolHistory) {
 	err := this.ifMgr.StoreUserIfOperation(history)
 	if err != nil {
-		log.Errorf("StoreUserIfOperation, this.fpMgr.StoreUserIfOperation error: %s", err)
+		log.Errorf("StoreUserIfOperation, this.ifMgr.StoreUserIfOperation error: %s", err)
+	}
+}
+
+func (this *Service) checkIfDebt() {
+	err := this.ifMgr.CheckIfDebt()
+	if err != nil {
+		log.Errorf("checkIfDebt, this.ifMgr.checkIfDebt: %s", err)
 	}
 }

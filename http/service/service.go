@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/robfig/cron"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
@@ -191,4 +192,15 @@ func (this *Service) SnapshotMinute() {
 		go this.StoreIFMarketInfo()
 		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
+}
+
+func (this *Service) MonitorAddrDebt() {
+	i := 0
+	c := cron.New()
+	spec := "0 0,40 * * * ?"
+	c.AddFunc(spec, func() {
+		i++
+		log.Infof("++++++++++++++++++++++++++++cron running:%d", i)
+	})
+	c.Start()
 }

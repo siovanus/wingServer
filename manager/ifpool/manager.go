@@ -350,6 +350,28 @@ func (this *IFPoolManager) IFHistory(address, asset, operation string, start, en
 	}, nil
 }
 
+func (this *IFPoolManager) CheckIfDebt() error {
+	//history, err := this.store.LoadIFBorrowUsersInLimitDay()
+	//if err != nil {
+	//	fmt.Errorf("CheckIfDebt, this.store.LoadIFBorrowUsersInLimitDay error: %s", err)
+	//}
+	//for _, v := range history {
+	//
+	//	amount := utils.ToIntByPrecise(v.Amount, this.cfg.TokenDecimal[v.Token])
+	//	dollar := utils.ToStringByPrecise(new(big.Int).Mul(amount, price), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
+	//	i := &common.IFHistory{
+	//		Name:      v.Token,
+	//		Icon:      this.cfg.IconMap[v.Token],
+	//		Operation: v.Operation,
+	//		Timestamp: v.Timestamp,
+	//		Balance:   v.Amount,
+	//		Dollar:    dollar,
+	//		Address:   v.Address,
+	//	}
+	//}
+	return nil
+}
+
 func (this *IFPoolManager) Reserves() (*common.Reserves, error) {
 	allMarket, err := this.Comptroller.AllMarkets()
 	if err != nil {
@@ -625,12 +647,6 @@ func (this *IFPoolManager) WingApyForStore() error {
 		totalValidBorrowDollar := new(big.Int).Mul(totalDebt, price)
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 
-		//totalValidBorrow, err := this.FlashTokenMap[address].TotalValidBorrows()
-		//totalValidBorrowDollar := utils.ToIntByPrecise(utils.ToStringByPrecise(new(big.Int).Mul(totalValidBorrow, price),
-		//	this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.FlashAssetMap[this.AssetMap[address]]]), this.cfg.TokenDecimal["pUSDT"])
-		//if err != nil {
-		//	return fmt.Errorf("IFPoolManager WingApy, this.FlashTokenMap[address].TotalValidBorrows error: %s", err)
-		//}
 		utility, ok := utilityMap[name]
 		log.Infof("##########################name:%s", name)
 		log.Infof("##########################utility:%d", utility)
