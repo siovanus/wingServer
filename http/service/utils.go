@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	gocommon "github.com/ontio/ontology-go-sdk/common"
