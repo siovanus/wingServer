@@ -396,11 +396,11 @@ func (this *Service) checkIfDebt() {
 	now := time.Now().Unix()
 	log.Infof("+++++++++++++++++++++now:%d", now)
 	eightDay := 8 * this.cfg.OneDaySecond
-	log.Infof("+++++++++++++++++++++eightDay:%d", eightDay)
 	nineDay := 9 * this.cfg.OneDaySecond
-	log.Infof("+++++++++++++++++++++nineDay:%d", nineDay)
 	end := now - eightDay
 	start := now - nineDay
+	log.Infof("+++++++++++++++++++++start:%d", start)
+	log.Infof("+++++++++++++++++++++end:%d", end)
 	debtAccounts, err := this.ifMgr.CheckIfDebt(start, end)
 	if err != nil {
 		log.Errorf("checkIfDebt, this.ifMgr.checkIfDebt: %s", err)

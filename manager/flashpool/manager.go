@@ -896,7 +896,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
 		flashStaticPercent = new(big.Int).Div(new(big.Int).Mul(flashStaticWeight, new(big.Int).SetUint64(1000000000)), totalStaticWeight)
 	}
-	log.Infof("flash StaticPercent:%d", flashStaticPercent)
+	//log.Infof("flash StaticPercent:%d", flashStaticPercent)
 
 	poolDynamicMap := poolWeight.PoolDynamicMap
 	flashDynamicWeight := poolDynamicMap[this.Comptroller.GetAddr()]
@@ -907,7 +907,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
 		flashDynamicPercent = new(big.Int).Div(new(big.Int).Mul(flashDynamicWeight, new(big.Int).SetUint64(1000000000)), totalDynamicWeight)
 	}
-	log.Infof("flash DynamicPercent:%d", flashDynamicPercent)
+	//log.Infof("flash DynamicPercent:%d", flashDynamicPercent)
 
 	utilities, err := this.getUtilities()
 	if err != nil {

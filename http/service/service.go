@@ -29,7 +29,15 @@ type Service struct {
 
 func NewService(sdk *sdk.OntologySdk, govMgr *governance.GovernanceManager, fpMgr *flashpool.FlashPoolManager,
 	ifMgr *ifpool.IFPoolManager, store *store.Client, cfg *config.Config) *Service {
-	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, ifMgr: ifMgr, store: store}
+	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, ifMgr: ifMgr, store: store, httpClient: &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   5,
+			DisableKeepAlives:     false, //enable keepalive
+			IdleConnTimeout:       time.Second * 300,
+			ResponseHeaderTimeout: time.Second * 300,
+		},
+		Timeout: time.Second * 300, //timeout for http response
+	}}
 }
 
 func (this *Service) AddListeningAddressList() {
