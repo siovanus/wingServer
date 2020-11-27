@@ -311,7 +311,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		ifPoolInfo.UserIFInfo.TotalBorrowDollar = utils.ToStringByPrecise(totalBorrowDollar, this.cfg.TokenDecimal["pUSDT"])
 		ifPoolInfo.UserIFInfo.BorrowWingEarned = utils.ToStringByPrecise(totalBorrowWingEarned, this.cfg.TokenDecimal["WING"])
 		ifPoolInfo.UserIFInfo.TotalInsuranceDollar = utils.ToStringByPrecise(totalInsuranceDollar, this.cfg.TokenDecimal["pUSDT"])
-		ifPoolInfo.UserIFInfo.InsuranceWingEarned = utils.ToStringByPrecise(totalInsuranceWingEarned, this.cfg.TokenDecimal["pUSDT"])
+		ifPoolInfo.UserIFInfo.InsuranceWingEarned = utils.ToStringByPrecise(totalInsuranceWingEarned, this.cfg.TokenDecimal["WING"])
 	}
 	return ifPoolInfo, nil
 }
