@@ -541,3 +541,32 @@ func (this *Service) IFHistory(param map[string]interface{}) map[string]interfac
 	}
 	return m
 }
+
+func (this *Service) IFLiquidation(param map[string]interface{}) map[string]interface{} {
+	req := &common.IFLiquidationRequest{}
+	resp := &common.Response{}
+	err := utils.ParseParams(req, param)
+	if err != nil {
+		resp.Error = restful.INVALID_PARAMS
+		resp.Desc = err.Error()
+		log.Errorf("IFLiquidation: decode params failed, err: %s", err)
+	} else {
+		debtAccounts, err := this.ifMgr.CheckIfDebt(req.Start, req.End)
+		if err != nil {
+			resp.Error = restful.INTERNAL_ERROR
+			resp.Desc = err.Error()
+			log.Errorf("IFLiquidation error: %s", err)
+		} else {
+			resp.Error = restful.SUCCESS
+			resp.Result = debtAccounts
+			log.Infof("IFLiquidation success")
+		}
+	}
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("IFLiquidation: failed, err: %s", err)
+	} else {
+		log.Debug("IFLiquidation: resp success")
+	}
+	return m
+}

@@ -23,4 +23,5 @@ type Web interface {
 
 	IFPoolInfo(map[string]interface{}) map[string]interface{}
 	IFHistory(map[string]interface{}) map[string]interface{}
+	IFLiquidation(map[string]interface{}) map[string]interface{}
 }

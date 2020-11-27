@@ -395,10 +395,10 @@ func (this *Service) StoreUserIfOperation(history *store.IfPoolHistory) {
 func (this *Service) checkIfDebt() {
 	now := time.Now().Unix()
 	log.Infof("+++++++++++++++++++++now:%d", now)
+	sevenDay := 7 * this.cfg.OneDaySecond
 	eightDay := 8 * this.cfg.OneDaySecond
-	nineDay := 9 * this.cfg.OneDaySecond
-	end := now - eightDay
-	start := now - nineDay
+	start := now - eightDay
+	end := now - sevenDay
 	log.Infof("+++++++++++++++++++++start:%d", start)
 	log.Infof("+++++++++++++++++++++end:%d", end)
 	debtAccounts, err := this.ifMgr.CheckIfDebt(start, end)

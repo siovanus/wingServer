@@ -27,8 +27,9 @@ const (
 	LIQUIDATIONLIST = "/api/v1/liquidationlist"
 	WINGAPYS        = "/api/v1/wingapys"
 
-	IFPOOLINFO = "/api/v1/if/ifpoolinfo"
-	IFHOSTORY  = "/api/v1/if/ifhistory"
+	IFPOOLINFO    = "/api/v1/if/ifpoolinfo"
+	IFHOSTORY     = "/api/v1/if/ifhistory"
+	IFLIQUIDATION = "/api/v1/ifliquidationlist"
 )
 
 const (
@@ -53,8 +54,9 @@ const (
 	ACTION_LIQUIDATIONLIST = "liquidationlist"
 	ACTION_WINGAPYS        = "wingapys"
 
-	ACTION_IFPOOLINFO = "ifpoolinfo"
-	ACTION_IFHISTORY  = "ifhistory"
+	ACTION_IFPOOLINFO    = "ifpoolinfo"
+	ACTION_IFHISTORY     = "ifhistory"
+	ACTION_IFLIQUIDATION = "ifliquidation"
 )
 
 type Response struct {
@@ -362,6 +364,11 @@ type IFHistory struct {
 	Balance   string
 	Dollar    string
 	Address   string
+}
+
+type IFLiquidationRequest struct {
+	Start int64
+	End   int64
 }
 
 type MarketUtility struct {
