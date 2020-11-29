@@ -1,7 +1,7 @@
 {
   "json_rpc_address": "http://polaris2.ont.io:20336",
   "port": 10337,
-  "governance_address": "a38a41063d769f67e3d8deaacc0b10c6264e135a",
+  "governance_address": "7022df7827ecab2e4b55b6fce2ef1e1cd0706a6c",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "caf7d9feb93a320adeb18a1984dea1ae0da1b118",
   "if_pool_address": "0a847a8e69647dd938a9ec518eaab32a3ed5d59e",
