@@ -684,9 +684,10 @@ func (this *IFPoolManager) WingApyForStore() error {
 		utility, ok := utilityMap[name]
 		log.Infof("##########################name:%s", name)
 		log.Infof("##########################utility:%d", utility)
-		var supplyApy, borrowApy, insuranceApy string
+		supplyApy := "0"
+		borrowApy := "0"
+		insuranceApy := "0"
 		if ok && totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
-			log.Infof("##########################utility:%d", utility)
 			log.Infof("##########################total:%d", total)
 			log.Infof("##########################SupplyPortion:%d", wingSBIPortion.SupplyPortion)
 			log.Infof("##########################BorrowPortion:%d", wingSBIPortion.BorrowPortion)
