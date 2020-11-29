@@ -183,17 +183,12 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	totalBorrowWingEarned := new(big.Int)
 	totalInsuranceDollar := new(big.Int)
 	totalInsuranceWingEarned := new(big.Int)
-	var accrued *big.Int
 
 	addr := ocommon.ADDRESS_EMPTY
 	if account != "" {
 		addr, err = ocommon.AddressFromBase58(account)
 		if err != nil {
 			return nil, fmt.Errorf("IFPoolInfo, ocommon.AddressFromBase58 error: %s", err)
-		}
-		accrued, err = this.Comptroller.WingUserAccrued(addr)
-		if err != nil {
-			return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.WingUserAccrued error: %s", err)
 		}
 	}
 
@@ -257,21 +252,18 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			supplyWingEarned = new(big.Int).Sub(supplyWingEarned, accrued)
 			totalSupplyWingEarned = new(big.Int).Add(totalSupplyWingEarned, supplyWingEarned)
 
 			_, borrowWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, true, false, false, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			borrowWingEarned = new(big.Int).Sub(borrowWingEarned, accrued)
 			totalBorrowWingEarned = new(big.Int).Add(totalBorrowWingEarned, borrowWingEarned)
 
 			_, insuranceWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, false, true, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
 			}
-			insuranceWingEarned = new(big.Int).Sub(insuranceWingEarned, accrued)
 			totalInsuranceWingEarned = new(big.Int).Add(totalInsuranceWingEarned, insuranceWingEarned)
 
 			insuranceBalance, err := this.ITokenMap[marketInfo.InsurancePool].BalanceOfUnderlying(addr)
