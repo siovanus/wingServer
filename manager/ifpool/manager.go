@@ -243,7 +243,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			assetName := this.cfg.IFMap[name]
 			supplyBalance, err := this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying(addr)
 			markets := []string{name}
-			_, _, interest, err := this.Comptroller.ClaimAllInterest(addr, markets, true)
+			_, interest, err := this.Comptroller.ClaimAllInterest(addr, markets, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllInterest error: %s", err)
 			}
@@ -292,7 +292,7 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 				SupplyBalance:         utils.ToStringByPrecise(supplyBalance, this.cfg.TokenDecimal[assetName]),
 				SupplyWingEarned:      utils.ToStringByPrecise(supplyWingEarned, this.cfg.TokenDecimal["WING"]),
 				BorrowWingEarned:      utils.ToStringByPrecise(borrowWingEarned, this.cfg.TokenDecimal["WING"]),
-				LastBorrowTimestamp:   accountSnapshot.BorrowTime,
+				LastBorrowTimestamp:   accountSnapshot.BorrowDayNumber,
 				InsuranceBalance:      utils.ToStringByPrecise(insuranceBalance, this.cfg.TokenDecimal[assetName]),
 				InsuranceWingEarned:   utils.ToStringByPrecise(insuranceWingEarned, this.cfg.TokenDecimal["WING"]),
 				CollateralBalance:     utils.ToStringByPrecise(accountSnapshot.Collateral, this.cfg.TokenDecimal[assetName]),
