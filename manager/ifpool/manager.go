@@ -244,8 +244,6 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			supplyBalance, err := this.FTokenMap[marketInfo.SupplyPool].BalanceOfUnderlying(addr)
 			markets := []string{name}
 			base58 := addr.ToBase58()
-			log.Infof("##################name:%s", name)
-			log.Infof("##################base58:%s", base58)
 			_, interest, err := this.Comptroller.ClaimAllInterest(addr, markets, true)
 			if err != nil {
 				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllInterest error: %s", err)
