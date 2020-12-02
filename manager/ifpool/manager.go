@@ -642,6 +642,12 @@ func (this *IFPoolManager) WingApyForStore() error {
 	log.Infof("0.6 times dailyTotal:%d", dailyTotal)
 	dailyTotal = new(big.Int).Div(new(big.Int).Add(new(big.Int).Mul(staticPercent, new(big.Int).Mul(dailyTotal, ifStaticPercent)), new(big.Int).Mul(dynamicPercent, new(big.Int).Mul(dailyTotal, ifDynamicPercent))), new(big.Int).SetUint64(100000000000))
 	log.Infof("if weight dailyTotal:%d", dailyTotal)
+
+	wingPrice, err := this.assetStoredPrice("WING")
+	if err != nil {
+		return fmt.Errorf("IFPoolManager WingApy, this.AssetStoredPrice error: %s", err)
+	}
+
 	allMarkets, err := this.Comptroller.AllMarkets()
 	if err != nil {
 		return fmt.Errorf("IFPoolManager WingApy, this.GetAllMarkets error: %s", err)
@@ -665,10 +671,6 @@ func (this *IFPoolManager) WingApyForStore() error {
 		totalPortion := new(big.Int).Add(new(big.Int).SetUint64(uint64(wingSBIPortion.InsurancePortion)),
 			new(big.Int).Add(new(big.Int).SetUint64(uint64(wingSBIPortion.SupplyPortion)),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.BorrowPortion))))
-		wingPrice, err := this.assetStoredPrice("WING")
-		if err != nil {
-			return fmt.Errorf("IFPoolManager WingApy, this.AssetStoredPrice error: %s", err)
-		}
 
 		price, err := this.assetStoredPrice(name)
 		if err != nil {
@@ -696,21 +698,21 @@ func (this *IFPoolManager) WingApyForStore() error {
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.SupplyPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[this.cfg.IFMap[name]]))))), totalPortion),
-				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]-this.cfg.TokenDecimal["pUSDT"])
 		}
 		if ok && totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.BorrowPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[this.cfg.IFMap[name]]))))), totalPortion),
-				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]-this.cfg.TokenDecimal["pUSDT"])
 		}
 		if ok && totalInsuranceDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.InsurancePortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[this.cfg.IFMap[name]]))))), totalPortion),
-				totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"])
+				totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]-this.cfg.TokenDecimal["pUSDT"])
 		}
 
 		ifMarketInfo.SupplyWingApy = supplyApy
