@@ -275,9 +275,6 @@ func (client Client) SaveIFHistory(history *IfPoolHistory) error {
 
 func (client Client) LoadIFHistory(address, asset, operation string, start, end, pageNo, pageSize uint64) ([]IfPoolHistory, error) {
 	startPage := pageSize * (pageNo - 1)
-	if startPage < 0 {
-		startPage = 0
-	}
 	IfPoolHistory := make([]IfPoolHistory, 0)
 	db := client.db
 	sql := fmt.Sprintf("address = '%s'", address)

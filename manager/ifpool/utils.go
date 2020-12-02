@@ -140,11 +140,11 @@ func (this *IFPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 	for i := 0; i < size; i++ {
 		address, err := source.NextAddress()
 		if err {
-			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
+			fmt.Errorf("getUtilities, source.NextAddress: %t", err)
 		}
 		staticData, err := source.NextI128()
 		if err {
-			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+			fmt.Errorf("getUtilities, source.NextBytes: %t", err)
 		}
 		staticWeight := staticData.ToBigInt()
 		poolStaticMap[address] = staticWeight
@@ -152,7 +152,7 @@ func (this *IFPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 
 		dynamicData, err := source.NextI128()
 		if err {
-			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+			fmt.Errorf("getUtilities, source.NextBytes: %t", err)
 		}
 		dynamicWeight := dynamicData.ToBigInt()
 		poolDynamicMap[address] = dynamicWeight

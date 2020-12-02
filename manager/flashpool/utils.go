@@ -165,20 +165,20 @@ func (this *FlashPoolManager) getUtilities() (*hcommon.MarketUtility, error) {
 	params := []interface{}{}
 	contractAddress, err := common.AddressFromHexString(this.cfg.FlashPoolAddress)
 	if err != nil {
-		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+		return nil, fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
 	}
 	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
 	if err != nil {
-		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+		return nil, fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
 	}
 	bs, err := res.Result.ToByteArray()
 	if err != nil {
-		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+		return nil, fmt.Errorf("getUtilities, ToByteArray: %s", err)
 	}
 	source := common.NewZeroCopySource(bs)
 	number, eof := source.NextByte()
 	if eof {
-		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+		return nil, fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
 	size := int(number)
 	total := new(big.Int)
@@ -186,11 +186,11 @@ func (this *FlashPoolManager) getUtilities() (*hcommon.MarketUtility, error) {
 	for i := 0; i < size; i++ {
 		address, err := source.NextAddress()
 		if err {
-			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
+			return nil, fmt.Errorf("getUtilities, source.NextAddress: %t", err)
 		}
 		data, err := source.NextBytes(32)
 		if err {
-			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+			return nil, fmt.Errorf("getUtilities, source.NextBytes: %t", err)
 		}
 		utility := common.BigIntFromNeoBytes(data)
 		utilityMap[address] = utility
@@ -207,20 +207,20 @@ func (this *FlashPoolManager) getDynamicPercent() (*big.Int, error) {
 	params := []interface{}{}
 	contractAddress, err := common.AddressFromHexString(this.cfg.GovernanceAddress)
 	if err != nil {
-		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+		return nil, fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
 	}
 	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
 	if err != nil {
-		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+		return nil, fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
 	}
 	bs, err := res.Result.ToByteArray()
 	if err != nil {
-		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+		return nil, fmt.Errorf("getUtilities, ToByteArray: %s", err)
 	}
 	source := common.NewZeroCopySource(bs)
 	number, eof := source.NextI128()
 	if eof {
-		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+		return nil, fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
 	return number.ToBigInt(), nil
 }
@@ -230,20 +230,20 @@ func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 	params := []interface{}{}
 	contractAddress, err := common.AddressFromHexString(this.cfg.GovernanceAddress)
 	if err != nil {
-		fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
+		return nil, fmt.Errorf("getUtilities, common.AddressFromHexString: %s", err)
 	}
 	res, err := this.Sdk.WasmVM.PreExecInvokeWasmVMContract(contractAddress, method, params)
 	if err != nil {
-		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
+		return nil, fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
 	}
 	bs, err := res.Result.ToByteArray()
 	if err != nil {
-		fmt.Errorf("getUtilities, ToByteArray: %s", err)
+		return nil, fmt.Errorf("getUtilities, ToByteArray: %s", err)
 	}
 	source := common.NewZeroCopySource(bs)
 	number, eof := source.NextByte()
 	if eof {
-		fmt.Errorf("getUtilities, source.NextByte: %v", err)
+		return nil, fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
 	size := int(number)
 	totalStatic := big.NewInt(0)
@@ -253,11 +253,11 @@ func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 	for i := 0; i < size; i++ {
 		address, err := source.NextAddress()
 		if err {
-			fmt.Errorf("getUtilities, source.NextAddress: %s", err)
+			return nil, fmt.Errorf("getUtilities, source.NextAddress: %s", err)
 		}
 		staticData, err := source.NextI128()
 		if err {
-			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+			return nil, fmt.Errorf("getUtilities, source.NextBytes: %s", err)
 		}
 		staticWeight := staticData.ToBigInt()
 		poolStaticMap[address] = staticWeight
@@ -265,7 +265,7 @@ func (this *FlashPoolManager) getPoolWeight() (*hcommon.PoolWeight, error) {
 
 		dynamicData, err := source.NextI128()
 		if err {
-			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
+			return nil, fmt.Errorf("getUtilities, source.NextBytes: %s", err)
 		}
 		dynamicWeight := dynamicData.ToBigInt()
 		poolDynamicMap[address] = dynamicWeight
