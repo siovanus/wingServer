@@ -193,6 +193,10 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 	}
 
 	for _, name := range allMarket {
+		wingApy, err := this.store.LoadIfWingApy(this.cfg.IFMap[name])
+		if err != nil {
+			return nil, fmt.Errorf("IFPoolInfo, this.store.LoadIfWingApy error: %s", err)
+		}
 		ifMarketInfo, err := this.store.LoadIFMarketInfo(name)
 		if err != nil {
 			return nil, fmt.Errorf("IFPoolInfo, this.store.LoadIFMarketInfo error: %s", err)
@@ -223,16 +227,16 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[ifAsset.Name]))))), totalSupply), this.cfg.TokenDecimal[ifAsset.Name])
 		}
-		ifAsset.SupplyWingAPY = ifMarketInfo.SupplyWingApy
+		ifAsset.SupplyWingAPY = wingApy.SupplyApy
 		ifAsset.TotalBorrowed = utils.ToStringByPrecise(totalDebt, this.cfg.TokenDecimal[ifAsset.Name])
 		// BorrowWingAPY
 		ifAsset.Liquidity = utils.ToStringByPrecise(totalCash, this.cfg.TokenDecimal[ifAsset.Name])
 		ifAsset.BorrowCap = "1000"
-		ifAsset.BorrowWingAPY = ifMarketInfo.BorrowWingApy
+		ifAsset.BorrowWingAPY = wingApy.BorrowApy
 		ifAsset.TotalInsurance = utils.ToStringByPrecise(totalInsurance, this.cfg.TokenDecimal[ifAsset.Name])
 		// InsuranceWingAPY
 		ifPoolInfo.IFAssetList = append(ifPoolInfo.IFAssetList, ifAsset)
-		ifAsset.InsuranceWingAPY = ifMarketInfo.InsuranceWingApy
+		ifAsset.InsuranceWingAPY = wingApy.InsuranceApy
 
 		//user data
 		if account != "" {
@@ -715,11 +719,14 @@ func (this *IFPoolManager) WingApyForStore() error {
 				totalInsuranceDollar), this.cfg.TokenDecimal["WING"])
 		}
 
-		ifMarketInfo.SupplyWingApy = supplyApy
-		ifMarketInfo.BorrowWingApy = borrowApy
-		ifMarketInfo.InsuranceWingApy = insuranceApy
+		ifWingapy := &store.IfWingApy{
+			AssetName:    this.cfg.IFMap[name],
+			SupplyApy:    supplyApy,
+			BorrowApy:    borrowApy,
+			InsuranceApy: insuranceApy,
+		}
 
-		err = this.store.SaveIFMarketInfo(&ifMarketInfo)
+		err = this.store.SaveIfWingApy(ifWingapy)
 		if err != nil {
 			return fmt.Errorf("IFPoolManager WingApy, this.store.SaveWingApy error: %s", err)
 		}

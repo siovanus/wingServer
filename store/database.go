@@ -241,9 +241,6 @@ type IFMarketInfo struct {
 	TotalInsurance   string
 	InterestRate     uint64
 	CollateralFactor uint64
-	SupplyWingApy    string
-	BorrowWingApy    string
-	InsuranceWingApy string
 }
 
 func (client Client) LoadIFMarketInfo(name string) (IFMarketInfo, error) {
@@ -356,4 +353,27 @@ func (client Client) LoadIFBorrowUsersInLimitDay(start, end int64) ([]IfPoolHist
 		log.Errorf("LoadIFHistory, Find error:%s", err)
 	}
 	return IfPoolHistory, err
+}
+
+type IfWingApy struct {
+	AssetName    string `gorm:"primary_key"`
+	SupplyApy    string
+	BorrowApy    string
+	InsuranceApy string
+}
+
+func (client Client) LoadIfWingApys() ([]IfWingApy, error) {
+	ifWingApys := make([]IfWingApy, 0)
+	err := client.db.Find(&ifWingApys).Error
+	return ifWingApys, err
+}
+
+func (client Client) LoadIfWingApy(assetName string) (IfWingApy, error) {
+	var ifWingApy IfWingApy
+	err := client.db.Where(IfWingApy{AssetName: assetName}).Last(&ifWingApy).Error
+	return ifWingApy, err
+}
+
+func (client Client) SaveIfWingApy(ifWingApy *IfWingApy) error {
+	return client.db.Save(ifWingApy).Error
 }

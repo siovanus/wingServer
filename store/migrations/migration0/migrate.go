@@ -65,19 +65,26 @@ type IFMarketInfo struct {
 	TotalInsurance   string
 	InterestRate     uint64
 	CollateralFactor uint64
-	SupplyWingApy    string
-	BorrowWingApy    string
-	InsuranceWingApy string
 }
 
 type IfPoolHistory struct {
-	ID        uint64 `gorm:"primary_key"`
-	Address   string
-	Token     string
-	Operation string
-	Amount    string
-	Timestamp uint64
-	TxHash    string
+	ID               uint64 `gorm:"primary_key"`
+	Address          string
+	Token            string
+	Operation        string
+	Amount           string
+	Timestamp        uint64
+	TxHash           string
+	Remark           string
+	CollateralToken  string
+	CollateralAmount string
+}
+
+type IfWingApy struct {
+	AssetName    string `gorm:"primary_key"`
+	SupplyApy    string
+	BorrowApy    string
+	InsuranceApy string
 }
 
 // Migrate runs the initial migration
@@ -128,6 +135,11 @@ func Migrate(tx *gorm.DB) error {
 	}
 
 	err = tx.AutoMigrate(IfPoolHistory{}).Error
+	if err != nil {
+		return errors.Wrap(err, "failed to auto migrate IfPoolHistory")
+	}
+
+	err = tx.AutoMigrate(IfWingApy{}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to auto migrate IfPoolHistory")
 	}
