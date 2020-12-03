@@ -686,7 +686,6 @@ func (this *IFPoolManager) WingApyForStore() error {
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 		if totalInsuranceDollar.Uint64() == 0 {
 			totalInsuranceDollar = utils.ToIntByPrecise("1", this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.IFMap[name]])
-			totalInsuranceDollar = big.NewInt(1)
 		}
 		utility, ok := utilityMap[name]
 		log.Infof("##########################name:%s", name)
