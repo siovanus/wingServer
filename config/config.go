@@ -31,7 +31,6 @@ type Config struct {
 	TokenDecimal           map[string]uint64 `json:"token_decimal"`
 	ScanInterval           uint64            `json:"scan_interval"`
 	SnapshotInterval       uint64            `json:"snapshot_interval"`
-	OneDaySecond           int64             `json:"one_day_second"`
 	IfAllowedBorrowingDays int64             `json:"if_allowed_borrowing_days"`
 }
 

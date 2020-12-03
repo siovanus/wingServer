@@ -604,7 +604,10 @@ func (this *IFPoolManager) WingApyForStore() error {
 		return fmt.Errorf("IFPoolManager WingApy, this.getPoolWeight error: %s", err)
 	}
 	poolStaticMap := poolWeight.PoolStaticMap
-	ifStaticWeight := poolStaticMap[this.Comptroller.GetAddr()]
+	ifStaticWeight, ok := poolStaticMap[this.Comptroller.GetAddr()]
+	if !ok {
+		return fmt.Errorf("if StaticWeight:%d", ifStaticWeight)
+	}
 	log.Infof("if StaticWeight:%d", ifStaticWeight)
 	totalStaticWeight := poolWeight.TotalStatic
 	log.Infof("if totalStaticWeight:%d", totalStaticWeight)

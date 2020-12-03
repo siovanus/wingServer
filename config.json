@@ -71,6 +71,5 @@
   },
   "scan_interval": 2,
   "snapshot_interval": 30,
-  "one_day_second": 1800,
   "if_allowed_borrowing_days": 3
 }
