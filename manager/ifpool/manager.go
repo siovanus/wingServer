@@ -260,19 +260,19 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			totalSupplyDollar = new(big.Int).Add(totalSupplyDollar, supplyDollar)
 			_, supplyWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, true, false, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalSupplyWingEarned = new(big.Int).Add(totalSupplyWingEarned, supplyWingEarned)
 
 			_, borrowWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, true, false, false, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalBorrowWingEarned = new(big.Int).Add(totalBorrowWingEarned, borrowWingEarned)
 
 			_, insuranceWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, false, true, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, this.Comptroller.ClaimAllWing error: %s", err)
+				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalInsuranceWingEarned = new(big.Int).Add(totalInsuranceWingEarned, insuranceWingEarned)
 
