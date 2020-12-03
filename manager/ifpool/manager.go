@@ -682,9 +682,17 @@ func (this *IFPoolManager) WingApyForStore() error {
 		}
 
 		totalSupplyDollar := new(big.Int).Mul(totalSupply, price)
+		if totalSupplyDollar.Uint64() == 0 {
+			totalSupplyDollar = big.NewInt(1)
+		}
 		totalValidBorrowDollar := new(big.Int).Mul(totalDebt, price)
+		if totalValidBorrowDollar.Uint64() == 0 {
+			totalValidBorrowDollar = big.NewInt(1)
+		}
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
-
+		if totalInsuranceDollar.Uint64() == 0 {
+			totalInsuranceDollar = big.NewInt(1)
+		}
 		utility, ok := utilityMap[name]
 		log.Infof("##########################name:%s", name)
 		log.Infof("##########################utility:%d", utility)
@@ -719,14 +727,14 @@ func (this *IFPoolManager) WingApyForStore() error {
 				totalInsuranceDollar), this.cfg.TokenDecimal["WING"])
 		}
 
-		ifWingapy := &store.IfWingApy{
+		ifWingApy := &store.IfWingApy{
 			AssetName:    this.cfg.IFMap[name],
 			SupplyApy:    supplyApy,
 			BorrowApy:    borrowApy,
 			InsuranceApy: insuranceApy,
 		}
 
-		err = this.store.SaveIfWingApy(ifWingapy)
+		err = this.store.SaveIfWingApy(ifWingApy)
 		if err != nil {
 			return fmt.Errorf("IFPoolManager WingApy, this.store.SaveWingApy error: %s", err)
 		}
