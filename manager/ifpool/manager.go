@@ -682,15 +682,10 @@ func (this *IFPoolManager) WingApyForStore() error {
 		}
 
 		totalSupplyDollar := new(big.Int).Mul(totalSupply, price)
-		if totalSupplyDollar.Uint64() == 0 {
-			totalSupplyDollar = big.NewInt(1)
-		}
 		totalValidBorrowDollar := new(big.Int).Mul(totalDebt, price)
-		if totalValidBorrowDollar.Uint64() == 0 {
-			totalValidBorrowDollar = big.NewInt(1)
-		}
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 		if totalInsuranceDollar.Uint64() == 0 {
+			totalInsuranceDollar = utils.ToIntByPrecise("1", this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.IFMap[name]])
 			totalInsuranceDollar = big.NewInt(1)
 		}
 		utility, ok := utilityMap[name]
