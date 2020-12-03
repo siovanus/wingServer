@@ -72,7 +72,5 @@
   "scan_interval": 2,
   "snapshot_interval": 30,
   "one_day_second": 1800,
-  "if_allowed_borrowing_days": 3,
-  "monitor_if_debt": "0 0,30 * * * ?",
-  "wing_backend_url": "http://172.168.3.245:31734/%s"
+  "if_allowed_borrowing_days": 3
 }

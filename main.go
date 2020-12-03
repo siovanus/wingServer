@@ -135,7 +135,6 @@ func startServer(ctx *cli.Context) {
 	go serv.SnapshotDaily()
 	go serv.SnapshotMinute()
 	go serv.TrackEvent()
-	go serv.MonitorAddrDebt()
 	go restServer.Start()
 	go checkLogFile(logLevel)
 

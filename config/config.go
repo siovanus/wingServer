@@ -33,8 +33,6 @@ type Config struct {
 	SnapshotInterval       uint64            `json:"snapshot_interval"`
 	OneDaySecond           int64             `json:"one_day_second"`
 	IfAllowedBorrowingDays int64             `json:"if_allowed_borrowing_days"`
-	MonitorIfDebt          string            `json:"monitor_if_debt"`
-	WingBackendUrl         string            `json:"wing_backend_url"`
 }
 
 func NewConfig(fileName string) (*Config, error) {

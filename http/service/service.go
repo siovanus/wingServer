@@ -4,12 +4,10 @@ import (
 	"github.com/siovanus/wingServer/manager/flashpool"
 	"github.com/siovanus/wingServer/manager/governance"
 	"github.com/siovanus/wingServer/manager/ifpool"
-	"net/http"
 	"os"
 	"time"
 
 	sdk "github.com/ontio/ontology-go-sdk"
-	"github.com/robfig/cron"
 	"github.com/siovanus/wingServer/config"
 	"github.com/siovanus/wingServer/log"
 	"github.com/siovanus/wingServer/store"
@@ -24,20 +22,11 @@ type Service struct {
 	store                *store.Client
 	trackHeight          uint32
 	listeningAddressList []string
-	httpClient           *http.Client
 }
 
 func NewService(sdk *sdk.OntologySdk, govMgr *governance.GovernanceManager, fpMgr *flashpool.FlashPoolManager,
 	ifMgr *ifpool.IFPoolManager, store *store.Client, cfg *config.Config) *Service {
-	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, ifMgr: ifMgr, store: store, httpClient: &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConnsPerHost:   5,
-			DisableKeepAlives:     false, //enable keepalive
-			IdleConnTimeout:       time.Second * 300,
-			ResponseHeaderTimeout: time.Second * 300,
-		},
-		Timeout: time.Second * 300, //timeout for http response
-	}}
+	return &Service{sdk: sdk, cfg: cfg, govMgr: govMgr, fpMgr: fpMgr, ifMgr: ifMgr, store: store}
 }
 
 func (this *Service) AddListeningAddressList() {
@@ -202,13 +191,4 @@ func (this *Service) SnapshotMinute() {
 		go this.StoreIFMarketInfo()
 		time.Sleep(time.Second * time.Duration(this.cfg.SnapshotInterval))
 	}
-}
-
-func (this *Service) MonitorAddrDebt() {
-	c := cron.New()
-	spec := this.cfg.MonitorIfDebt
-	c.AddFunc(spec, func() {
-		this.checkIfDebt()
-	})
-	c.Start()
 }
