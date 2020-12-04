@@ -715,7 +715,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 		if err != nil {
 			log.Errorf("WingApyForStore, this.BorrowMap[marketInfo.BorrowPool].FormalPrincipal error: %s", err)
 		}
-		log.Infof("##########################name:%s,totalValidBorrow:%d", name, totalValidBorrow)
+		log.Infof("##########################name:%s,totalValidBorrow:%d", name, totalValidBorrow.ToBigInt())
 		totalValidBorrowDollar := new(big.Int).Mul(totalValidBorrow.ToBigInt(), price)
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 		if totalInsuranceDollar.Uint64() == 0 {
