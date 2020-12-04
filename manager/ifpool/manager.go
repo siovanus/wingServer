@@ -358,9 +358,9 @@ func (this *IFPoolManager) CheckIfDebt(start, end int64) ([]*common.DebtAccount,
 		fmt.Errorf("CheckIfDebt, this.store.LoadIFBorrowUsersInLimitDay error: %s", err)
 	}
 	debtAccounts := make([]*common.DebtAccount, 0)
-	collateralAssets := make([]*common.CollateralAsset, 0)
-	totalCollateralDollar := new(big.Int)
 	for _, v := range history {
+		collateralAssets := make([]*common.CollateralAsset, 0)
+		totalCollateralDollar := new(big.Int)
 		marketInfo, err := this.Comptroller.MarketInfo(this.cfg.IFOracleMap[v.Token])
 		if err != nil {
 			log.Errorf("CheckIfDebt, this.Comptroller.MarketInfo error: %s", err)
