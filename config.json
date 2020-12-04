@@ -4,7 +4,7 @@
   "governance_address": "6165f58fe4210629c2788ac49f5db437b56122d6",
   "wing_address": "ff31ec74d01f7b7d45ed2add930f5d2239f7de33",
   "flash_pool_address": "38a24c02a79d22c241f3b93eadcfee3d79f765bc",
-  "if_pool_address": "60b6bcca8a1eb2fc7e34930e436dc3ca78e40a36",
+  "if_pool_address": "f2f91d044acb4b5df299ba2c5f5ef731f8060f65",
   "oracle_address": "22fc643aa439ec713e936a3848976f734a556046",
   "oscore_oracle_address": "0ece89ce4b0eb9657fafb4166fdd417e670fda2a",
   "database_url": "postgresql://postgres:zmh630323@172.168.3.18:5432/wing?sslmode=disable",
@@ -14,7 +14,7 @@
     "prenBTC": "https://app.ont.io/wing/prenBTC.svg",
     "pUSDC": "https://app.ont.io/wing/pUSDC.svg",
     "WING": "https://app.ont.io/wing/wing_icon.svg",
-    "Flash": "https://app.ont.io/wing/flash_icon.svg",
+    "Flash": "https://app.ont.io/wing/flashpool_icon.svg",
     "pETH": "https://app.ont.io/wing/peth.svg",
     "pUSDT": "https://app.ont.io/wing/pusdt.svg",
     "pDAI": "https://app.ont.io/wing/oDAI.svg",
@@ -23,7 +23,7 @@
     "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
     "pUNI": "https://app.ont.io/wing/UNI-ONT.svg",
     "ONG": "https://app.ont.io/wing/ONG_icon.svg",
-    "Inclusive": "https://app.ont.io/wing/flash_icon.svg"
+    "Inclusive": "https://app.ont.io/wing/ifpool_icon.svg"
   },
   "flash_asset_map": {
     "WBTC": "pWBTC",

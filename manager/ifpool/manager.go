@@ -707,7 +707,16 @@ func (this *IFPoolManager) WingApyForStore() error {
 		}
 
 		totalSupplyDollar := new(big.Int).Mul(totalSupply, price)
-		totalValidBorrowDollar := new(big.Int).Mul(totalDebt, price)
+		marketInfo, err := this.Comptroller.MarketInfo(name)
+		if err != nil {
+			log.Errorf("WingApyForStore, this.Comptroller.MarketInfo error: %s", err)
+		}
+		totalValidBorrow, err := this.BorrowMap[marketInfo.BorrowPool].FormalPrincipal()
+		if err != nil {
+			log.Errorf("WingApyForStore, this.BorrowMap[marketInfo.BorrowPool].FormalPrincipal error: %s", err)
+		}
+		log.Infof("##########################name:%s,totalValidBorrow:%d", name, totalValidBorrow)
+		totalValidBorrowDollar := new(big.Int).Mul(totalValidBorrow.ToBigInt(), price)
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 		if totalInsuranceDollar.Uint64() == 0 {
 			totalInsuranceDollar = utils.ToIntByPrecise("1", this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.IFMap[name]])
