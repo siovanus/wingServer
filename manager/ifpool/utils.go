@@ -3,7 +3,6 @@ package ifpool
 import (
 	"fmt"
 	hcommon "github.com/siovanus/wingServer/http/common"
-	"github.com/siovanus/wingServer/log"
 	"math/big"
 
 	"github.com/ontio/ontology/common"
@@ -78,7 +77,6 @@ func (this *IFPoolManager) getUtilities() (*hcommon.IfMarketUtility, error) {
 		fmt.Errorf("getUtilities, PreExecInvokeWasmVMContract: %s", err)
 	}
 	bs, err := res.Result.ToByteArray()
-	log.Infof("++++++++++++++++++++++Result.ToByteArray :%s", common.ToHexString(bs))
 	if err != nil {
 		fmt.Errorf("getUtilities, ToByteArray: %s", err)
 	}
@@ -88,7 +86,6 @@ func (this *IFPoolManager) getUtilities() (*hcommon.IfMarketUtility, error) {
 		fmt.Errorf("getUtilities, source.NextByte: %v", err)
 	}
 
-	log.Infof("++++++++++++++++++++++source.NextByte :%d", number)
 	size := int(number)
 	total := new(big.Int)
 	utilityMap := make(map[string]*big.Int)
@@ -102,7 +99,6 @@ func (this *IFPoolManager) getUtilities() (*hcommon.IfMarketUtility, error) {
 			fmt.Errorf("getUtilities, source.NextBytes: %s", err)
 		}
 		utility := common.BigIntFromNeoBytes(data)
-		log.Infof("____________________________market:%s utility:%d", name, utility)
 		utilityMap[name] = utility
 		total = new(big.Int).Add(total, utility)
 	}

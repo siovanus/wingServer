@@ -22,7 +22,8 @@
     "pNEO": "https://app.ont.io/wing/neo-ont.svg",
     "pOKB": "https://app.ont.io/wing/OKB-ONT.svg",
     "pUNI": "https://app.ont.io/wing/UNI-ONT.svg",
-    "ONG": "https://app.ont.io/wing/ONG_icon.svg"
+    "ONG": "https://app.ont.io/wing/ONG_icon.svg",
+    "Inclusive": "https://app.ont.io/wing/flash_icon.svg"
   },
   "flash_asset_map": {
     "WBTC": "pWBTC",

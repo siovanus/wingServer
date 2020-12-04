@@ -260,19 +260,19 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 			totalSupplyDollar = new(big.Int).Add(totalSupplyDollar, supplyDollar)
 			_, supplyWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, true, false, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
+				return nil, fmt.Errorf("IFPoolInfo, supply, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalSupplyWingEarned = new(big.Int).Add(totalSupplyWingEarned, supplyWingEarned)
 
 			_, borrowWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, true, false, false, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
+				return nil, fmt.Errorf("IFPoolInfo, borrow, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalBorrowWingEarned = new(big.Int).Add(totalBorrowWingEarned, borrowWingEarned)
 
 			_, insuranceWingEarned, err := this.Comptroller.ClaimAllWing([]ocommon.Address{addr}, []string{name}, false, false, true, true)
 			if err != nil {
-				return nil, fmt.Errorf("IFPoolInfo, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
+				return nil, fmt.Errorf("IFPoolInfo, insurance, %s, this.Comptroller.ClaimAllWing error: %s", account, err)
 			}
 			totalInsuranceWingEarned = new(big.Int).Add(totalInsuranceWingEarned, insuranceWingEarned)
 
@@ -358,6 +358,8 @@ func (this *IFPoolManager) CheckIfDebt(start, end int64) ([]*common.DebtAccount,
 		fmt.Errorf("CheckIfDebt, this.store.LoadIFBorrowUsersInLimitDay error: %s", err)
 	}
 	debtAccounts := make([]*common.DebtAccount, 0)
+	collateralAssets := make([]*common.CollateralAsset, 0)
+	totalCollateralDollar := new(big.Int)
 	for _, v := range history {
 		marketInfo, err := this.Comptroller.MarketInfo(this.cfg.IFOracleMap[v.Token])
 		if err != nil {
@@ -377,30 +379,50 @@ func (this *IFPoolManager) CheckIfDebt(start, end int64) ([]*common.DebtAccount,
 		debt := new(big.Int).Add(principal, interest)
 		if big.NewInt(0).Cmp(debt) < 0 {
 			// 逾期违约
+			// 查询抵押品
+			for _, marketName := range this.cfg.IFOracleMap {
+				collateralMarketInfo, err := this.Comptroller.MarketInfo(marketName)
+				if err != nil {
+					log.Errorf("CheckIfDebt, this.Comptroller.MarketInfo error: %s", err)
+				}
+				collateralAccountSnapshot, err := this.BorrowMap[collateralMarketInfo.BorrowPool].AccountSnapshotCurrent(addr)
+				if err != nil {
+					log.Errorf("CheckIfDebt, this.BorrowMap[marketInfo.BorrowPool].AccountSnapshotCurrent error: %s", err)
+				}
+				collateral := collateralAccountSnapshot.Collateral
+				if big.NewInt(0).Cmp(collateral) < 0 {
+					collateralPrice, err := this.assetStoredPrice(marketName)
+					if err != nil {
+						log.Errorf("CheckIfDebt, this.AssetStoredPrice error: %s", err)
+					}
+
+					collateralDollar := utils.ToStringByPrecise(new(big.Int).Mul(collateral, collateralPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.IFMap[marketName]])
+					totalCollateralDollar = new(big.Int).Add(totalCollateralDollar, utils.ToIntByPrecise(collateralDollar, this.cfg.TokenDecimal["oracle"]))
+					collateralAsset := &common.CollateralAsset{
+						Icon:    this.cfg.IconMap[this.cfg.IFMap[marketName]],
+						Name:    this.cfg.IFMap[marketName],
+						Balance: utils.ToStringByPrecise(collateral, this.cfg.TokenDecimal[this.cfg.IFMap[marketName]]),
+						Dollar:  collateralDollar,
+					}
+					collateralAssets = append(collateralAssets, collateralAsset)
+				}
+			}
+
 			debtPrice, err := this.assetStoredPrice(this.cfg.IFOracleMap[v.Token])
 			if err != nil {
 				log.Errorf("CheckIfDebt, this.AssetStoredPrice error: %s", err)
 			}
-			debtAmount := utils.ToIntByPrecise(v.Amount, this.cfg.TokenDecimal[v.Token])
-			debtDollar := utils.ToStringByPrecise(new(big.Int).Mul(debtAmount, debtPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
-			collateralPrice, err := this.assetStoredPrice(this.cfg.IFOracleMap[v.CollateralToken])
-			if err != nil {
-				log.Errorf("CheckIfDebt, this.AssetStoredPrice error: %s", err)
-			}
-			collateralAmount := utils.ToIntByPrecise(v.CollateralAmount, this.cfg.TokenDecimal[v.CollateralToken])
-			collateralDollar := utils.ToStringByPrecise(new(big.Int).Mul(collateralAmount, collateralPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.CollateralToken])
+			debtDollar := utils.ToStringByPrecise(new(big.Int).Mul(debt, debtPrice), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[v.Token])
 
 			i := &common.DebtAccount{
 				Address:          address,
 				Debt:             v.Token,
 				DebtIcon:         this.cfg.IconMap[v.Token],
-				DebtAmount:       v.Amount,
+				DebtAmount:       utils.ToStringByPrecise(debt, this.cfg.TokenDecimal[v.Token]),
 				DebtPrice:        debtDollar,
-				Collateral:       v.CollateralToken,
-				CollateralIcon:   this.cfg.IconMap[v.CollateralToken],
-				CollateralAmount: v.CollateralAmount,
-				CollateralPrice:  collateralDollar,
-				BorrowTime:       v.Timestamp,
+				CollateralDollar: utils.ToStringByPrecise(totalCollateralDollar, this.cfg.TokenDecimal["oracle"]),
+				CollateralAssets: collateralAssets,
+				BorrowTime:       accountSnapshot.BorrowDayNumber,
 			}
 			debtAccounts = append(debtAccounts, i)
 		}
@@ -693,16 +715,11 @@ func (this *IFPoolManager) WingApyForStore() error {
 		utility, ok := utilityMap[name]
 		log.Infof("##########################name:%s", name)
 		log.Infof("##########################utility:%d", utility)
+		log.Infof("##########################total:%d", total)
 		supplyApy := "0"
 		borrowApy := "0"
 		insuranceApy := "0"
 		if ok && totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
-			log.Infof("##########################total:%d", total)
-			log.Infof("##########################SupplyPortion:%d", wingSBIPortion.SupplyPortion)
-			log.Infof("##########################BorrowPortion:%d", wingSBIPortion.BorrowPortion)
-			log.Infof("##########################InsurancePortion:%d", wingSBIPortion.InsurancePortion)
-			log.Infof("##########################totalPortion:%d", totalPortion)
-
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.SupplyPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
