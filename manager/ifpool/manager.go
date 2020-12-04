@@ -717,6 +717,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 		}
 		log.Infof("##########################name:%s,totalValidBorrow:%d", name, totalValidBorrow.ToBigInt())
 		totalValidBorrowDollar := new(big.Int).Mul(totalValidBorrow.ToBigInt(), price)
+		log.Infof("##########################name:%s,totalValidBorrowDollar:%d", name, totalValidBorrowDollar)
 		totalInsuranceDollar := new(big.Int).Mul(totalInsurance, price)
 		if totalInsuranceDollar.Uint64() == 0 {
 			totalInsuranceDollar = utils.ToIntByPrecise("1", this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal[this.cfg.IFMap[name]])
@@ -729,6 +730,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 		borrowApy := "0"
 		insuranceApy := "0"
 		if ok && totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+			log.Infof("##########################SupplyPortion:%d", wingSBIPortion.SupplyPortion)
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.SupplyPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
@@ -736,6 +738,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 				totalSupplyDollar), this.cfg.TokenDecimal["WING"])
 		}
 		if ok && totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+			log.Infof("##########################BorrowPortion:%d", wingSBIPortion.BorrowPortion)
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.BorrowPortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
@@ -743,6 +746,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 				totalValidBorrowDollar), this.cfg.TokenDecimal["WING"])
 		}
 		if ok && totalInsuranceDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+			log.Infof("##########################InsurancePortion:%d", wingSBIPortion.InsurancePortion)
 			insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
 				new(big.Int).SetUint64(uint64(wingSBIPortion.InsurancePortion))), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
