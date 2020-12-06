@@ -729,7 +729,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 		supplyApy := "0"
 		borrowApy := "0"
 		insuranceApy := "0"
-		if ok && totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+		if ok && totalSupplyDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 && utility.Cmp(big.NewInt(1)) != 0 {
 			log.Infof("##########################SupplyPortion:%d", wingSBIPortion.SupplyPortion)
 			supplyApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
@@ -737,7 +737,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[this.cfg.IFMap[name]]))))), totalPortion),
 				totalSupplyDollar), this.cfg.TokenDecimal["WING"])
 		}
-		if ok && totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+		if ok && totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 && utility.Cmp(big.NewInt(1)) != 0 {
 			log.Infof("##########################BorrowPortion:%d", wingSBIPortion.BorrowPortion)
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
@@ -745,7 +745,7 @@ func (this *IFPoolManager) WingApyForStore() error {
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal[this.cfg.IFMap[name]]))))), totalPortion),
 				totalValidBorrowDollar), this.cfg.TokenDecimal["WING"])
 		}
-		if ok && totalInsuranceDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
+		if ok && totalInsuranceDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 && utility.Cmp(big.NewInt(1)) != 0 {
 			log.Infof("##########################InsurancePortion:%d", wingSBIPortion.InsurancePortion)
 			insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailyTotal, utility), total),
