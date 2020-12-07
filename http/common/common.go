@@ -14,6 +14,7 @@ const (
 	RESERVES                    = "/api/v1/reserves"
 	IFRESERVES                  = "/api/v1/ifreserves"
 	FLASHPOOLBANNER             = "/api/v1/flashpoolbanner"
+	IFPOOLBANNER                = "/api/v1/ifpoolbanner"
 
 	FLASHPOOLDETAIL       = "/api/v1/flashpooldetail"
 	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
@@ -41,6 +42,7 @@ const (
 	ACTION_RESERVES                    = "reserves"
 	ACTION_IFRESERVES                  = "ifreserves"
 	ACTION_FLASHPOOLBANNER             = "flashpoolbanner"
+	ACTION_IFPOOLBANNER                = "ifpoolbanner"
 
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
 	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
@@ -113,7 +115,7 @@ type Distribution struct {
 	Total           string
 }
 
-type FlashPoolBanner struct {
+type PoolBanner struct {
 	Today string
 	Share string
 	Total string

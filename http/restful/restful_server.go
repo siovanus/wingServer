@@ -76,6 +76,7 @@ func (this *restServer) registryRestServerAction(web Web) {
 		common.IFRESERVES:                  {name: common.ACTION_IFRESERVES, handler: web.IfReserves},
 		common.FLASHPOOLDETAIL:             {name: common.ACTION_FLASHPOOLDETAIL, handler: web.FlashPoolDetail},
 		common.FLASHPOOLBANNER:             {name: common.ACTION_FLASHPOOLBANNER, handler: web.FlashPoolBanner},
+		common.IFPOOLBANNER:                {name: common.ACTION_IFPOOLBANNER, handler: web.IfPoolBanner},
 		common.FLASHPOOLALLMARKET:          {name: common.ACTION_FLASHPOOLALLMARKET, handler: web.FlashPoolAllMarket},
 		common.BORROWADDRESSLIST:           {name: common.ACTION_BORROWADDRESSLIST, handler: web.BorrowAddressList},
 		common.WINGAPYS:                    {name: common.ACTION_WINGAPYS, handler: web.WingApys},

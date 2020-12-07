@@ -86,14 +86,14 @@ func (this *Service) PoolDistribution(param map[string]interface{}) map[string]i
 
 func (this *Service) IfPoolDistribution(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
-	flashPoolDistribution, err := this.ifMgr.PoolDistribution()
+	ifPoolDistribution, err := this.ifMgr.PoolDistribution()
 	if err != nil {
 		resp.Error = restful.INTERNAL_ERROR
 		resp.Desc = err.Error()
 		log.Errorf("IfPoolDistribution error: %s", err)
 	} else {
 		resp.Error = restful.SUCCESS
-		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{flashPoolDistribution}}
+		resp.Result = &common.PoolDistribution{PoolDistribution: []*common.Distribution{ifPoolDistribution}}
 		log.Infof("IfPoolDistribution success")
 	}
 
@@ -244,6 +244,28 @@ func (this *Service) FlashPoolBanner(param map[string]interface{}) map[string]in
 		log.Errorf("FlashPoolBanner: failed, err: %s", err)
 	} else {
 		log.Debug("FlashPoolBanner: resp success")
+	}
+	return m
+}
+
+func (this *Service) IfPoolBanner(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	ifPoolBanner, err := this.ifMgr.IfPoolBanner()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("ifPoolBanner error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = ifPoolBanner
+		log.Infof("ifPoolBanner success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("ifPoolBanner: failed, err: %s", err)
+	} else {
+		log.Debug("ifPoolBanner: resp success")
 	}
 	return m
 }
