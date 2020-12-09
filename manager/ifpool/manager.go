@@ -243,14 +243,14 @@ func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error
 		totalInsurance := utils.ToIntByPrecise(ifMarketInfo.TotalInsurance, 0)
 		totalSupply := new(big.Int).Add(totalCash, totalDebt)
 		ifAsset.TotalSupply = utils.ToStringByPrecise(totalSupply, this.cfg.TokenDecimal[ifAsset.Name])
-		totalInterest := utils.ToIntByPrecise(ifMarketInfo.TotalInterest, this.cfg.TokenDecimal["percentage"])
+		totalInterest := utils.ToIntByPrecise(ifMarketInfo.TotalInterest, this.cfg.TokenDecimal["apyPercentage"])
 		index := new(big.Int)
 		if totalSupply.Uint64() != 0 {
 			index = new(big.Int).Div(totalInterest, totalSupply)
 		}
 		now := time.Now().UTC().Unix()
 		ifAsset.SupplyInterestPerDay = utils.ToStringByPrecise(new(big.Int).Mul(new(big.Int).Div(index,
-			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["percentage"])
+			new(big.Int).SetInt64(now-GenesisTime)), new(big.Int).SetUint64(governance.DaySecond)), this.cfg.TokenDecimal["apyPercentage"])
 		// supplyWingAPy
 		if totalSupply.Uint64() != 0 {
 			ifAsset.UtilizationRate = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(totalDebt,
