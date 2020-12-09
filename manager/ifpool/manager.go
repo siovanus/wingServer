@@ -22,7 +22,7 @@ import (
 	oscore_oracle "github.com/wing-groups/wing-contract-tools/contracts/oscore-oracle"
 )
 
-var GenesisTime = time.Date(2020, time.December, 9, 0, 0, 0, 0, time.UTC).Unix()
+var GenesisTime = time.Date(2020, time.December, 9, 8, 0, 0, 0, time.UTC).Unix()
 
 const MaxLevel uint64 = 3
 
