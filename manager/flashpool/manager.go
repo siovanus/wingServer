@@ -921,7 +921,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	totalStaticWeight := poolWeight.TotalStatic
 	flashStaticPercent := new(big.Int).SetUint64(0)
 	if totalStaticWeight.Cmp(big.NewInt(0)) != 0 {
-		flashStaticPercent = new(big.Int).Div(new(big.Int).Mul(flashStaticWeight, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), totalStaticWeight)
+		flashStaticPercent = new(big.Int).Div(new(big.Int).Mul(flashStaticWeight, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["apyPercentage"]))))), totalStaticWeight)
 	}
 
 	poolDynamicMap := poolWeight.PoolDynamicMap
@@ -929,7 +929,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 	totalDynamicWeight := poolWeight.TotalDynamic
 	flashDynamicPercent := new(big.Int).SetUint64(0)
 	if totalDynamicWeight.Cmp(big.NewInt(0)) != 0 {
-		flashDynamicPercent = new(big.Int).Div(new(big.Int).Mul(flashDynamicWeight, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["percentage"]))))), totalDynamicWeight)
+		flashDynamicPercent = new(big.Int).Div(new(big.Int).Mul(flashDynamicWeight, new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["apyPercentage"]))))), totalDynamicWeight)
 	}
 
 	utilities, err := this.getUtilities()
@@ -989,14 +989,14 @@ func (this *FlashPoolManager) WingApyForStore() error {
 				new(big.Int).Div(new(big.Int).Mul(dailySB, utility), total),
 				new(big.Int).SetUint64(wingSBIPortion.SupplyPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
-				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["percentage"]+2)
+				totalSupplyDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["apyPercentage"]+2)
 		}
 		if totalValidBorrowDollar.Uint64() != 0 && utility.Cmp(big.NewInt(0)) != 0 {
 			borrowApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(
 				new(big.Int).Div(new(big.Int).Mul(dailySB, utility), total),
 				new(big.Int).SetUint64(wingSBIPortion.BorrowPortion)), wingPrice), new(big.Int).SetUint64(governance.YearDay)),
 				new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))), totalPortion),
-				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["percentage"]+2)
+				totalValidBorrowDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["apyPercentage"]+2)
 		}
 
 		if this.cfg.FlashAssetMap[this.AssetMap[address]] == "WING" {
@@ -1004,7 +1004,7 @@ func (this *FlashPoolManager) WingApyForStore() error {
 			if totalInsuranceDollar.Uint64() != 0 {
 				insuranceApy = utils.ToStringByPrecise(new(big.Int).Div(new(big.Int).Mul(new(big.Int).Mul(new(big.Int).Mul(dailyInsurance, wingPrice),
 					new(big.Int).SetUint64(governance.YearDay)), new(big.Int).SetUint64(uint64(math.Pow10(int(this.cfg.TokenDecimal["pUSDT"]))))),
-					totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["percentage"]+2)
+					totalInsuranceDollar), this.cfg.TokenDecimal["oracle"]+this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["apyPercentage"]+2)
 			}
 		}
 

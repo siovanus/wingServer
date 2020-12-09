@@ -51,7 +51,8 @@
     "pUSDC": "USDC"
   },
   "token_decimal": {
-    "percentage": 12,
+    "percentage": 4,
+    "apyPercentage": 12,
     "ONTd": 9,
     "pUSDC": 6,
     "pUSDT": 6,
