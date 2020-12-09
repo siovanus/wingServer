@@ -160,6 +160,34 @@ func (this *IFPoolManager) StoreUserIfOperation(history *store.IfPoolHistory) er
 	return nil
 }
 
+func (this *IFPoolManager) IfPoolDetail() (*common.IfPoolDetail, error) {
+	allMarket, err := this.Comptroller.AllMarkets()
+	if err != nil {
+		return nil, fmt.Errorf("IfPoolDetail, this.Comptroller.AllMarkets error: %s", err)
+	}
+	totalSupplyDollar := new(big.Int)
+	for _, name := range allMarket {
+		ifMarketInfo, err := this.store.LoadIFMarketInfo(name)
+		if err != nil {
+			return nil, fmt.Errorf("IfPoolDetail, this.store.LoadIFMarketInfo error: %s", err)
+		}
+		price, err := this.assetStoredPrice(name)
+		if err != nil {
+			return nil, fmt.Errorf("IFPoolInfo, this.assetStoredPrice error: %s", err)
+		}
+		totalCash := utils.ToIntByPrecise(ifMarketInfo.TotalCash, 0)
+		totalDebt := utils.ToIntByPrecise(ifMarketInfo.TotalDebt, 0)
+		totalSupply := new(big.Int).Add(totalCash, totalDebt)
+		supplyDollar := new(big.Int).Mul(totalSupply, price)
+		supplyDollar = utils.ToIntByPrecise(utils.ToStringByPrecise(supplyDollar, this.cfg.TokenDecimal[this.cfg.IFMap[name]]), 0)
+		totalSupplyDollar = new(big.Int).Add(totalSupplyDollar, supplyDollar)
+	}
+	ifPoolDetail := &common.IfPoolDetail{
+		TotalSupply: utils.ToStringByPrecise(totalSupplyDollar, this.cfg.TokenDecimal["oracle"]),
+	}
+	return ifPoolDetail, nil
+}
+
 func (this *IFPoolManager) IFPoolInfo(account string) (*common.IFPoolInfo, error) {
 	ifPoolInfo := &common.IFPoolInfo{
 		IFAssetList: make([]*common.IFAsset, 0),

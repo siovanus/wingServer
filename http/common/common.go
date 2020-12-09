@@ -20,6 +20,8 @@ const (
 	FLASHPOOLALLMARKET    = "/api/v1/flashpoolallmarket"
 	USERFLASHPOOLOVERVIEW = "/api/v1/userflashpooloverview"
 
+	IFPOOLDETAIL = "/api/v1/ifpooldetail"
+
 	BORROWADDRESSLIST = "/api/v1/borrowaddresslist"
 
 	ASSETPRICE      = "/api/v1/assetprice"
@@ -47,6 +49,7 @@ const (
 	ACTION_FLASHPOOLDETAIL       = "flashpooldetail"
 	ACTION_FLASHPOOLALLMARKET    = "flashpoolallmarket"
 	ACTION_USERFLASHPOOLOVERVIEW = "userflashpooloverview"
+	ACTION_IFPOOLDETAIL          = "ifpooldetail"
 
 	ACTION_BORROWADDRESSLIST = "borrowaddresslist"
 
@@ -399,4 +402,8 @@ type DebtAccount struct {
 	CollateralDollar string             `json:"collateralDollar"`
 	CollateralAssets []*CollateralAsset `json:"collateralAssets"`
 	BorrowTime       uint64             `json:"borrowTime"`
+}
+
+type IfPoolDetail struct {
+	TotalSupply string
 }

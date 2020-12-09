@@ -292,6 +292,28 @@ func (this *Service) FlashPoolDetail(param map[string]interface{}) map[string]in
 	return m
 }
 
+func (this *Service) IfPoolDetail(param map[string]interface{}) map[string]interface{} {
+	resp := &common.Response{}
+	ifPoolDetail, err := this.ifMgr.IfPoolDetail()
+	if err != nil {
+		resp.Error = restful.INTERNAL_ERROR
+		resp.Desc = err.Error()
+		log.Errorf("IfPoolDetail error: %s", err)
+	} else {
+		resp.Error = restful.SUCCESS
+		resp.Result = ifPoolDetail
+		log.Infof("IfPoolDetail success")
+	}
+
+	m, err := utils.RefactorResp(resp, resp.Error)
+	if err != nil {
+		log.Errorf("FlashPoolDetail: failed, err: %s", err)
+	} else {
+		log.Debug("FlashPoolDetail: resp success")
+	}
+	return m
+}
+
 func (this *Service) FlashPoolAllMarket(param map[string]interface{}) map[string]interface{} {
 	resp := &common.Response{}
 	flashPoolAllMarket, err := this.fpMgr.FlashPoolAllMarket()
