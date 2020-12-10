@@ -249,8 +249,8 @@ func (this *FlashPoolManager) FlashPoolBanner() (*common.PoolBanner, error) {
 	}
 
 	return &common.PoolBanner{
-		Today: utils.ToStringByPrecise(this.dailyDistribution, this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["percentage"]+2),
-		Share: utils.ToStringByPrecise(share, this.cfg.TokenDecimal["percentage"]+2),
+		Today: utils.ToStringByPrecise(this.dailyDistribution, this.cfg.TokenDecimal["WING"]+this.cfg.TokenDecimal["apyPercentage"]+2),
+		Share: utils.ToStringByPrecise(share, this.cfg.TokenDecimal["apyPercentage"]+2),
 		Total: utils.ToStringByPrecise(total, this.cfg.TokenDecimal["WING"]),
 	}, nil
 }
