@@ -377,3 +377,19 @@ func (client Client) LoadIfWingApy(assetName string) (IfWingApy, error) {
 func (client Client) SaveIfWingApy(ifWingApy *IfWingApy) error {
 	return client.db.Save(ifWingApy).Error
 }
+
+type FlashPoolLiquidation struct {
+	ID              uint64 `gorm:"primary_key"`
+	Liquidator      string
+	Borrower        string
+	BorrowToken     string
+	RepayAmount     string
+	LiquidateToken  string
+	LiquidateAmount string
+	Timestamp       uint64
+	TxHash          string
+}
+
+func (client Client) SaveFlashPoolLiquidation(liquidation *FlashPoolLiquidation) error {
+	return client.db.Save(liquidation).Error
+}

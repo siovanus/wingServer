@@ -155,7 +155,7 @@ func (this *IFPoolManager) StoreIFMarketInfo() error {
 func (this *IFPoolManager) StoreUserIfOperation(history *store.IfPoolHistory) error {
 	err := this.store.SaveIFHistory(history)
 	if err != nil {
-		return fmt.Errorf("StoreIFInfo, this.store.SaveIFInfo error: %s", err)
+		return fmt.Errorf("StoreUserIfOperation, this.store.SaveIFHistory error: %s", err)
 	}
 	return nil
 }
